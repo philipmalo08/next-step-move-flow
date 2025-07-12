@@ -1,11 +1,210 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { AddressScreen } from "@/components/AddressScreen";
+import { DateTimeScreen } from "@/components/DateTimeScreen";
+import { ServiceTierScreen } from "@/components/ServiceTierScreen";
+import { ItemsScreen } from "@/components/ItemsScreen";
+import { QuoteScreen } from "@/components/QuoteScreen";
+import { PaymentScreen } from "@/components/PaymentScreen";
+import { ConfirmationScreen } from "@/components/ConfirmationScreen";
+import { StepIndicator } from "@/components/StepIndicator";
+
+interface Address {
+  id: string;
+  address: string;
+  type: 'pickup' | 'dropoff';
+}
+
+interface Item {
+  id: string;
+  name: string;
+  category: string;
+  weight: number;
+  volume: number;
+  quantity: number;
+}
+
+interface ServiceTier {
+  id: string;
+  name: string;
+  price: number;
+  priceUnit: string;
+}
+
+interface QuoteData {
+  baseServiceFee: number;
+  itemCost: number;
+  distanceFee: number;
+  subtotal: number;
+  gst: number;
+  qst: number;
+  total: number;
+}
+
+interface PaymentData {
+  fullName: string;
+  email: string;
+  phone: string;
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+  cardholderName: string;
+  billingAddress: string;
+  billingCity: string;
+  billingPostal: string;
+}
+
+const STEPS = [
+  'Welcome',
+  'Addresses',
+  'Date & Time',
+  'Service Tier',
+  'Items',
+  'Quote',
+  'Payment',
+  'Confirmation'
+];
 
 const Index = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [serviceTier, setServiceTier] = useState<ServiceTier>();
+  const [items, setItems] = useState<Item[]>([]);
+  const [quote, setQuote] = useState<QuoteData>();
+  const [paymentData, setPaymentData] = useState<PaymentData>();
+
+  const handleStart = () => {
+    setCurrentStep(1);
+  };
+
+  const handleAddressNext = (addressData: Address[]) => {
+    setAddresses(addressData);
+    setCurrentStep(2);
+  };
+
+  const handleDateTimeNext = (date: Date, time: string) => {
+    setSelectedDate(date);
+    setSelectedTime(time);
+    setCurrentStep(3);
+  };
+
+  const handleServiceTierNext = (tier: ServiceTier) => {
+    setServiceTier(tier);
+    setCurrentStep(4);
+  };
+
+  const handleItemsNext = (itemData: Item[]) => {
+    setItems(itemData);
+    setCurrentStep(5);
+  };
+
+  const handleQuoteNext = (quoteData: QuoteData) => {
+    setQuote(quoteData);
+    setCurrentStep(6);
+  };
+
+  const handlePaymentNext = (paymentInfo: PaymentData) => {
+    setPaymentData(paymentInfo);
+    setCurrentStep(7);
+  };
+
+  const handleStartNew = () => {
+    setCurrentStep(0);
+    setAddresses([]);
+    setSelectedDate(undefined);
+    setSelectedTime('');
+    setServiceTier(undefined);
+    setItems([]);
+    setQuote(undefined);
+    setPaymentData(undefined);
+  };
+
+  const goBack = () => {
+    setCurrentStep(prev => Math.max(0, prev - 1));
+  };
+
+  // Calculate simulated distance for quote
+  const distance = addresses.length >= 2 ? 12.5 : 0; // km
+
+  if (currentStep === 0) {
+    return <WelcomeScreen onStart={handleStart} />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gradient-background">
+      {/* Progress Indicator */}
+      {currentStep > 0 && currentStep < 7 && (
+        <StepIndicator 
+          currentStep={currentStep - 1} 
+          totalSteps={6} 
+          stepTitles={STEPS.slice(1, 7)} 
+        />
+      )}
+
+      {/* Step Content */}
+      <div className="pb-8">
+        {currentStep === 1 && (
+          <AddressScreen 
+            onNext={handleAddressNext} 
+            onBack={goBack}
+          />
+        )}
+        
+        {currentStep === 2 && (
+          <DateTimeScreen 
+            onNext={handleDateTimeNext} 
+            onBack={goBack}
+          />
+        )}
+        
+        {currentStep === 3 && (
+          <ServiceTierScreen 
+            onNext={handleServiceTierNext} 
+            onBack={goBack}
+          />
+        )}
+        
+        {currentStep === 4 && (
+          <ItemsScreen 
+            onNext={handleItemsNext} 
+            onBack={goBack}
+          />
+        )}
+        
+        {currentStep === 5 && serviceTier && (
+          <QuoteScreen 
+            items={items}
+            serviceTier={serviceTier}
+            distance={distance}
+            onNext={handleQuoteNext} 
+            onBack={goBack}
+          />
+        )}
+        
+        {currentStep === 6 && quote && (
+          <PaymentScreen 
+            quote={quote}
+            onNext={handlePaymentNext} 
+            onBack={goBack}
+          />
+        )}
+        
+        {currentStep === 7 && selectedDate && serviceTier && quote && paymentData && (
+          <ConfirmationScreen 
+            bookingData={{
+              date: selectedDate,
+              time: selectedTime,
+              addresses,
+              serviceTier,
+              items,
+              quote,
+              paymentData
+            }}
+            onStartNew={handleStartNew}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,205 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { CheckCircle, Calendar, Clock, MapPin, Package, Phone, Mail, CreditCard } from "lucide-react";
+
+interface BookingData {
+  date: Date;
+  time: string;
+  addresses: Array<{ address: string; type: 'pickup' | 'dropoff' }>;
+  serviceTier: { name: string; price: number };
+  items: Array<{ name: string; quantity: number; weight: number; volume: number }>;
+  quote: { total: number };
+  paymentData: { fullName: string; email: string; phone: string };
+}
+
+interface ConfirmationScreenProps {
+  bookingData: BookingData;
+  onStartNew: () => void;
+}
+
+const timeSlotLabels = {
+  'morning': 'Morning (8:00 AM - 12:00 PM)',
+  'afternoon': 'Afternoon (12:00 PM - 5:00 PM)',
+  'evening': 'Evening (5:00 PM - 8:00 PM)',
+  'flexible': 'Flexible (Anytime)'
+};
+
+export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScreenProps) {
+  const totalWeight = bookingData.items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
+  const totalVolume = bookingData.items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
+  const totalItems = bookingData.items.reduce((sum, item) => sum + item.quantity, 0);
+  
+  const bookingId = `NM-${Date.now().toString().slice(-6)}`;
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      {/* Success Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-success rounded-full mb-6 animate-fade-in-up">
+          <CheckCircle className="w-10 h-10 text-accent-foreground" />
+        </div>
+        <h1 className="text-4xl font-bold text-foreground mb-4">Booking Confirmed!</h1>
+        <p className="text-xl text-muted-foreground mb-2">
+          Your move has been successfully scheduled
+        </p>
+        <p className="text-lg font-medium text-primary">
+          Booking ID: <span className="font-mono">{bookingId}</span>
+        </p>
+      </div>
+
+      {/* Move Details */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Date & Time */}
+        <Card className="p-6 shadow-soft">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-primary" />
+            Date & Time
+          </h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <span>{bookingData.date.toLocaleDateString('en-CA', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <span>{timeSlotLabels[bookingData.time as keyof typeof timeSlotLabels]}</span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Service Details */}
+        <Card className="p-6 shadow-soft">
+          <h3 className="text-lg font-semibold mb-4">Service Details</h3>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-muted-foreground">Service Tier</p>
+              <p className="font-medium">{bookingData.serviceTier.name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Cost</p>
+              <p className="text-lg font-bold text-primary">${bookingData.quote.total.toFixed(2)}</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Addresses */}
+      <Card className="p-6 shadow-soft">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-primary" />
+          Locations
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium text-accent mb-2">Pickup Location(s)</p>
+            {bookingData.addresses.filter(addr => addr.type === 'pickup').map((addr, index) => (
+              <p key={index} className="text-muted-foreground mb-1">{addr.address}</p>
+            ))}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-primary mb-2">Drop-off Location(s)</p>
+            {bookingData.addresses.filter(addr => addr.type === 'dropoff').map((addr, index) => (
+              <p key={index} className="text-muted-foreground mb-1">{addr.address}</p>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Items Summary */}
+      <Card className="p-6 shadow-soft">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Package className="w-5 h-5 text-primary" />
+          Items Summary
+        </h3>
+        
+        <div className="grid grid-cols-3 gap-4 mb-6 text-center">
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-2xl font-bold text-primary">{totalItems}</p>
+            <p className="text-sm text-muted-foreground">Total Items</p>
+          </div>
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-2xl font-bold text-primary">{totalWeight.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground">lbs</p>
+          </div>
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-2xl font-bold text-primary">{totalVolume.toFixed(1)}</p>
+            <p className="text-sm text-muted-foreground">ft³</p>
+          </div>
+        </div>
+
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          {bookingData.items.map((item, index) => (
+            <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
+              <span className="font-medium">{item.name}</span>
+              <span className="text-muted-foreground">Qty: {item.quantity}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Contact Information */}
+      <Card className="p-6 shadow-soft">
+        <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-muted-foreground" />
+            <span>{bookingData.paymentData.email}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="w-4 h-4 text-muted-foreground" />
+            <span>{bookingData.paymentData.phone}</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* What's Next */}
+      <Card className="p-6 bg-gradient-primary/5 border-primary/20">
+        <h3 className="text-lg font-semibold mb-4">What happens next?</h3>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">1</div>
+            <div>
+              <p className="font-medium">Confirmation Email</p>
+              <p className="text-sm text-muted-foreground">You'll receive a detailed confirmation email within the next few minutes.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">2</div>
+            <div>
+              <p className="font-medium">Team Assignment</p>
+              <p className="text-sm text-muted-foreground">We'll assign your dedicated moving team and send you their contact details.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">3</div>
+            <div>
+              <p className="font-medium">Day Before Reminder</p>
+              <p className="text-sm text-muted-foreground">We'll call you the day before to confirm timing and any last-minute details.</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Actions */}
+      <div className="text-center space-y-4">
+        <p className="text-muted-foreground">
+          Need to make changes? Contact us at <span className="font-medium">1-800-MOVE-NOW</span> or <span className="font-medium">support@nextmovement.com</span>
+        </p>
+        
+        <Button 
+          onClick={onStartNew}
+          variant="outline"
+          size="lg"
+        >
+          Book Another Move
+        </Button>
+      </div>
+    </div>
+  );
+}
