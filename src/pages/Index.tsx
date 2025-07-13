@@ -74,13 +74,15 @@ const Index = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [quote, setQuote] = useState<QuoteData>();
   const [paymentData, setPaymentData] = useState<PaymentData>();
+  const [distance, setDistance] = useState<number>(0);
 
   const handleStart = () => {
     setCurrentStep(1);
   };
 
-  const handleAddressNext = (addressData: Address[]) => {
+  const handleAddressNext = (addressData: Address[], estimatedDistance: number) => {
     setAddresses(addressData);
+    setDistance(estimatedDistance);
     setCurrentStep(2);
   };
 
@@ -125,8 +127,6 @@ const Index = () => {
     setCurrentStep(prev => Math.max(0, prev - 1));
   };
 
-  // Calculate simulated distance for quote
-  const distance = addresses.length >= 2 ? 12.5 : 0; // km
 
   if (currentStep === 0) {
     return <WelcomeScreen onStart={handleStart} />;
@@ -186,6 +186,7 @@ const Index = () => {
         {currentStep === 6 && quote && (
           <PaymentScreen 
             quote={quote}
+            pickupAddress={addresses.find(addr => addr.type === 'pickup')?.address || ''}
             onNext={handlePaymentNext} 
             onBack={goBack}
           />

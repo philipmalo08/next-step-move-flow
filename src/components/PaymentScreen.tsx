@@ -14,6 +14,7 @@ interface PaymentScreenProps {
     gst: number;
     qst: number;
   };
+  pickupAddress: string;
   onNext: (paymentData: PaymentData) => void;
   onBack: () => void;
 }
@@ -31,7 +32,7 @@ interface PaymentData {
   billingPostal: string;
 }
 
-export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
+export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentScreenProps) {
   const [formData, setFormData] = useState<PaymentData>({
     fullName: '',
     email: '',
@@ -47,6 +48,34 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
 
   const [errors, setErrors] = useState<Partial<PaymentData>>({});
   const [sameAsPickup, setSameAsPickup] = useState(false);
+
+  // Auto-fill billing address when "same as pickup" is checked
+  const handleSameAsPickupChange = (checked: boolean) => {
+    setSameAsPickup(checked);
+    if (checked && pickupAddress) {
+      // Extract city and postal from pickup address (basic parsing)
+      const addressParts = pickupAddress.split(',');
+      if (addressParts.length >= 3) {
+        const streetAddress = addressParts[0].trim();
+        const cityPart = addressParts[addressParts.length - 2].trim();
+        const postalPart = addressParts[addressParts.length - 1].trim();
+        
+        setFormData(prev => ({
+          ...prev,
+          billingAddress: streetAddress,
+          billingCity: cityPart,
+          billingPostal: postalPart
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          billingAddress: pickupAddress,
+          billingCity: '',
+          billingPostal: ''
+        }));
+      }
+    }
+  };
 
   const updateField = (field: keyof PaymentData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -233,7 +262,7 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
                   <Checkbox 
                     id="same-as-pickup" 
                     checked={sameAsPickup}
-                    onCheckedChange={(checked) => setSameAsPickup(checked as boolean)}
+                    onCheckedChange={(checked) => handleSameAsPickupChange(checked as boolean)}
                   />
                   <Label htmlFor="same-as-pickup" className="text-sm">Same as pickup address</Label>
                 </div>

@@ -13,7 +13,7 @@ interface Address {
 }
 
 interface AddressScreenProps {
-  onNext: (addresses: Address[]) => void;
+  onNext: (addresses: Address[], distance: number) => void;
   onBack: () => void;
 }
 
@@ -270,7 +270,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                 Back
               </Button>
               <Button 
-                onClick={() => onNext(addresses)}
+                onClick={() => onNext(addresses, distance)}
                 disabled={!canProceed}
                 className="flex-1 bg-primary hover:bg-primary/90"
               >

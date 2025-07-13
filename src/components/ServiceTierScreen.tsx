@@ -52,7 +52,6 @@ const serviceTiers: ServiceTier[] = [
     features: [
       "Everything in Premium",
       "Full packing & unpacking",
-      "Furniture disassembly/reassembly",
       "Setup & arrangement service",
       "Moving bins provided (20 bins that are retrieved at end of move)"
     ],

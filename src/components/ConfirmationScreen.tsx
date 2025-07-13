@@ -41,7 +41,7 @@ export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScre
         </div>
         <h1 className="text-4xl font-bold text-foreground mb-4">Booking Confirmed!</h1>
         <p className="text-xl text-muted-foreground mb-2">
-          Your move has been successfully scheduled
+          Your move has been successfully scheduled. A booking confirmation and receipt will be sent to you by email.
         </p>
         <p className="text-lg font-medium text-primary">
           Booking ID: <span className="font-mono">{bookingId}</span>
@@ -158,33 +158,6 @@ export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScre
         </div>
       </Card>
 
-      {/* What's Next */}
-      <Card className="p-6 bg-gradient-primary/5 border-primary/20">
-        <h3 className="text-lg font-semibold mb-4">What happens next?</h3>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">1</div>
-            <div>
-              <p className="font-medium">Confirmation Email</p>
-              <p className="text-sm text-muted-foreground">You'll receive a detailed confirmation email within the next few minutes.</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">2</div>
-            <div>
-              <p className="font-medium">Team Assignment</p>
-              <p className="text-sm text-muted-foreground">We'll assign your dedicated moving team and send you their contact details.</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">3</div>
-            <div>
-              <p className="font-medium">Day Before Reminder</p>
-              <p className="text-sm text-muted-foreground">We'll call you the day before to confirm timing and any last-minute details.</p>
-            </div>
-          </div>
-        </div>
-      </Card>
 
       {/* Actions */}
       <div className="text-center space-y-4">
