@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   base: "./",
   server: {
     host: "::",
-    port: 8080,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
   },
   plugins: [
     react(),
