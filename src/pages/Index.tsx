@@ -10,6 +10,7 @@ import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
 import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface Address {
   id: string;
@@ -78,6 +79,9 @@ const Index = () => {
   const [paymentData, setPaymentData] = useState<PaymentData>();
   const [distance, setDistance] = useState<number>(0);
   const [deviceUserId, setDeviceUserId] = useState<string | null>(null);
+  
+  // Initialize reCAPTCHA for bot protection
+  useRecaptcha();
 
   // Initialize device-based anonymous authentication
   useEffect(() => {
