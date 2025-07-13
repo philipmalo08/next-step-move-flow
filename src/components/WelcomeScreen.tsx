@@ -74,17 +74,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       
       {/* Copyright Footer */}
       <div className="text-center py-4">
-        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-          <span>© 2021 Next Movement. All rights reserved.</span>
-          <Button 
-            variant="link" 
-            size="sm" 
-            onClick={() => window.location.href = "/admin-login"}
-            className="text-xs h-auto p-0"
-          >
-            Admin
-          </Button>
-        </div>
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
       </div>
     </div>
   );

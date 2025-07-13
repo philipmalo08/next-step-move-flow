@@ -62,7 +62,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   // Load Google Maps
   useEffect(() => {
     const loader = new Loader({
-      apiKey: "AIzaSyC8Qc9vX3K2mP7nF1wR8dH5jL4yN9uT6eI",
+      apiKey: "AIzaSyBQUSNmGK2eAGkDYKiQt-R57giLOlFy-kY",
       version: "weekly",
       libraries: ["places", "geometry"]
     });
