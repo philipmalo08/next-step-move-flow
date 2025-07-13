@@ -10,6 +10,7 @@ import { saveBooking, BookingData } from "@/lib/bookingService";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentScreenProps {
   quote: {
@@ -153,6 +154,27 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
       // Execute reCAPTCHA
       const recaptchaToken = await executeRecaptcha('submit_booking');
       console.log('reCAPTCHA token generated:', recaptchaToken);
+
+      // Verify reCAPTCHA token on server
+      const recaptchaVerification = await supabase.functions.invoke('verify-recaptcha', {
+        body: {
+          token: recaptchaToken,
+          action: 'submit_booking'
+        }
+      });
+
+      if (recaptchaVerification.error || !recaptchaVerification.data?.success) {
+        console.error('reCAPTCHA verification failed:', recaptchaVerification.error || recaptchaVerification.data);
+        toast({
+          title: "Security Verification Failed",
+          description: "Please try again or contact support if the issue persists.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('reCAPTCHA verification successful:', recaptchaVerification.data);
+
       // Get the current authenticated user (should already be signed in anonymously)
       const userId = auth.currentUser?.uid;
       
