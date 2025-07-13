@@ -61,8 +61,14 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
 
   // Load Google Maps
   useEffect(() => {
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error("Google Maps API key not found. Please set VITE_GOOGLE_MAPS_API_KEY environment variable.");
+      return;
+    }
+
     const loader = new Loader({
-      apiKey: "AIzaSyBQUSNmGK2eAGkDYKiQt-R57giLOlFy-kY",
+      apiKey: apiKey,
       version: "weekly",
       libraries: ["places", "geometry"]
     });

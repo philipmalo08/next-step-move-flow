@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
+import { validateEmail, validatePhone, validateCreditCard, validateCVV, validateExpiryDate, sanitizeInput } from "@/utils/validation";
 
 interface PaymentScreenProps {
   quote: {
@@ -115,15 +116,36 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentS
   const validateForm = () => {
     const newErrors: Partial<PaymentData> = {};
 
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
+    // Sanitize inputs
+    const sanitizedData = {
+      ...formData,
+      fullName: sanitizeInput(formData.fullName),
+      email: sanitizeInput(formData.email),
+      cardholderName: sanitizeInput(formData.cardholderName),
+      billingAddress: sanitizeInput(formData.billingAddress),
+      billingCity: sanitizeInput(formData.billingCity)
+    };
+
+    // Basic required field validation
+    if (!sanitizedData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!sanitizedData.email.trim()) newErrors.email = 'Email is required';
+    else if (!validateEmail(sanitizedData.email)) newErrors.email = 'Please enter a valid email address';
+    
+    if (!sanitizedData.phone.trim()) newErrors.phone = 'Phone is required';
+    else if (!validatePhone(sanitizedData.phone)) newErrors.phone = 'Please enter a valid phone number';
+    
     if (!formData.cardNumber.replace(/\s/g, '').trim()) newErrors.cardNumber = 'Card number is required';
+    else if (!validateCreditCard(formData.cardNumber)) newErrors.cardNumber = 'Please enter a valid card number';
+    
     if (!formData.expiryDate.trim()) newErrors.expiryDate = 'Expiry date is required';
+    else if (!validateExpiryDate(formData.expiryDate)) newErrors.expiryDate = 'Please enter a valid expiry date (MM/YY)';
+    
     if (!formData.cvv.trim()) newErrors.cvv = 'CVV is required';
-    if (!formData.cardholderName.trim()) newErrors.cardholderName = 'Cardholder name is required';
-    if (!formData.billingAddress.trim()) newErrors.billingAddress = 'Billing address is required';
-    if (!formData.billingCity.trim()) newErrors.billingCity = 'City is required';
+    else if (!validateCVV(formData.cvv)) newErrors.cvv = 'Please enter a valid CVV';
+    
+    if (!sanitizedData.cardholderName.trim()) newErrors.cardholderName = 'Cardholder name is required';
+    if (!sanitizedData.billingAddress.trim()) newErrors.billingAddress = 'Billing address is required';
+    if (!sanitizedData.billingCity.trim()) newErrors.billingCity = 'City is required';
     if (!formData.billingPostal.trim()) newErrors.billingPostal = 'Postal code is required';
 
     setErrors(newErrors);
