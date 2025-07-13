@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
 import { saveBooking, BookingData } from "@/lib/bookingService";
-import { signInAnonymously } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -148,12 +147,11 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack, bookingDat
     setIsSubmitting(true);
     
     try {
-      // Authenticate user anonymously if not already authenticated
-      let userId = auth.currentUser?.uid;
+      // Get the current authenticated user (should already be signed in anonymously)
+      const userId = auth.currentUser?.uid;
       
       if (!userId) {
-        const userCredential = await signInAnonymously(auth);
-        userId = userCredential.user.uid;
+        throw new Error("User authentication required");
       }
 
       // Prepare complete booking data

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { AddressScreen } from "@/components/AddressScreen";
 import { DateTimeScreen } from "@/components/DateTimeScreen";
@@ -8,6 +8,8 @@ import { QuoteScreen } from "@/components/QuoteScreen";
 import { PaymentScreen } from "@/components/PaymentScreen";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
+import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 interface Address {
   id: string;
@@ -75,6 +77,45 @@ const Index = () => {
   const [quote, setQuote] = useState<QuoteData>();
   const [paymentData, setPaymentData] = useState<PaymentData>();
   const [distance, setDistance] = useState<number>(0);
+  const [deviceUserId, setDeviceUserId] = useState<string | null>(null);
+
+  // Initialize device-based anonymous authentication
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
+    const initializeDeviceAuth = async () => {
+      try {
+        // Listen for auth state changes
+        unsubscribe = onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            // User is already signed in (anonymously)
+            setDeviceUserId(user.uid);
+            console.log("Device UID:", user.uid);
+          } else {
+            // No user signed in, create anonymous user for this device
+            try {
+              const userCredential = await signInAnonymously(auth);
+              setDeviceUserId(userCredential.user.uid);
+              console.log("New device UID created:", userCredential.user.uid);
+            } catch (error) {
+              console.error("Error creating anonymous user:", error);
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Error initializing device auth:", error);
+      }
+    };
+
+    initializeDeviceAuth();
+    
+    // Cleanup function
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   const handleStart = () => {
     setCurrentStep(1);
