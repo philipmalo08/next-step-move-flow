@@ -107,8 +107,12 @@ const Index = () => {
     setCurrentStep(6);
   };
 
-  const handlePaymentNext = (paymentInfo: PaymentData) => {
+  const handlePaymentNext = (paymentInfo: PaymentData, bookingId?: string) => {
     setPaymentData(paymentInfo);
+    // Store booking ID if provided
+    if (bookingId) {
+      console.log("Booking saved with ID:", bookingId);
+    }
     setCurrentStep(7);
   };
 
@@ -183,12 +187,20 @@ const Index = () => {
           />
         )}
         
-        {currentStep === 6 && quote && (
+        {currentStep === 6 && quote && selectedDate && serviceTier && (
           <PaymentScreen 
             quote={quote}
             pickupAddress={addresses.find(addr => addr.type === 'pickup')?.address || ''}
             onNext={handlePaymentNext} 
             onBack={goBack}
+            bookingData={{
+              date: selectedDate,
+              time: selectedTime,
+              addresses,
+              serviceTier,
+              items,
+              quote
+            }}
           />
         )}
         

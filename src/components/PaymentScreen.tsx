@@ -6,17 +6,26 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
+import { saveBooking, BookingData } from "@/lib/bookingService";
+import { signInAnonymously } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
 
 interface PaymentScreenProps {
   quote: {
-    total: number;
+    baseServiceFee: number;
+    itemCost: number;
+    distanceFee: number;
     subtotal: number;
     gst: number;
     qst: number;
+    total: number;
   };
   pickupAddress: string;
-  onNext: (paymentData: PaymentData) => void;
+  onNext: (paymentData: PaymentData, bookingId?: string) => void;
   onBack: () => void;
+  // Full booking data for saving to Firestore
+  bookingData: Omit<BookingData, 'paymentData'>;
 }
 
 interface PaymentData {
@@ -32,7 +41,7 @@ interface PaymentData {
   billingPostal: string;
 }
 
-export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentScreenProps) {
+export function PaymentScreen({ quote, pickupAddress, onNext, onBack, bookingData }: PaymentScreenProps) {
   const [formData, setFormData] = useState<PaymentData>({
     fullName: '',
     email: '',
@@ -48,6 +57,8 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentS
 
   const [errors, setErrors] = useState<Partial<PaymentData>>({});
   const [sameAsPickup, setSameAsPickup] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   // Auto-fill billing address when "same as pickup" is checked
   const handleSameAsPickupChange = (checked: boolean) => {
@@ -130,10 +141,47 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentS
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      onNext(formData);
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    
+    try {
+      // Authenticate user anonymously if not already authenticated
+      let userId = auth.currentUser?.uid;
+      
+      if (!userId) {
+        const userCredential = await signInAnonymously(auth);
+        userId = userCredential.user.uid;
+      }
+
+      // Prepare complete booking data
+      const completeBookingData: BookingData = {
+        ...bookingData,
+        paymentData: formData
+      };
+
+      // Save booking to Firestore
+      const bookingId = await saveBooking(completeBookingData, userId);
+      
+      toast({
+        title: "Booking Confirmed!",
+        description: `Your booking has been saved with ID: ${bookingId}`,
+      });
+
+      // Proceed to confirmation screen
+      onNext(formData, bookingId);
+      
+    } catch (error) {
+      console.error("Error processing booking:", error);
+      toast({
+        title: "Booking Error",
+        description: "There was an issue saving your booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -376,9 +424,10 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentS
             type="submit"
             size="lg"
             className="group"
+            disabled={isSubmitting}
           >
-            Complete Booking
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+            {isSubmitting ? "Processing..." : "Complete Booking"}
+            {!isSubmitting && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />}
           </Button>
         </div>
       </form>
