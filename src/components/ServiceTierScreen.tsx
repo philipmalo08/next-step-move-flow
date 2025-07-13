@@ -18,7 +18,7 @@ const serviceTiers: ServiceTier[] = [
   {
     id: "basic",
     name: "Basic",
-    price: 0.31,
+    price: 0.35,
     priceUnit: "per lb",
     description: "Standard move. Furniture protected with moving blankets. Packing boxes not included.",
     features: [
@@ -32,13 +32,11 @@ const serviceTiers: ServiceTier[] = [
   {
     id: "premium", 
     name: "Premium",
-    price: 0.34,
+    price: 0.38,
     priceUnit: "per lb",
-    description: "Includes packing services for all your small items into boxes, plus standard furniture protection.",
+    description: "Includes furniture disassembly/assembly, plus standard furniture protection.",
     features: [
       "Everything in Basic",
-      "Packing services included",
-      "Moving boxes provided",
       "Enhanced liability coverage",
       "Furniture disassembly/assembly"
     ],
@@ -48,16 +46,15 @@ const serviceTiers: ServiceTier[] = [
   {
     id: "white-glove",
     name: "White Glove",
-    price: 0.37,
+    price: 0.41,
     priceUnit: "per lb",
     description: "Full-service move including disassembly and reassembly of furniture, and packing services.",
     features: [
       "Everything in Premium",
       "Full packing & unpacking",
       "Furniture disassembly/reassembly",
-      "Custom crating for valuables",
       "Setup & arrangement service",
-      "White glove handling"
+      "Moving bins provided (20 bins that are retrieved at end of move)"
     ],
     icon: "👑"
   }

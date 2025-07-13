@@ -13,8 +13,7 @@ interface DateTimeScreenProps {
 const timeSlots = [
   { id: 'morning', label: 'Morning', time: '8:00 AM - 12:00 PM', icon: '🌅' },
   { id: 'afternoon', label: 'Afternoon', time: '12:00 PM - 5:00 PM', icon: '☀️' },
-  { id: 'evening', label: 'Evening', time: '5:00 PM - 8:00 PM', icon: '🌆' },
-  { id: 'flexible', label: 'Flexible', time: 'Anytime (save 10%)', icon: '⚡' }
+  { id: 'evening', label: 'Evening', time: '5:00 PM - 8:00 PM', icon: '🌆' }
 ];
 
 export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
@@ -83,11 +82,6 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{slot.icon}</span>
                       <span className="font-medium">{slot.label}</span>
-                      {slot.id === 'flexible' && (
-                        <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
-                          SAVE 10%
-                        </span>
-                      )}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">{slot.time}</p>
                   </div>

@@ -48,12 +48,12 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
       const totalWeight = items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
       const totalVolume = items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
       
-      // Tier pricing rates
-      const tierRates = {
-        "Basic": 0.31,
-        "Premium": 0.34,
-        "White Glove": 0.37
-      };
+        // Tier pricing rates
+        const tierRates = {
+            "Basic": 0.35,
+            "Premium": 0.38,
+            "White Glove": 0.41
+        };
 
       const baseServiceFee = 50;
       const itemCost = totalWeight * (tierRates[serviceTier.name as keyof typeof tierRates] || 0.31);

@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
 
 interface PaymentScreenProps {
@@ -45,6 +46,7 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
   });
 
   const [errors, setErrors] = useState<Partial<PaymentData>>({});
+  const [sameAsPickup, setSameAsPickup] = useState(false);
 
   const updateField = (field: keyof PaymentData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -225,7 +227,17 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
 
             {/* Billing Address */}
             <Card className="p-6 shadow-soft">
-              <h3 className="text-lg font-semibold mb-4">Billing Address</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Billing Address</h3>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="same-as-pickup" 
+                    checked={sameAsPickup}
+                    onCheckedChange={(checked) => setSameAsPickup(checked as boolean)}
+                  />
+                  <Label htmlFor="same-as-pickup" className="text-sm">Same as pickup address</Label>
+                </div>
+              </div>
               
               <div className="space-y-4">
                 <div>
@@ -234,6 +246,7 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
                     id="billingAddress"
                     value={formData.billingAddress}
                     onChange={(e) => updateField('billingAddress', e.target.value)}
+                    disabled={sameAsPickup}
                     className={errors.billingAddress ? 'border-destructive' : ''}
                   />
                   {errors.billingAddress && <p className="text-xs text-destructive mt-1">{errors.billingAddress}</p>}
@@ -246,6 +259,7 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
                       id="billingCity"
                       value={formData.billingCity}
                       onChange={(e) => updateField('billingCity', e.target.value)}
+                      disabled={sameAsPickup}
                       className={errors.billingCity ? 'border-destructive' : ''}
                     />
                     {errors.billingCity && <p className="text-xs text-destructive mt-1">{errors.billingCity}</p>}
@@ -257,6 +271,7 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
                       id="billingPostal"
                       value={formData.billingPostal}
                       onChange={(e) => updateField('billingPostal', e.target.value.toUpperCase())}
+                      disabled={sameAsPickup}
                       className={errors.billingPostal ? 'border-destructive' : ''}
                     />
                     {errors.billingPostal && <p className="text-xs text-destructive mt-1">{errors.billingPostal}</p>}

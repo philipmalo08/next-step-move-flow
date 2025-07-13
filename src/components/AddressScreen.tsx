@@ -84,7 +84,9 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
     const input = document.getElementById(`address-${addressId}`) as HTMLInputElement;
     if (!input || autocompleteRefs.current[addressId]) return;
 
-    const autocomplete = new window.google.maps.places.Autocomplete(input);
+    const autocomplete = new window.google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: 'ca' } // Limit to Canada only
+    });
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (place.formatted_address) {
