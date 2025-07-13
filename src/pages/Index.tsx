@@ -232,6 +232,7 @@ const Index = () => {
           <PaymentScreen 
             quote={quote}
             pickupAddress={addresses.find(addr => addr.type === 'pickup')?.address || ''}
+            distance={distance}
             onNext={handlePaymentNext} 
             onBack={goBack}
             bookingData={{

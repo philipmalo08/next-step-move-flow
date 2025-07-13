@@ -21,6 +21,7 @@ interface PaymentScreenProps {
     total: number;
   };
   pickupAddress: string;
+  distance: number;
   onNext: (paymentData: PaymentData, bookingId?: string) => void;
   onBack: () => void;
   // Full booking data for saving to Firestore
@@ -40,7 +41,7 @@ interface PaymentData {
   billingPostal: string;
 }
 
-export function PaymentScreen({ quote, pickupAddress, onNext, onBack, bookingData }: PaymentScreenProps) {
+export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, bookingData }: PaymentScreenProps) {
   const [formData, setFormData] = useState<PaymentData>({
     fullName: '',
     email: '',
@@ -161,7 +162,7 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack, bookingDat
       };
 
       // Save booking to Firestore
-      const bookingId = await saveBooking(completeBookingData, userId);
+      const bookingId = await saveBooking(completeBookingData, userId, distance);
       
       toast({
         title: "Booking Confirmed!",

@@ -44,6 +44,17 @@ export interface BookingData {
     billingCity: string;
     billingPostal: string;
   };
+  // Additional fields for storage
+  calculatedDistance?: number;
+  estimatedTotalVolume?: number;
+  estimatedTotalWeight?: number;
+  customItems?: Array<{
+    name: string;
+    category: string;
+    weight: number;
+    volume: number;
+    quantity: number;
+  }>;
 }
 
 export interface StoredBookingData {
@@ -55,15 +66,16 @@ export interface StoredBookingData {
   // Booking details
   bookingDate: Date;
   bookingTime: string;
-  pickupAddress: string;
-  dropoffAddress: string;
+  pickupAddresses: string[];
+  dropoffAddresses: string[];
   
   // Service details
   serviceTier: string;
   servicePrice: number;
   
   // Items (simplified for storage)
-  items: Array<{
+  selectedItems: Record<string, number>; // item name -> quantity
+  customItems: Array<{
     name: string;
     category: string;
     weight: number;
@@ -76,27 +88,60 @@ export interface StoredBookingData {
   gst: number;
   qst: number;
   total: number;
+  finalQuoteAmount: number;
   
-  // Billing information
-  billingAddress: {
-    street: string;
-    city: string;
-    postal: string;
+  // Distance and volume calculations
+  calculatedDistance: string;
+  estimatedTotalWeight: number;
+  estimatedTotalVolume: number;
+  
+  // Payment details summary (no sensitive card info)
+  paymentDetailsSummary: {
+    fullName: string;
+    email: string;
+    phone: string;
+    cardholderName: string;
+    billingAddress: string;
+    last4: string;
   };
   
   // Metadata
-  createdAt: any; // serverTimestamp
+  timestamp: any; // serverTimestamp
   status: 'confirmed' | 'pending' | 'cancelled';
   bookingId: string;
+  userId: string;
 }
 
-export const saveBooking = async (bookingData: BookingData, userId?: string): Promise<string> => {
+export const saveBooking = async (bookingData: BookingData, userId?: string, distance?: number): Promise<string> => {
   try {
     console.log("Starting saveBooking with userId:", userId);
     console.log("Current auth user:", auth.currentUser?.uid);
     
     // Generate a unique booking ID
     const bookingId = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    
+    // Calculate totals
+    const totalWeight = bookingData.items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
+    const totalVolume = bookingData.items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
+    
+    // Create selectedItems map (item name -> quantity)
+    const selectedItems: Record<string, number> = {};
+    bookingData.items.forEach(item => {
+      if (item.category !== 'Custom') {
+        selectedItems[item.name] = item.quantity;
+      }
+    });
+    
+    // Extract custom items
+    const customItems = bookingData.items
+      .filter(item => item.category === 'Custom')
+      .map(item => ({
+        name: item.name,
+        category: item.category,
+        weight: item.weight,
+        volume: item.volume,
+        quantity: item.quantity
+      }));
     
     // Prepare data for storage according to Firestore rules
     const storedBooking: StoredBookingData = {
@@ -108,39 +153,44 @@ export const saveBooking = async (bookingData: BookingData, userId?: string): Pr
       // Booking details
       bookingDate: bookingData.date,
       bookingTime: bookingData.time,
-      pickupAddress: bookingData.addresses.find(addr => addr.type === 'pickup')?.address || '',
-      dropoffAddress: bookingData.addresses.find(addr => addr.type === 'dropoff')?.address || '',
+      pickupAddresses: bookingData.addresses.filter(addr => addr.type === 'pickup').map(addr => addr.address),
+      dropoffAddresses: bookingData.addresses.filter(addr => addr.type === 'dropoff').map(addr => addr.address),
       
       // Service details
       serviceTier: bookingData.serviceTier.name,
       servicePrice: bookingData.serviceTier.price,
       
       // Items
-      items: bookingData.items.map(item => ({
-        name: item.name,
-        category: item.category,
-        weight: item.weight,
-        volume: item.volume,
-        quantity: item.quantity
-      })),
+      selectedItems: selectedItems,
+      customItems: customItems,
       
       // Quote details
       subtotal: bookingData.quote.subtotal,
       gst: bookingData.quote.gst,
       qst: bookingData.quote.qst,
       total: bookingData.quote.total,
+      finalQuoteAmount: bookingData.quote.total,
       
-      // Billing information (without sensitive card details)
-      billingAddress: {
-        street: bookingData.paymentData.billingAddress,
-        city: bookingData.paymentData.billingCity,
-        postal: bookingData.paymentData.billingPostal
+      // Distance and calculations
+      calculatedDistance: (distance || bookingData.calculatedDistance || 0).toString(),
+      estimatedTotalWeight: totalWeight,
+      estimatedTotalVolume: totalVolume,
+      
+      // Payment details summary (without sensitive card details)
+      paymentDetailsSummary: {
+        fullName: bookingData.paymentData.fullName,
+        email: bookingData.paymentData.email,
+        phone: bookingData.paymentData.phone,
+        cardholderName: bookingData.paymentData.cardholderName,
+        billingAddress: bookingData.paymentData.billingAddress,
+        last4: bookingData.paymentData.cardNumber.slice(-4)
       },
       
       // Metadata
-      createdAt: serverTimestamp(),
+      timestamp: serverTimestamp(),
       status: 'confirmed',
-      bookingId: bookingId
+      bookingId: bookingId,
+      userId: userId || ''
     };
 
     // Use the Firestore path according to your rules
