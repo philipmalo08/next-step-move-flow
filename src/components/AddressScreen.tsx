@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { MapPin, Plus, X, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, ArrowRight, Plus, X, MapPin } from "lucide-react";
+import { Loader } from "@googlemaps/js-api-loader";
 
 interface Address {
   id: string;
@@ -16,23 +17,31 @@ interface AddressScreenProps {
   onBack: () => void;
 }
 
-export function AddressScreen({ onNext, onBack }: AddressScreenProps) {
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
+export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const [addresses, setAddresses] = useState<Address[]>([
     { id: '1', address: '', type: 'pickup' },
     { id: '2', address: '', type: 'dropoff' }
   ]);
-
-  const [distance, setDistance] = useState<string>('');
+  const [distance, setDistance] = useState<number>(0);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  
+  const mapRef = useRef<HTMLDivElement>(null);
+  const autocompleteRefs = useRef<{[key: string]: any}>({});
+  const mapInstance = useRef<any>(null);
+  const directionsService = useRef<any>(null);
+  const directionsRenderer = useRef<any>(null);
 
   const updateAddress = (id: string, address: string) => {
     setAddresses(prev => prev.map(addr => 
       addr.id === id ? { ...addr, address } : addr
     ));
-    
-    // Simulate distance calculation
-    if (address && addresses.find(a => a.id !== id && a.address)) {
-      setDistance('12.5 km');
-    }
   };
 
   const addStop = (type: 'pickup' | 'dropoff') => {
@@ -47,134 +56,229 @@ export function AddressScreen({ onNext, onBack }: AddressScreenProps) {
   };
 
   const canProceed = addresses.filter(addr => addr.address.trim()).length >= 2;
-
   const pickupAddresses = addresses.filter(addr => addr.type === 'pickup');
   const dropoffAddresses = addresses.filter(addr => addr.type === 'dropoff');
 
+  // Load Google Maps
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: "AIzaSyBQUSNmGK2eAGkDYKiQt-R57giLOlFy-kY",
+      version: "weekly",
+      libraries: ["places", "geometry"]
+    });
+
+    loader.load().then(() => {
+      setIsMapLoaded(true);
+      
+      // Initialize autocomplete for existing inputs
+      addresses.forEach(addr => {
+        initializeAutocomplete(addr.id);
+      });
+    });
+  }, []);
+
+  // Initialize autocomplete for an input
+  const initializeAutocomplete = (addressId: string) => {
+    if (!isMapLoaded || !window.google) return;
+
+    const input = document.getElementById(`address-${addressId}`) as HTMLInputElement;
+    if (!input || autocompleteRefs.current[addressId]) return;
+
+    const autocomplete = new window.google.maps.places.Autocomplete(input);
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place.formatted_address) {
+        updateAddress(addressId, place.formatted_address);
+      }
+    });
+
+    autocompleteRefs.current[addressId] = autocomplete;
+  };
+
+  // Initialize autocomplete when new addresses are added
+  useEffect(() => {
+    if (isMapLoaded) {
+      addresses.forEach(addr => {
+        if (!autocompleteRefs.current[addr.id]) {
+          setTimeout(() => initializeAutocomplete(addr.id), 100);
+        }
+      });
+    }
+  }, [addresses, isMapLoaded]);
+
+  // Show map and calculate route when both pickup and dropoff are filled
+  useEffect(() => {
+    const validAddresses = addresses.filter(addr => addr.address.trim());
+    const hasPickupAndDropoff = 
+      validAddresses.some(addr => addr.type === 'pickup') && 
+      validAddresses.some(addr => addr.type === 'dropoff');
+
+    if (hasPickupAndDropoff && isMapLoaded && !showMap) {
+      setShowMap(true);
+      setTimeout(initializeMap, 100);
+    } else if (hasPickupAndDropoff && showMap) {
+      calculateRoute();
+    }
+  }, [addresses, isMapLoaded]);
+
+  const initializeMap = () => {
+    if (!mapRef.current || !window.google) return;
+
+    mapInstance.current = new window.google.maps.Map(mapRef.current, {
+      zoom: 10,
+      center: { lat: 45.5017, lng: -73.5673 }, // Montreal default
+    });
+
+    directionsService.current = new window.google.maps.DirectionsService();
+    directionsRenderer.current = new window.google.maps.DirectionsRenderer();
+    directionsRenderer.current.setMap(mapInstance.current);
+
+    calculateRoute();
+  };
+
+  const calculateRoute = () => {
+    if (!directionsService.current || !directionsRenderer.current) return;
+
+    const pickup = addresses.find(addr => addr.type === 'pickup' && addr.address.trim());
+    const dropoff = addresses.find(addr => addr.type === 'dropoff' && addr.address.trim());
+
+    if (!pickup || !dropoff) return;
+
+    const request = {
+      origin: pickup.address,
+      destination: dropoff.address,
+      travelMode: window.google.maps.TravelMode.DRIVING,
+    };
+
+    directionsService.current.route(request, (result: any, status: any) => {
+      if (status === 'OK') {
+        directionsRenderer.current.setDirections(result);
+        const route = result.routes[0];
+        const distanceInMeters = route.legs[0].distance.value;
+        const distanceInKm = distanceInMeters / 1000;
+        setDistance(distanceInKm);
+      }
+    });
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-foreground mb-2">Where are we moving?</h2>
-        <p className="text-muted-foreground">Enter your pickup and drop-off locations</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Pickup Locations */}
-        <Card className="p-6 shadow-soft">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold">Pickup Locations</h3>
-          </div>
-          
-          <div className="space-y-3">
-            {pickupAddresses.map((addr, index) => (
-              <div key={addr.id} className="flex gap-2">
-                <div className="flex-1">
+    <div className="min-h-screen bg-gradient-background px-4 py-4">
+      <div className="max-w-2xl mx-auto">
+        <Card className="shadow-lg">
+          <CardHeader className="text-center pb-3">
+            <CardTitle className="text-xl sm:text-2xl">Where are we moving?</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Pickup Addresses */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-green-600" />
+                <Label className="text-sm font-semibold">Pickup Location{pickupAddresses.length > 1 ? 's' : ''}</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addStop('pickup')}
+                  className="ml-auto h-7 w-7 p-0"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              
+              {pickupAddresses.map((addr, index) => (
+                <div key={addr.id} className="flex gap-2">
                   <Input
-                    placeholder={index === 0 ? "Main pickup address" : "Additional pickup"}
+                    id={`address-${addr.id}`}
+                    placeholder={index === 0 ? "Enter pickup address" : "Additional pickup location"}
                     value={addr.address}
                     onChange={(e) => updateAddress(addr.id, e.target.value)}
-                    className="w-full"
+                    className="text-sm"
                   />
+                  {pickupAddresses.length > 1 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeStop(addr.id)}
+                      className="h-9 w-9 p-0 text-destructive hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
-                {pickupAddresses.length > 1 && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => removeStop(addr.id)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            
-            <Button
-              variant="outline"
-              onClick={() => addStop('pickup')}
-              className="w-full"
-            >
-              <Plus className="w-4 h-4" />
-              Add pickup stop
-            </Button>
-          </div>
-        </Card>
-
-        {/* Drop-off Locations */}
-        <Card className="p-6 shadow-soft">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-success rounded-full flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-accent-foreground" />
+              ))}
             </div>
-            <h3 className="text-lg font-semibold">Drop-off Locations</h3>
-          </div>
-          
-          <div className="space-y-3">
-            {dropoffAddresses.map((addr, index) => (
-              <div key={addr.id} className="flex gap-2">
-                <div className="flex-1">
+
+            {/* Dropoff Addresses */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-red-600" />
+                <Label className="text-sm font-semibold">Dropoff Location{dropoffAddresses.length > 1 ? 's' : ''}</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addStop('dropoff')}
+                  className="ml-auto h-7 w-7 p-0"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              
+              {dropoffAddresses.map((addr, index) => (
+                <div key={addr.id} className="flex gap-2">
                   <Input
-                    placeholder={index === 0 ? "Main drop-off address" : "Additional drop-off"}
+                    id={`address-${addr.id}`}
+                    placeholder={index === 0 ? "Enter dropoff address" : "Additional dropoff location"}
                     value={addr.address}
                     onChange={(e) => updateAddress(addr.id, e.target.value)}
-                    className="w-full"
+                    className="text-sm"
                   />
+                  {dropoffAddresses.length > 1 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeStop(addr.id)}
+                      className="h-9 w-9 p-0 text-destructive hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
-                {dropoffAddresses.length > 1 && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => removeStop(addr.id)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+              ))}
+            </div>
+
+            {/* Map */}
+            {showMap && (
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Route Preview</Label>
+                <div 
+                  ref={mapRef}
+                  className="w-full h-48 rounded-lg border bg-muted"
+                />
+                {distance > 0 && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    Estimated distance: {distance.toFixed(1)} km
+                  </p>
                 )}
               </div>
-            ))}
-            
-            <Button
-              variant="outline"
-              onClick={() => addStop('dropoff')}
-              className="w-full"
-            >
-              <Plus className="w-4 h-4" />
-              Add drop-off stop
-            </Button>
-          </div>
-        </Card>
-      </div>
-
-      {/* Map Placeholder */}
-      <Card className="p-6 shadow-soft">
-        <div className="bg-muted rounded-lg h-64 flex items-center justify-center">
-          <div className="text-center">
-            <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-            <p className="text-muted-foreground">Route will appear here</p>
-            {distance && (
-              <p className="text-sm text-primary font-medium mt-2">
-                Estimated distance: {distance}
-              </p>
             )}
-          </div>
-        </div>
-      </Card>
 
-      {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button 
-          onClick={() => onNext(addresses)}
-          disabled={!canProceed}
-          className="group"
-        >
-          Continue
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-        </Button>
+            {/* Navigation */}
+            <div className="flex gap-3 pt-4">
+              <Button variant="outline" onClick={onBack} className="flex-1">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              <Button 
+                onClick={() => onNext(addresses)}
+                disabled={!canProceed}
+                className="flex-1 bg-primary hover:bg-primary/90"
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-}
+};

@@ -56,19 +56,21 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
 
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
+    const match = v.substring(0, 16);
     const parts = [];
 
     for (let i = 0, len = match.length; i < len; i += 4) {
       parts.push(match.substring(i, i + 4));
     }
 
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return v;
-    }
+    return parts.join(' ').trim();
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    const v = value.replace(/\D/g, '');
+    if (v.length <= 3) return v;
+    if (v.length <= 6) return `(${v.slice(0, 3)}) ${v.slice(3)}`;
+    return `(${v.slice(0, 3)}) ${v.slice(3, 6)}-${v.slice(6, 10)}`;
   };
 
   const formatExpiryDate = (value: string) => {
@@ -105,9 +107,9 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-4 space-y-6">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-foreground mb-2">Payment Details</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Payment Details</h2>
         <p className="text-muted-foreground">Complete your booking with secure payment</p>
       </div>
 
@@ -151,7 +153,8 @@ export function PaymentScreen({ quote, onNext, onBack }: PaymentScreenProps) {
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => updateField('phone', e.target.value)}
+                    onChange={(e) => updateField('phone', formatPhoneNumber(e.target.value))}
+                    placeholder="(123) 456-7890"
                     className={errors.phone ? 'border-destructive' : ''}
                   />
                   {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}

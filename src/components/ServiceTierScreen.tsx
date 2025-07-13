@@ -18,28 +18,28 @@ const serviceTiers: ServiceTier[] = [
   {
     id: "basic",
     name: "Basic",
-    price: 89,
+    price: 0.31,
     priceUnit: "per lb",
-    description: "Essential moving service with professional movers",
+    description: "Standard move. Furniture protected with moving blankets. Packing boxes not included.",
     features: [
       "Professional moving team",
-      "Basic equipment provided", 
+      "Furniture protection with blankets", 
       "Standard liability coverage",
-      "Local moves only"
+      "Loading & unloading"
     ],
     icon: "📦"
   },
   {
     id: "premium", 
     name: "Premium",
-    price: 159,
+    price: 0.34,
     priceUnit: "per lb",
-    description: "Enhanced service with additional protection and flexibility",
+    description: "Includes packing services for all your small items into boxes, plus standard furniture protection.",
     features: [
-      "Experienced moving specialists",
-      "Premium equipment & tools",
+      "Everything in Basic",
+      "Packing services included",
+      "Moving boxes provided",
       "Enhanced liability coverage",
-      "Long-distance moves available",
       "Furniture disassembly/assembly"
     ],
     icon: "⭐",
@@ -48,16 +48,16 @@ const serviceTiers: ServiceTier[] = [
   {
     id: "white-glove",
     name: "White Glove",
-    price: 249,
+    price: 0.37,
     priceUnit: "per lb",
-    description: "Premium full-service experience with maximum care",
+    description: "Full-service move including disassembly and reassembly of furniture, and packing services.",
     features: [
-      "Elite moving professionals",
-      "Specialized equipment",
-      "Full-value protection",
-      "Packing & unpacking service",
+      "Everything in Premium",
+      "Full packing & unpacking",
+      "Furniture disassembly/reassembly",
       "Custom crating for valuables",
-      "Setup & arrangement service"
+      "Setup & arrangement service",
+      "White glove handling"
     ],
     icon: "👑"
   }

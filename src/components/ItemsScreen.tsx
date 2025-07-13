@@ -194,7 +194,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
                 <h3 className="text-lg font-semibold text-primary border-b pb-2">{category}</h3>
                 <div className="space-y-2">
                   {items.map((item) => {
-                    const quantity = getItemQuantity(item);
+                    const quantity = getItemQuantity({...item, category});
                     return (
                       <div key={item.name} className="flex items-center justify-between p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
@@ -205,7 +205,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateQuantity(item, -1)}
+                            onClick={() => updateQuantity({...item, category}, -1)}
                             disabled={quantity === 0}
                             className="h-8 w-8 p-0"
                           >
@@ -215,7 +215,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateQuantity(item, 1)}
+                            onClick={() => updateQuantity({...item, category}, 1)}
                             className="h-8 w-8 p-0"
                           >
                             <Plus className="h-4 w-4" />

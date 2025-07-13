@@ -18,9 +18,9 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
               className={cn(
                 "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
                 index < currentStep
-                  ? "bg-gradient-primary border-primary text-primary-foreground"
+                  ? "bg-primary border-primary text-primary-foreground"
                   : index === currentStep
-                  ? "bg-primary border-primary text-primary-foreground animate-pulse"
+                  ? "bg-primary border-primary text-primary-foreground"
                   : "bg-background border-muted text-muted-foreground"
               )}
             >
@@ -47,7 +47,7 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
                 <div
                   className={cn(
                     "h-full transition-all duration-500",
-                    index < currentStep ? "bg-gradient-primary" : "bg-muted"
+                    index < currentStep ? "bg-primary" : "bg-muted"
                   )}
                   style={{ width: "calc(100% - 5rem)" }}
                 />
@@ -61,7 +61,7 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
       <div className="mt-4 md:hidden">
         <div className="w-full bg-muted rounded-full h-2">
           <div
-            className="bg-gradient-primary h-2 rounded-full transition-all duration-500"
+            className="bg-primary h-2 rounded-full transition-all duration-500"
             style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
           />
         </div>

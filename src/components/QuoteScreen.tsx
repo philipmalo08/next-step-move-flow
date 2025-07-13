@@ -57,7 +57,7 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
 
       const baseServiceFee = 50;
       const itemCost = totalWeight * (tierRates[serviceTier.name as keyof typeof tierRates] || 0.31);
-      const distanceFee = distance * 1.50;
+      const distanceFee = distance * 2.64;
       const subtotal = baseServiceFee + itemCost + distanceFee;
       const gst = subtotal * 0.05; // 5% GST
       const qst = subtotal * 0.09975; // 9.975% QST
@@ -134,7 +134,7 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
             </div>
             
             <div className="flex justify-between">
-              <span>Distance Fee ({distance.toFixed(1)} km × $1.50)</span>
+              <span>Distance Fee ({distance.toFixed(1)} km)</span>
               <span>${quote.distanceFee.toFixed(2)}</span>
             </div>
             
