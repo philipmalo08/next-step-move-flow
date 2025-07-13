@@ -1,5 +1,5 @@
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
 
 export interface BookingData {
   date: Date;
@@ -92,6 +92,9 @@ export interface StoredBookingData {
 
 export const saveBooking = async (bookingData: BookingData, userId?: string): Promise<string> => {
   try {
+    console.log("Starting saveBooking with userId:", userId);
+    console.log("Current auth user:", auth.currentUser?.uid);
+    
     // Generate a unique booking ID
     const bookingId = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
     
