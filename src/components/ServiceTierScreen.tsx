@@ -48,12 +48,12 @@ const serviceTiers: ServiceTier[] = [
     name: "White Glove",
     price: 0.41,
     priceUnit: "per lb",
-    description: "Full-service move including disassembly and reassembly of furniture, and packing services.",
+    description: "Full-service move including disassembly/reassembly of furniture, and packing services with eco-friendly reusable bins for your small items.",
     features: [
       "Everything in Premium",
       "Full packing & unpacking",
       "Setup & arrangement service",
-      "Moving bins provided (20 bins that are retrieved at end of move)"
+      "20 moving bins provided that are retrieved at the end of the move"
     ],
     icon: "👑"
   }
@@ -158,6 +158,11 @@ export const ServiceTierScreen = ({ onNext, onBack }: ServiceTierScreenProps) =>
             </div>
           </CardContent>
         </Card>
+        
+        {/* Copyright Footer */}
+        <div className="text-center py-4">
+          <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+        </div>
       </div>
     </div>
   );

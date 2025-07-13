@@ -255,6 +255,11 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
           </Button>
         </div>
       </div>
+      
+      {/* Copyright Footer */}
+      <div className="text-center py-4">
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+      </div>
     </div>
   );
 }

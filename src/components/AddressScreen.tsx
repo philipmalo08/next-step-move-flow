@@ -280,6 +280,11 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Copyright Footer */}
+        <div className="text-center py-4">
+          <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+        </div>
       </div>
     </div>
   );

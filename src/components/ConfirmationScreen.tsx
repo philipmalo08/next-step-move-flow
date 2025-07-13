@@ -173,6 +173,11 @@ export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScre
           Book Another Move
         </Button>
       </div>
+      
+      {/* Copyright Footer */}
+      <div className="text-center py-4">
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+      </div>
     </div>
   );
 }

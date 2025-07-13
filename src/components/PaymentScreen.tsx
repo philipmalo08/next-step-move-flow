@@ -200,6 +200,24 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentS
                 Payment Information
               </h3>
               
+              {/* Credit Card Logos */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>We accept:</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-5 bg-gradient-to-r from-blue-600 to-blue-400 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">VISA</span>
+                  </div>
+                  <div className="w-8 h-5 bg-gradient-to-r from-red-600 to-orange-400 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">MC</span>
+                  </div>
+                  <div className="w-8 h-5 bg-gradient-to-r from-blue-500 to-green-500 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">AMEX</span>
+                  </div>
+                </div>
+              </div>
+              
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="cardNumber">Card Number *</Label>
@@ -364,6 +382,11 @@ export function PaymentScreen({ quote, pickupAddress, onNext, onBack }: PaymentS
           </Button>
         </div>
       </form>
+      
+      {/* Copyright Footer */}
+      <div className="text-center py-4">
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+      </div>
     </div>
   );
 }

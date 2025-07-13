@@ -37,7 +37,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <Truck className="w-6 h-6 text-accent-foreground" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Professional Service</h3>
-            <p className="text-muted-foreground">Trained movers with full insurance coverage</p>
+            <p className="text-muted-foreground">Expert movers with 7 years of experience in the industry</p>
           </div>
           
           <div className="bg-card rounded-lg p-4 shadow-soft hover:shadow-medium transition-all duration-300">
@@ -68,6 +68,11 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           <div className="text-sm">1000+ Happy Customers</div>
           <div className="text-sm">Fully Insured</div>
         </div>
+      </div>
+      
+      {/* Copyright Footer */}
+      <div className="text-center py-4">
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
       </div>
     </div>
   );

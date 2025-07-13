@@ -361,6 +361,11 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Copyright Footer */}
+      <div className="text-center py-4">
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+      </div>
     </div>
   );
 };

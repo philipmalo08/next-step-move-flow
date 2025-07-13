@@ -131,6 +131,11 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
         </Button>
       </div>
+      
+      {/* Copyright Footer */}
+      <div className="text-center py-4">
+        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+      </div>
     </div>
   );
 }
