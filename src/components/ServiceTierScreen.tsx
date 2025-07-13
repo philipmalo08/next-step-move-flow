@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Check, Star, Crown, Shield, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Check, ArrowLeft, ArrowRight } from "lucide-react";
 
 interface ServiceTier {
   id: string;
@@ -11,66 +10,75 @@ interface ServiceTier {
   priceUnit: string;
   description: string;
   features: string[];
-  icon: React.ElementType;
+  icon: string;
   popular?: boolean;
 }
 
 const serviceTiers: ServiceTier[] = [
   {
-    id: 'basic',
-    name: 'Basic',
-    price: 2.50,
-    priceUnit: 'per lb',
-    description: 'Essential moving service with professional movers',
+    id: "basic",
+    name: "Basic",
+    price: 89,
+    priceUnit: "per lb",
+    description: "Essential moving service with professional movers",
     features: [
-      'Professional movers',
-      'Basic insurance coverage',
-      'Loading & unloading',
-      'Transportation included'
+      "Professional moving team",
+      "Basic equipment provided", 
+      "Standard liability coverage",
+      "Local moves only"
     ],
-    icon: Shield
+    icon: "📦"
   },
   {
-    id: 'premium',
-    name: 'Premium',
-    price: 3.25,
-    priceUnit: 'per lb',
-    description: 'Enhanced service with additional protection',
+    id: "premium", 
+    name: "Premium",
+    price: 159,
+    priceUnit: "per lb",
+    description: "Enhanced service with additional protection and flexibility",
     features: [
-      'Everything in Basic',
-      'Furniture padding',
-      'Full insurance coverage',
-      'Disassembly & reassembly',
-      'Priority scheduling'
+      "Experienced moving specialists",
+      "Premium equipment & tools",
+      "Enhanced liability coverage",
+      "Long-distance moves available",
+      "Furniture disassembly/assembly"
     ],
-    icon: Star,
+    icon: "⭐",
     popular: true
   },
   {
-    id: 'white-glove',
-    name: 'White Glove',
-    price: 4.50,
-    priceUnit: 'per lb',
-    description: 'Premium service with complete care',
+    id: "white-glove",
+    name: "White Glove",
+    price: 249,
+    priceUnit: "per lb",
+    description: "Premium full-service experience with maximum care",
     features: [
-      'Everything in Premium',
-      'Packing & unpacking',
-      'Premium insurance',
-      'Specialty item handling',
-      'Setup at new location',
-      'Dedicated team lead'
+      "Elite moving professionals",
+      "Specialized equipment",
+      "Full-value protection",
+      "Packing & unpacking service",
+      "Custom crating for valuables",
+      "Setup & arrangement service"
     ],
-    icon: Crown
+    icon: "👑"
   }
 ];
+
+const getTierColor = (tierId: string) => {
+  switch (tierId) {
+    case "basic": return "text-blue-600 border-blue-200 bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:bg-blue-950";
+    case "premium": return "text-orange-600 border-orange-200 bg-orange-50 dark:text-orange-400 dark:border-orange-800 dark:bg-orange-950";
+    case "white-glove": return "text-purple-600 border-purple-200 bg-purple-50 dark:text-purple-400 dark:border-purple-800 dark:bg-purple-950";
+    default: return "";
+  }
+};
 
 interface ServiceTierScreenProps {
   onNext: (tier: ServiceTier) => void;
   onBack: () => void;
 }
 
-export function ServiceTierScreen({ onNext, onBack }: ServiceTierScreenProps) {
-  const [selectedTier, setSelectedTier] = useState<string>('premium');
+export const ServiceTierScreen = ({ onNext, onBack }: ServiceTierScreenProps) => {
+  const [selectedTier, setSelectedTier] = useState<string>('');
 
   const handleNext = () => {
     const tier = serviceTiers.find(t => t.id === selectedTier);
@@ -80,106 +88,81 @@ export function ServiceTierScreen({ onNext, onBack }: ServiceTierScreenProps) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-foreground mb-2">Choose your service level</h2>
-        <p className="text-muted-foreground">Select the service tier that best fits your needs</p>
-      </div>
+    <div className="min-h-screen bg-gradient-background px-4 py-6">
+      <div className="max-w-4xl mx-auto">
+        <Card className="shadow-lg">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-xl sm:text-2xl">Choose Your Service Level</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              {serviceTiers.map((tier) => (
+                <Card
+                  key={tier.id}
+                  className={`cursor-pointer transition-all hover:shadow-lg ${
+                    selectedTier === tier.id 
+                      ? 'ring-2 ring-primary border-primary shadow-lg' 
+                      : 'hover:border-primary/50'
+                  } ${tier.popular ? 'relative overflow-hidden' : ''} ${getTierColor(tier.id)}`}
+                  onClick={() => setSelectedTier(tier.id)}
+                >
+                  {tier.popular && (
+                    <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-xs font-medium">
+                      Popular
+                    </div>
+                  )}
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="text-center mb-4">
+                      <div className="text-2xl sm:text-3xl mb-2">{tier.icon}</div>
+                      <h3 className="text-lg sm:text-xl font-bold">{tier.name}</h3>
+                    </div>
+                    <p className="text-muted-foreground text-center mb-4 text-sm">{tier.description}</p>
+                    <ul className="space-y-2">
+                      {tier.features.map((feature, index) => (
+                        <li key={index} className="flex items-start text-xs sm:text-sm">
+                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {serviceTiers.map((tier) => {
-          const IconComponent = tier.icon;
-          const isSelected = selectedTier === tier.id;
-          
-          return (
-            <Card
-              key={tier.id}
-              className={cn(
-                "relative p-6 cursor-pointer transition-all duration-300 hover:shadow-medium",
-                isSelected 
-                  ? "border-primary shadow-glow bg-primary/5" 
-                  : "border-border hover:border-primary/50",
-                tier.popular && "border-accent"
-              )}
-              onClick={() => setSelectedTier(tier.id)}
-            >
-              {tier.popular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-gradient-success text-accent-foreground px-3 py-1 rounded-full text-xs font-medium">
-                    MOST POPULAR
-                  </span>
-                </div>
-              )}
-
-              <div className="text-center mb-6">
-                <div className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3",
-                  isSelected ? "bg-gradient-primary" : "bg-muted"
-                )}>
-                  <IconComponent className={cn(
-                    "w-6 h-6",
-                    isSelected ? "text-primary-foreground" : "text-muted-foreground"
-                  )} />
-                </div>
-                
-                <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
-                <div className="mb-2">
-                  <span className="text-3xl font-bold text-primary">${tier.price}</span>
-                  <span className="text-muted-foreground ml-1">{tier.priceUnit}</span>
-                </div>
-                <p className="text-sm text-muted-foreground">{tier.description}</p>
-              </div>
-
-              <div className="space-y-3">
-                {tier.features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-accent" />
-                    <span className="text-sm">{feature}</span>
+            {/* Selected Tier Summary */}
+            {selectedTier && (
+              <Card className="bg-accent/50 border-0">
+                <CardContent className="pt-4 pb-4">
+                  <div className="text-center">
+                    <h3 className="font-semibold mb-3">Selected Service</h3>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-xl">{serviceTiers.find(t => t.id === selectedTier)?.icon}</span>
+                      <span className="text-lg font-bold">{serviceTiers.find(t => t.id === selectedTier)?.name}</span>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </CardContent>
+              </Card>
+            )}
 
-              <div className={cn(
-                "absolute top-4 right-4 w-5 h-5 rounded-full border-2 transition-colors",
-                isSelected
-                  ? "border-primary bg-primary"
-                  : "border-muted-foreground"
-              )}>
-                {isSelected && (
-                  <Check className="w-3 h-3 text-primary-foreground absolute top-0.5 left-0.5" />
-                )}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Selected Summary */}
-      {selectedTier && (
-        <Card className="p-4 bg-gradient-primary/5 border-primary/20 animate-fade-in-up">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">Selected Service</p>
-            <p className="font-medium text-lg">
-              {serviceTiers.find(t => t.id === selectedTier)?.name} - 
-              ${serviceTiers.find(t => t.id === selectedTier)?.price} per lb
-            </p>
-          </div>
+            {/* Navigation */}
+            <div className="flex gap-3 pt-6">
+              <Button variant="outline" onClick={onBack} className="flex-1">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              <Button 
+                onClick={handleNext}
+                disabled={!selectedTier}
+                className="flex-1 bg-primary hover:bg-primary/90"
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
         </Card>
-      )}
-
-      {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button 
-          onClick={handleNext}
-          className="group"
-        >
-          Continue
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-        </Button>
       </div>
     </div>
   );
-}
+};

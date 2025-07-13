@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, MapPin, Package, ArrowRight, CheckCircle } from "lucide-react";
+import { Calculator, MapPin, Package, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
 
 interface Item {
   id: string;
@@ -48,9 +48,16 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
       const totalWeight = items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
       const totalVolume = items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
       
-      const baseServiceFee = 150;
-      const itemCost = totalWeight * serviceTier.price;
-      const distanceFee = distance * 2.5; // $2.50 per km
+      // Tier pricing rates
+      const tierRates = {
+        "Basic": 0.31,
+        "Premium": 0.34,
+        "White Glove": 0.37
+      };
+
+      const baseServiceFee = 50;
+      const itemCost = totalWeight * (tierRates[serviceTier.name as keyof typeof tierRates] || 0.31);
+      const distanceFee = distance * 1.50;
       const subtotal = baseServiceFee + itemCost + distanceFee;
       const gst = subtotal * 0.05; // 5% GST
       const qst = subtotal * 0.09975; // 9.975% QST
@@ -97,16 +104,17 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
   if (!quote) return null;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div className="text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-success rounded-full mb-4">
-          <CheckCircle className="w-8 h-8 text-accent-foreground" />
+    <div className="min-h-screen bg-gradient-background px-4 py-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-success rounded-full mb-4">
+            <CheckCircle className="w-8 h-8 text-accent-foreground" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Your Instant Quote</h2>
+          <p className="text-muted-foreground">Here's your personalized moving quote</p>
         </div>
-        <h2 className="text-3xl font-bold text-foreground mb-2">Your Instant Quote</h2>
-        <p className="text-muted-foreground">Here's your personalized moving quote</p>
-      </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Quote Breakdown */}
         <Card className="p-6 shadow-soft">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -121,12 +129,12 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
             </div>
             
             <div className="flex justify-between">
-              <span>Items Cost ({totalWeight} lbs × ${serviceTier.price})</span>
+              <span>Items Cost ({totalWeight} lbs)</span>
               <span>${quote.itemCost.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between">
-              <span>Distance Fee ({distance.toFixed(1)} km × $2.50)</span>
+              <span>Distance Fee ({distance.toFixed(1)} km × $1.50)</span>
               <span>${quote.distanceFee.toFixed(2)}</span>
             </div>
             
@@ -161,7 +169,7 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
           {/* Service Tier */}
           <Card className="p-4 shadow-soft">
             <h4 className="font-semibold mb-2">Selected Service</h4>
-            <p className="text-primary font-medium">{serviceTier.name} - ${serviceTier.price} per lb</p>
+            <p className="text-primary font-medium">{serviceTier.name}</p>
           </Card>
 
           {/* Items Summary */}
@@ -232,19 +240,20 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
         </div>
       </Card>
 
-      {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button 
-          onClick={() => onNext(quote)}
-          size="lg"
-          className="group"
-        >
-          Book This Move
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-        </Button>
+        {/* Navigation */}
+        <div className="flex gap-3 pt-4">
+          <Button variant="outline" onClick={onBack} className="flex-1">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <Button 
+            onClick={() => onNext(quote)}
+            className="flex-1 group"
+          >
+            Book This Move
+            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+          </Button>
+        </div>
       </div>
     </div>
   );
