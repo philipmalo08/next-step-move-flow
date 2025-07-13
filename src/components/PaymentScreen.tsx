@@ -9,6 +9,7 @@ import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
 import { saveBooking, BookingData } from "@/lib/bookingService";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface PaymentScreenProps {
   quote: {
@@ -59,6 +60,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   const [sameAsPickup, setSameAsPickup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { executeRecaptcha } = useRecaptcha();
 
   // Auto-fill billing address when "same as pickup" is checked
   const handleSameAsPickupChange = (checked: boolean) => {
@@ -148,6 +150,9 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
     setIsSubmitting(true);
     
     try {
+      // Execute reCAPTCHA
+      const recaptchaToken = await executeRecaptcha('submit_booking');
+      console.log('reCAPTCHA token generated:', recaptchaToken);
       // Get the current authenticated user (should already be signed in anonymously)
       const userId = auth.currentUser?.uid;
       
