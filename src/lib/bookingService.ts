@@ -142,9 +142,12 @@ export const saveBooking = async (bookingData: BookingData, userId?: string): Pr
 
     // Use the Firestore path according to your rules
     const appId = "next-movement-app"; // Your app identifier
-    const actualUserId = userId || "guest"; // Use guest if no userId provided
     
-    const bookingsCollection = collection(db, `artifacts/${appId}/users/${actualUserId}/bookings`);
+    if (!userId) {
+      throw new Error("User must be authenticated to save booking");
+    }
+    
+    const bookingsCollection = collection(db, `artifacts/${appId}/users/${userId}/bookings`);
     const docRef = await addDoc(bookingsCollection, storedBooking);
     
     console.log("Booking saved successfully with ID:", docRef.id);
