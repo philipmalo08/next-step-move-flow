@@ -24,11 +24,52 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   ]);
   const [distance, setDistance] = useState<number>(0);
   const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
+  const [suggestions, setSuggestions] = useState<{[key: string]: string[]}>({});
+  const [loadingSuggestions, setLoadingSuggestions] = useState<{[key: string]: boolean}>({});
 
   const updateAddress = (id: string, address: string) => {
     setAddresses(prev => prev.map(addr => 
       addr.id === id ? { ...addr, address } : addr
     ));
+    
+    // Get address suggestions
+    if (address.length > 2) {
+      getSuggestions(id, address);
+    } else {
+      setSuggestions(prev => ({ ...prev, [id]: [] }));
+    }
+  };
+
+  const getSuggestions = async (addressId: string, query: string) => {
+    if (query.length < 3) return;
+    
+    setLoadingSuggestions(prev => ({ ...prev, [addressId]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke('maps-api', {
+        body: {
+          service: 'geocoding',
+          address: query + ', Canada' // Restrict to Canada
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.results) {
+        const addressSuggestions = data.results.map((result: any) => result.formatted_address);
+        setSuggestions(prev => ({ ...prev, [addressId]: addressSuggestions.slice(0, 5) }));
+      }
+    } catch (error) {
+      console.error('Error getting suggestions:', error);
+    } finally {
+      setLoadingSuggestions(prev => ({ ...prev, [addressId]: false }));
+    }
+  };
+
+  const selectSuggestion = (addressId: string, suggestion: string) => {
+    setAddresses(prev => prev.map(addr => 
+      addr.id === addressId ? { ...addr, address: suggestion } : addr
+    ));
+    setSuggestions(prev => ({ ...prev, [addressId]: [] }));
   };
 
   const addStop = (type: 'pickup' | 'dropoff') => {
@@ -111,24 +152,48 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               </div>
               
               {pickupAddresses.map((addr, index) => (
-                <div key={addr.id} className="flex gap-2">
-                  <Input
-                    id={`address-${addr.id}`}
-                    placeholder={index === 0 ? "Enter pickup address" : "Additional pickup location"}
-                    value={addr.address}
-                    onChange={(e) => updateAddress(addr.id, e.target.value)}
-                    className="text-sm"
-                  />
-                  {pickupAddresses.length > 1 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeStop(addr.id)}
-                      className="h-9 w-9 p-0 text-destructive hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  )}
+                <div key={addr.id} className="relative">
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <Input
+                        id={`address-${addr.id}`}
+                        placeholder={index === 0 ? "Enter pickup address" : "Additional pickup location"}
+                        value={addr.address}
+                        onChange={(e) => updateAddress(addr.id, e.target.value)}
+                        className="text-sm"
+                      />
+                      {/* Address Suggestions */}
+                      {suggestions[addr.id] && suggestions[addr.id].length > 0 && (
+                        <div className="absolute top-full left-0 right-0 z-10 bg-background border border-border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
+                          {suggestions[addr.id].map((suggestion, suggestionIndex) => (
+                            <button
+                              key={suggestionIndex}
+                              type="button"
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-muted focus:bg-muted focus:outline-none"
+                              onClick={() => selectSuggestion(addr.id, suggestion)}
+                            >
+                              {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {loadingSuggestions[addr.id] && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin h-4 w-4 border-2 border-muted-foreground border-t-transparent rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
+                    {pickupAddresses.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeStop(addr.id)}
+                        className="h-9 w-9 p-0 shrink-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -149,24 +214,48 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               </div>
               
               {dropoffAddresses.map((addr, index) => (
-                <div key={addr.id} className="flex gap-2">
-                  <Input
-                    id={`address-${addr.id}`}
-                    placeholder={index === 0 ? "Enter dropoff address" : "Additional dropoff location"}
-                    value={addr.address}
-                    onChange={(e) => updateAddress(addr.id, e.target.value)}
-                    className="text-sm"
-                  />
-                  {dropoffAddresses.length > 1 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeStop(addr.id)}
-                      className="h-9 w-9 p-0 text-destructive hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  )}
+                <div key={addr.id} className="relative">
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <Input
+                        id={`address-${addr.id}`}
+                        placeholder={index === 0 ? "Enter dropoff address" : "Additional dropoff location"}
+                        value={addr.address}
+                        onChange={(e) => updateAddress(addr.id, e.target.value)}
+                        className="text-sm"
+                      />
+                      {/* Address Suggestions */}
+                      {suggestions[addr.id] && suggestions[addr.id].length > 0 && (
+                        <div className="absolute top-full left-0 right-0 z-10 bg-background border border-border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
+                          {suggestions[addr.id].map((suggestion, suggestionIndex) => (
+                            <button
+                              key={suggestionIndex}
+                              type="button"
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-muted focus:bg-muted focus:outline-none"
+                              onClick={() => selectSuggestion(addr.id, suggestion)}
+                            >
+                              {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {loadingSuggestions[addr.id] && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin h-4 w-4 border-2 border-muted-foreground border-t-transparent rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
+                    {dropoffAddresses.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeStop(addr.id)}
+                        className="h-9 w-9 p-0 shrink-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
