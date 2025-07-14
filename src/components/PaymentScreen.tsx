@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
 import { paymentDataSchema } from "@/lib/validation";
-import { sanitizeInput, sanitizeCardholderName, logSecurityEvent } from "@/lib/security";
 
 interface PaymentScreenProps {
   quote: {
@@ -93,10 +92,10 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   };
 
   const updateField = (field: keyof PaymentData, value: string) => {
-    // For cardholder name, preserve spaces while sanitizing
+    // For cardholder name, preserve spaces while sanitizing basic input
     const sanitizedValue = field === 'cardholderName' 
-      ? sanitizeCardholderName(value)
-      : sanitizeInput(value);
+      ? value.replace(/[<>]/g, '').trim()
+      : value.replace(/[<>]/g, '').trim();
     
     setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
     
@@ -150,10 +149,6 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
       }
       
       setErrors(newErrors);
-      logSecurityEvent('payment_form_validation_failed', { 
-        errors: Object.keys(newErrors),
-        userAgent: navigator.userAgent 
-      });
       return false;
     }
   };
@@ -182,10 +177,6 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
       });
 
       if (verificationError || !verificationData?.success) {
-        logSecurityEvent('recaptcha_verification_failed', { 
-          error: verificationError?.message,
-          success: verificationData?.success 
-        });
         throw new Error('Security verification failed. Please try again.');
       }
 

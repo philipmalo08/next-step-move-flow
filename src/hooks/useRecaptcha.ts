@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from 'react';
-import { SECURITY_CONFIG, logSecurityEvent } from '@/lib/security';
 
 declare global {
   interface Window {
@@ -10,6 +9,8 @@ declare global {
   }
 }
 
+const RECAPTCHA_SITE_KEY = '6LcxIIIrAAAAAH2F07tO0GpMncJPgV1tDgNHwCaj';
+
 export const useRecaptcha = () => {
   // Execute reCAPTCHA on page load for general protection
   useEffect(() => {
@@ -17,11 +18,10 @@ export const useRecaptcha = () => {
       if (typeof window.grecaptcha !== 'undefined') {
         window.grecaptcha.ready(async () => {
           try {
-            const token = await window.grecaptcha.execute(SECURITY_CONFIG.RECAPTCHA_SITE_KEY, { action: 'page_load' });
+            const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'page_load' });
             console.log('Page load reCAPTCHA token:', token);
           } catch (error) {
             console.error('reCAPTCHA page load error:', error);
-            logSecurityEvent('recaptcha_page_load_failed', { error: error instanceof Error ? error.message : 'Unknown error' });
           }
         });
       }
@@ -39,10 +39,9 @@ export const useRecaptcha = () => {
 
       window.grecaptcha.ready(async () => {
         try {
-          const token = await window.grecaptcha.execute(SECURITY_CONFIG.RECAPTCHA_SITE_KEY, { action });
+          const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
           resolve(token);
         } catch (error) {
-          logSecurityEvent('recaptcha_execution_failed', { action, error: error instanceof Error ? error.message : 'Unknown error' });
           reject(error);
         }
       });

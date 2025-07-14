@@ -10,8 +10,6 @@ import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
-import { useSecureSession } from "@/hooks/useSecureSession";
-import { logSecurityEvent } from "@/lib/security";
 
 interface Address {
   id: string;
@@ -80,11 +78,8 @@ const Index = () => {
   const [paymentData, setPaymentData] = useState<PaymentData>();
   const [distance, setDistance] = useState<number>(0);
   
-  // Initialize security measures
+  // Initialize reCAPTCHA
   useRecaptcha();
-
-  // Initialize secure device session
-  const { sessionId, isInitializing, sessionError, updateActivity } = useSecureSession();
 
   const handleStart = () => {
     setCurrentStep(1);

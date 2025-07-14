@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Plus, X, MapPin, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeAddress, checkRateLimit } from "@/lib/validation";
-import { logSecurityEvent } from "@/lib/security";
 import { useToast } from "@/hooks/use-toast";
 
 interface Address {
@@ -72,7 +71,6 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
         description: "Please wait before making more address requests.",
         variant: "destructive",
       });
-      logSecurityEvent('address_suggestions_rate_limit_exceeded', { addressId, query: query.substring(0, 50) });
       return;
     }
     
@@ -86,7 +84,6 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
       });
 
       if (error) {
-        logSecurityEvent('address_suggestions_api_error', { error: error.message, addressId });
         throw error;
       }
 
