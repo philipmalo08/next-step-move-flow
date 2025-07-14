@@ -10,6 +10,8 @@ import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { useSecureSession } from "@/hooks/useSecureSession";
+import { logSecurityEvent } from "@/lib/security";
 
 interface Address {
   id: string;
@@ -77,50 +79,12 @@ const Index = () => {
   const [quote, setQuote] = useState<QuoteData>();
   const [paymentData, setPaymentData] = useState<PaymentData>();
   const [distance, setDistance] = useState<number>(0);
-  const [deviceUserId, setDeviceUserId] = useState<string | null>(null);
   
   // Initialize reCAPTCHA for bot protection
   useRecaptcha();
 
-  // Initialize device-based session with Supabase
-  useEffect(() => {
-    const initializeDeviceSession = async () => {
-      try {
-        // Generate or retrieve device ID from localStorage
-        let deviceId = localStorage.getItem('device_id');
-        if (!deviceId) {
-          deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          localStorage.setItem('device_id', deviceId);
-        }
-
-        // Create or update device session in Supabase
-        const { data, error } = await supabase
-          .from('device_sessions')
-          .upsert({
-            device_id: deviceId,
-            session_data: { 
-              created_at: new Date().toISOString(),
-              user_agent: navigator.userAgent 
-            }
-          }, { 
-            onConflict: 'device_id' 
-          })
-          .select()
-          .single();
-
-        if (error) {
-          console.error("Error creating device session:", error);
-        } else {
-          setDeviceUserId(data.id);
-          console.log("Device session ID:", data.id);
-        }
-      } catch (error) {
-        console.error("Error initializing device session:", error);
-      }
-    };
-
-    initializeDeviceSession();
-  }, []);
+  // Initialize secure device session
+  const { sessionId, isInitializing, sessionError, updateActivity } = useSecureSession();
 
   const handleStart = () => {
     setCurrentStep(1);

@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, Plus, X, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, X, MapPin, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeAddress, checkRateLimit } from "@/lib/validation";
+import { logSecurityEvent } from "@/lib/security";
+import { useToast } from "@/hooks/use-toast";
 
 interface Address {
   id: string;
@@ -18,6 +21,7 @@ interface AddressScreenProps {
 }
 
 export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
+  const { toast } = useToast();
   const [addresses, setAddresses] = useState<Address[]>([
     { id: '1', address: '', type: 'pickup' },
     { id: '2', address: '', type: 'dropoff' }
@@ -26,15 +30,32 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
   const [suggestions, setSuggestions] = useState<{[key: string]: string[]}>({});
   const [loadingSuggestions, setLoadingSuggestions] = useState<{[key: string]: boolean}>({});
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   const updateAddress = (id: string, address: string) => {
+    // Sanitize input
+    const sanitizedAddress = sanitizeAddress(address);
+    
+    // Validate length
+    if (sanitizedAddress.length > 500) {
+      setValidationErrors(prev => ({ ...prev, [id]: 'Address too long' }));
+      return;
+    }
+    
+    // Clear validation error
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[id];
+      return newErrors;
+    });
+    
     setAddresses(prev => prev.map(addr => 
-      addr.id === id ? { ...addr, address } : addr
+      addr.id === id ? { ...addr, address: sanitizedAddress } : addr
     ));
     
     // Get address suggestions
-    if (address.length > 2) {
-      getSuggestions(id, address);
+    if (sanitizedAddress.length > 2) {
+      getSuggestions(id, sanitizedAddress);
     } else {
       setSuggestions(prev => ({ ...prev, [id]: [] }));
     }
@@ -43,23 +64,45 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const getSuggestions = async (addressId: string, query: string) => {
     if (query.length < 3) return;
     
+    // Rate limiting check
+    const clientId = 'address_suggestions_' + (typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown');
+    if (!checkRateLimit(clientId, 30, 60000)) {
+      toast({
+        title: "Rate limit exceeded",
+        description: "Please wait before making more address requests.",
+        variant: "destructive",
+      });
+      logSecurityEvent('address_suggestions_rate_limit_exceeded', { addressId, query: query.substring(0, 50) });
+      return;
+    }
+    
     setLoadingSuggestions(prev => ({ ...prev, [addressId]: true }));
     try {
       const { data, error } = await supabase.functions.invoke('maps-api', {
         body: {
           service: 'geocoding',
-          address: query + ', Canada' // Restrict to Canada
+          address: sanitizeAddress(query) + ', Canada' // Restrict to Canada and sanitize
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        logSecurityEvent('address_suggestions_api_error', { error: error.message, addressId });
+        throw error;
+      }
 
       if (data?.results) {
-        const addressSuggestions = data.results.map((result: any) => result.formatted_address);
-        setSuggestions(prev => ({ ...prev, [addressId]: addressSuggestions.slice(0, 5) }));
+        const addressSuggestions = data.results
+          .map((result: any) => sanitizeAddress(result.formatted_address))
+          .slice(0, 5); // Limit to 5 suggestions
+        setSuggestions(prev => ({ ...prev, [addressId]: addressSuggestions }));
       }
     } catch (error) {
       console.error('Error getting suggestions:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get address suggestions. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoadingSuggestions(prev => ({ ...prev, [addressId]: false }));
     }
@@ -160,8 +203,15 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                         placeholder={index === 0 ? "Enter pickup address" : "Additional pickup location"}
                         value={addr.address}
                         onChange={(e) => updateAddress(addr.id, e.target.value)}
-                        className="text-sm"
+                        className={`text-sm ${validationErrors[addr.id] ? 'border-destructive' : ''}`}
+                        maxLength={500}
                       />
+                      {validationErrors[addr.id] && (
+                        <div className="flex items-center gap-1 mt-1 text-xs text-destructive">
+                          <AlertTriangle className="h-3 w-3" />
+                          {validationErrors[addr.id]}
+                        </div>
+                      )}
                       {/* Address Suggestions */}
                       {suggestions[addr.id] && suggestions[addr.id].length > 0 && (
                         <div className="absolute top-full left-0 right-0 z-10 bg-background border border-border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
@@ -222,8 +272,15 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                         placeholder={index === 0 ? "Enter dropoff address" : "Additional dropoff location"}
                         value={addr.address}
                         onChange={(e) => updateAddress(addr.id, e.target.value)}
-                        className="text-sm"
+                        className={`text-sm ${validationErrors[addr.id] ? 'border-destructive' : ''}`}
+                        maxLength={500}
                       />
+                      {validationErrors[addr.id] && (
+                        <div className="flex items-center gap-1 mt-1 text-xs text-destructive">
+                          <AlertTriangle className="h-3 w-3" />
+                          {validationErrors[addr.id]}
+                        </div>
+                      )}
                       {/* Address Suggestions */}
                       {suggestions[addr.id] && suggestions[addr.id].length > 0 && (
                         <div className="absolute top-full left-0 right-0 z-10 bg-background border border-border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
