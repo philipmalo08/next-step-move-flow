@@ -11,7 +11,6 @@ import { StepIndicator } from "@/components/StepIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { useSecureSession } from "@/hooks/useSecureSession";
-import { useSecurityHeaders } from "@/hooks/useSecurityHeaders";
 import { logSecurityEvent } from "@/lib/security";
 
 interface Address {
@@ -83,7 +82,6 @@ const Index = () => {
   
   // Initialize security measures
   useRecaptcha();
-  useSecurityHeaders();
 
   // Initialize secure device session
   const { sessionId, isInitializing, sessionError, updateActivity } = useSecureSession();
