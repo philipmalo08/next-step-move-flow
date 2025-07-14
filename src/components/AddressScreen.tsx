@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Plus, X, MapPin, AlertTriangle } from "lucide-re
 import { supabase } from "@/integrations/supabase/client";
 import { checkRateLimit } from "@/lib/validation";
 import { useToast } from "@/hooks/use-toast";
+import { AddressMap } from "./AddressMap";
 
 interface Address {
   id: string;
@@ -311,17 +312,20 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               ))}
             </div>
 
-            {/* Distance Display */}
+            {/* Distance Display and Map */}
             {distance > 0 && (
-              <div className="bg-muted/50 rounded-lg p-3 text-center">
-                <p className="text-sm font-medium">
-                  Estimated distance: {distance.toFixed(1)} km
-                </p>
-                {isCalculatingDistance && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Calculating route...
+              <div className="space-y-4">
+                <div className="bg-muted/50 rounded-lg p-3 text-center">
+                  <p className="text-sm font-medium">
+                    Estimated distance: {distance.toFixed(1)} km
                   </p>
-                )}
+                  {isCalculatingDistance && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Calculating route...
+                    </p>
+                  )}
+                </div>
+                <AddressMap addresses={addresses} distance={distance} />
               </div>
             )}
 

@@ -176,8 +176,10 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
         throw new Error('Security verification failed. Please try again.');
       }
 
-      // Generate a simple user ID for the booking
-      const userId = crypto.randomUUID();
+      // Generate a session-based user ID for the booking
+      const sessionId = sessionStorage.getItem('booking_session_id') || crypto.randomUUID();
+      sessionStorage.setItem('booking_session_id', sessionId);
+      const userId = sessionId;
 
       // Prepare complete booking data
       const completeBookingData: BookingData = {

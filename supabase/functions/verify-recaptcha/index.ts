@@ -95,7 +95,7 @@ serve(async (req) => {
 
     // Check the score (for v3, lower scores indicate more likely bot behavior)
     // Typically, scores above 0.5 are considered human-like
-    const minScore = action === 'booking_submit' ? 0.3 : 0.5; // Lower threshold for critical actions
+    const minScore = action === 'payment_submission' ? 0.3 : 0.5; // Lower threshold for critical actions
     
     if (result.score < minScore) {
       console.warn(`Low reCAPTCHA score: ${result.score} for action ${action}`);

@@ -11,20 +11,10 @@ const corsHeaders = {
 // Rate limiting store
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-// Input validation and sanitization
-const sanitizeInput = (input: string): string => {
-  return input
-    .replace(/[<>]/g, '')
-    .replace(/javascript:/gi, '')
-    .trim()
-    .substring(0, 500);
-};
-
+// Minimal input validation - just basic safety checks
 const validateInput = (input: string): boolean => {
   if (!input || typeof input !== 'string') return false;
-  if (input.length < 2 || input.length > 500) return false;
-  // Allow common address characters including apostrophes, parentheses, forward slashes, etc.
-  if (!/^[a-zA-Z0-9\s,.'()-/&#]+$/.test(input)) return false;
+  if (input.length < 1 || input.length > 500) return false;
   return true;
 };
 
@@ -90,34 +80,22 @@ const handler = async (req: Request): Promise<Response> => {
     let url: string;
     
     if (service === 'geocoding' && address) {
-      // Validate and sanitize address input
+      // Basic validation only
       if (!validateInput(address)) {
-        logSecurityEvent('invalid_geocoding_input', { address: address.substring(0, 50), clientId });
         throw new Error('Invalid address format');
       }
       
-      const sanitizedAddress = sanitizeInput(address);
-      // Only add Canada restriction if not already present and if address is too short/generic
-      const needsCanadaRestriction = !sanitizedAddress.toLowerCase().includes('canada') && 
-                                   !sanitizedAddress.toLowerCase().includes('quebec') &&
-                                   !sanitizedAddress.toLowerCase().includes('montreal') &&
-                                   !sanitizedAddress.toLowerCase().includes('toronto') &&
-                                   !sanitizedAddress.toLowerCase().includes('vancouver') &&
-                                   sanitizedAddress.length < 10;
-      const restrictedAddress = needsCanadaRestriction ? `${sanitizedAddress}, Canada` : sanitizedAddress;
+      // Use address as-is, add Canada restriction only for very short queries
+      const addressToUse = address.trim().length < 3 ? `${address.trim()}, Canada` : address.trim();
       
-      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(restrictedAddress)}&key=${apiKey}&region=ca&components=country:CA`;
+      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressToUse)}&key=${apiKey}&region=ca&components=country:CA`;
     } else if (service === 'distance' && origin && destination) {
-      // Validate and sanitize both origin and destination
+      // Basic validation only
       if (!validateInput(origin) || !validateInput(destination)) {
-        logSecurityEvent('invalid_distance_input', { origin: origin?.substring(0, 50), destination: destination?.substring(0, 50), clientId });
         throw new Error('Invalid origin or destination format');
       }
       
-      const sanitizedOrigin = sanitizeInput(origin);
-      const sanitizedDestination = sanitizeInput(destination);
-      
-      url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(sanitizedOrigin)}&destinations=${encodeURIComponent(sanitizedDestination)}&key=${apiKey}&region=ca`;
+      url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin.trim())}&destinations=${encodeURIComponent(destination.trim())}&key=${apiKey}&region=ca`;
     } else {
       logSecurityEvent('invalid_service_request', { service, hasAddress: !!address, hasOrigin: !!origin, hasDestination: !!destination, clientId });
       throw new Error('Invalid request parameters');
