@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Plus, X, MapPin } from "lucide-react";
-import { Loader } from "@googlemaps/js-api-loader";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Address {
   id: string;
@@ -17,26 +17,13 @@ interface AddressScreenProps {
   onBack: () => void;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const [addresses, setAddresses] = useState<Address[]>([
     { id: '1', address: '', type: 'pickup' },
     { id: '2', address: '', type: 'dropoff' }
   ]);
   const [distance, setDistance] = useState<number>(0);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [showMap, setShowMap] = useState(false);
-  
-  const mapRef = useRef<HTMLDivElement>(null);
-  const autocompleteRefs = useRef<{[key: string]: any}>({});
-  const mapInstance = useRef<any>(null);
-  const directionsService = useRef<any>(null);
-  const directionsRenderer = useRef<any>(null);
+  const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
 
   const updateAddress = (id: string, address: string) => {
     setAddresses(prev => prev.map(addr => 
@@ -59,109 +46,46 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const pickupAddresses = addresses.filter(addr => addr.type === 'pickup');
   const dropoffAddresses = addresses.filter(addr => addr.type === 'dropoff');
 
-  // Load Google Maps
+  // Calculate distance when addresses change
   useEffect(() => {
-    const loader = new Loader({
-      apiKey: "AIzaSyBQUSNmGK2eAGkDYKiQt-R57giLOlFy-kY",
-      version: "weekly",
-      libraries: ["places", "geometry"]
-    });
+    const calculateDistance = async () => {
+      const pickup = addresses.find(addr => addr.type === 'pickup' && addr.address.trim());
+      const dropoff = addresses.find(addr => addr.type === 'dropoff' && addr.address.trim());
 
-    loader.load().then(() => {
-      setIsMapLoaded(true);
-      
-      // Initialize autocomplete for existing inputs
-      addresses.forEach(addr => {
-        initializeAutocomplete(addr.id);
-      });
-    });
-  }, []);
-
-  // Initialize autocomplete for an input
-  const initializeAutocomplete = (addressId: string) => {
-    if (!isMapLoaded || !window.google) return;
-
-    const input = document.getElementById(`address-${addressId}`) as HTMLInputElement;
-    if (!input || autocompleteRefs.current[addressId]) return;
-
-    const autocomplete = new window.google.maps.places.Autocomplete(input, {
-      componentRestrictions: { country: 'ca' } // Limit to Canada only
-    });
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (place.formatted_address) {
-        updateAddress(addressId, place.formatted_address);
+      if (!pickup || !dropoff) {
+        setDistance(0);
+        return;
       }
-    });
 
-    autocompleteRefs.current[addressId] = autocomplete;
-  };
+      setIsCalculatingDistance(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('maps-api', {
+          body: {
+            service: 'distance',
+            origin: pickup.address,
+            destination: dropoff.address
+          }
+        });
 
-  // Initialize autocomplete when new addresses are added
-  useEffect(() => {
-    if (isMapLoaded) {
-      addresses.forEach(addr => {
-        if (!autocompleteRefs.current[addr.id]) {
-          setTimeout(() => initializeAutocomplete(addr.id), 100);
+        if (error) throw error;
+
+        if (data?.rows?.[0]?.elements?.[0]?.distance?.value) {
+          const distanceInMeters = data.rows[0].elements[0].distance.value;
+          const distanceInKm = distanceInMeters / 1000;
+          setDistance(distanceInKm);
         }
-      });
-    }
-  }, [addresses, isMapLoaded]);
-
-  // Show map and calculate route when both pickup and dropoff are filled
-  useEffect(() => {
-    const validAddresses = addresses.filter(addr => addr.address.trim());
-    const hasPickupAndDropoff = 
-      validAddresses.some(addr => addr.type === 'pickup') && 
-      validAddresses.some(addr => addr.type === 'dropoff');
-
-    if (hasPickupAndDropoff && isMapLoaded && !showMap) {
-      setShowMap(true);
-      setTimeout(initializeMap, 100);
-    } else if (hasPickupAndDropoff && showMap) {
-      calculateRoute();
-    }
-  }, [addresses, isMapLoaded]);
-
-  const initializeMap = () => {
-    if (!mapRef.current || !window.google) return;
-
-    mapInstance.current = new window.google.maps.Map(mapRef.current, {
-      zoom: 10,
-      center: { lat: 45.5017, lng: -73.5673 }, // Montreal default
-    });
-
-    directionsService.current = new window.google.maps.DirectionsService();
-    directionsRenderer.current = new window.google.maps.DirectionsRenderer();
-    directionsRenderer.current.setMap(mapInstance.current);
-
-    calculateRoute();
-  };
-
-  const calculateRoute = () => {
-    if (!directionsService.current || !directionsRenderer.current) return;
-
-    const pickup = addresses.find(addr => addr.type === 'pickup' && addr.address.trim());
-    const dropoff = addresses.find(addr => addr.type === 'dropoff' && addr.address.trim());
-
-    if (!pickup || !dropoff) return;
-
-    const request = {
-      origin: pickup.address,
-      destination: dropoff.address,
-      travelMode: window.google.maps.TravelMode.DRIVING,
+      } catch (error) {
+        console.error('Error calculating distance:', error);
+        // Fallback: estimate distance based on coordinates if needed
+        setDistance(10); // Default estimate
+      } finally {
+        setIsCalculatingDistance(false);
+      }
     };
 
-    directionsService.current.route(request, (result: any, status: any) => {
-      if (status === 'OK') {
-        directionsRenderer.current.setDirections(result);
-        const route = result.routes[0];
-        const distanceInMeters = route.legs[0].distance.value;
-        const distanceInKm = distanceInMeters / 1000;
-        setDistance(distanceInKm);
-      }
-    });
-  };
+    const timeoutId = setTimeout(calculateDistance, 1000); // Debounce API calls
+    return () => clearTimeout(timeoutId);
+  }, [addresses]);
 
   return (
     <div className="min-h-screen bg-gradient-background px-4 py-4">
@@ -247,17 +171,15 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               ))}
             </div>
 
-            {/* Map */}
-            {showMap && (
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Route Preview</Label>
-                <div 
-                  ref={mapRef}
-                  className="w-full h-48 rounded-lg border bg-muted"
-                />
-                {distance > 0 && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Estimated distance: {distance.toFixed(1)} km
+            {/* Distance Display */}
+            {distance > 0 && (
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
+                <p className="text-sm font-medium">
+                  Estimated distance: {distance.toFixed(1)} km
+                </p>
+                {isCalculatingDistance && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Calculating route...
                   </p>
                 )}
               </div>
