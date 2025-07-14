@@ -1,5 +1,3 @@
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db, auth } from "./firebase";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BookingData {
@@ -58,46 +56,36 @@ export interface BookingData {
   }>;
 }
 
-export interface StoredBookingData {
-  // Personal information
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  
-  // Booking details
-  bookingDate: Date;
-  bookingTime: string;
-  pickupAddresses: string[];
-  dropoffAddresses: string[];
-  
-  // Service details
-  serviceTier: string;
-  servicePrice: number;
-  
-  // Items (simplified for storage)
-  selectedItems: Record<string, number>; // item name -> quantity
-  customItems: Array<{
+// Simplified interface for Supabase storage
+export interface SupabaseBookingData {
+  booking_id: string;
+  user_id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  booking_date: string;
+  booking_time: string;
+  pickup_addresses: string[];
+  dropoff_addresses: string[];
+  service_tier: string;
+  service_price: number;
+  selected_items: Record<string, number>;
+  custom_items: Array<{
     name: string;
     category: string;
     weight: number;
     volume: number;
     quantity: number;
   }>;
-  
-  // Quote details
   subtotal: number;
   gst: number;
   qst: number;
   total: number;
-  finalQuoteAmount: number;
-  
-  // Distance and volume calculations
-  calculatedDistance: string;
-  estimatedTotalWeight: number;
-  estimatedTotalVolume: number;
-  
-  // Payment details summary (no sensitive card info)
-  paymentDetailsSummary: {
+  final_quote_amount: number;
+  calculated_distance?: string;
+  estimated_total_weight?: number;
+  estimated_total_volume?: number;
+  payment_details_summary: {
     fullName: string;
     email: string;
     phone: string;
@@ -105,18 +93,12 @@ export interface StoredBookingData {
     billingAddress: string;
     last4: string;
   };
-  
-  // Metadata
-  timestamp: any; // serverTimestamp
   status: 'confirmed' | 'pending' | 'cancelled';
-  bookingId: string;
-  userId: string;
 }
 
 export const saveBooking = async (bookingData: BookingData, userId?: string, distance?: number): Promise<string> => {
   try {
     console.log("Starting saveBooking with userId:", userId);
-    console.log("Current auth user:", auth.currentUser?.uid);
     
     // Generate a unique booking ID
     const bookingId = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
@@ -144,41 +126,44 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
         quantity: item.quantity
       }));
     
-    // Prepare data for storage according to Firestore rules
-    const storedBooking: StoredBookingData = {
+    // Prepare data for Supabase storage
+    const bookingRecord = {
+      booking_id: bookingId,
+      user_id: userId || '',
+      
       // Personal information
-      customerName: bookingData.paymentData.fullName,
-      customerEmail: bookingData.paymentData.email,
-      customerPhone: bookingData.paymentData.phone,
+      customer_name: bookingData.paymentData.fullName,
+      customer_email: bookingData.paymentData.email,
+      customer_phone: bookingData.paymentData.phone,
       
       // Booking details
-      bookingDate: bookingData.date,
-      bookingTime: bookingData.time,
-      pickupAddresses: bookingData.addresses.filter(addr => addr.type === 'pickup').map(addr => addr.address),
-      dropoffAddresses: bookingData.addresses.filter(addr => addr.type === 'dropoff').map(addr => addr.address),
+      booking_date: bookingData.date.toISOString().split('T')[0], // Convert to date string
+      booking_time: bookingData.time,
+      pickup_addresses: bookingData.addresses.filter(addr => addr.type === 'pickup').map(addr => addr.address),
+      dropoff_addresses: bookingData.addresses.filter(addr => addr.type === 'dropoff').map(addr => addr.address),
       
       // Service details
-      serviceTier: bookingData.serviceTier.name,
-      servicePrice: bookingData.serviceTier.price,
+      service_tier: bookingData.serviceTier.name,
+      service_price: bookingData.serviceTier.price,
       
       // Items
-      selectedItems: selectedItems,
-      customItems: customItems,
+      selected_items: selectedItems,
+      custom_items: customItems,
       
       // Quote details
       subtotal: bookingData.quote.subtotal,
       gst: bookingData.quote.gst,
       qst: bookingData.quote.qst,
       total: bookingData.quote.total,
-      finalQuoteAmount: bookingData.quote.total,
+      final_quote_amount: bookingData.quote.total,
       
       // Distance and calculations
-      calculatedDistance: (distance || bookingData.calculatedDistance || 0).toString(),
-      estimatedTotalWeight: totalWeight,
-      estimatedTotalVolume: totalVolume,
+      calculated_distance: (distance || bookingData.calculatedDistance || 0).toString(),
+      estimated_total_weight: totalWeight,
+      estimated_total_volume: totalVolume,
       
       // Payment details summary (without sensitive card details)
-      paymentDetailsSummary: {
+      payment_details_summary: {
         fullName: bookingData.paymentData.fullName,
         email: bookingData.paymentData.email,
         phone: bookingData.paymentData.phone,
@@ -188,23 +173,25 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
       },
       
       // Metadata
-      timestamp: serverTimestamp(),
-      status: 'confirmed',
-      bookingId: bookingId,
-      userId: userId || ''
+      status: 'confirmed'
     };
 
-    // Use the Firestore path according to your rules
-    const appId = "next-movement-app"; // Your app identifier
-    
     if (!userId) {
       throw new Error("User must be authenticated to save booking");
     }
     
-    const bookingsCollection = collection(db, `artifacts/${appId}/users/${userId}/bookings`);
-    const docRef = await addDoc(bookingsCollection, storedBooking);
+    const { data, error } = await supabase
+      .from('bookings')
+      .insert([bookingRecord])
+      .select()
+      .single();
     
-    console.log("Booking saved successfully with ID:", docRef.id);
+    if (error) {
+      console.error("Supabase error:", error);
+      throw new Error(`Failed to save booking: ${error.message}`);
+    }
+    
+    console.log("Booking saved successfully with ID:", data.id);
     
     // Send confirmation email
     try {
@@ -214,7 +201,7 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
       // Don't fail the booking if email fails
     }
     
-    return docRef.id;
+    return data.id;
   } catch (error) {
     console.error("Error saving booking:", error);
     throw new Error("Failed to save booking data");

@@ -14,7 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          booking_date: string
+          booking_id: string
+          booking_time: string
+          calculated_distance: string | null
+          created_at: string
+          custom_items: Json
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          dropoff_addresses: string[]
+          estimated_total_volume: number | null
+          estimated_total_weight: number | null
+          final_quote_amount: number
+          gst: number
+          id: string
+          payment_details_summary: Json
+          pickup_addresses: string[]
+          qst: number
+          selected_items: Json
+          service_price: number
+          service_tier: string
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_date: string
+          booking_id: string
+          booking_time: string
+          calculated_distance?: string | null
+          created_at?: string
+          custom_items?: Json
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          dropoff_addresses: string[]
+          estimated_total_volume?: number | null
+          estimated_total_weight?: number | null
+          final_quote_amount: number
+          gst: number
+          id?: string
+          payment_details_summary: Json
+          pickup_addresses: string[]
+          qst: number
+          selected_items?: Json
+          service_price: number
+          service_tier: string
+          status?: string
+          subtotal: number
+          total: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          booking_id?: string
+          booking_time?: string
+          calculated_distance?: string | null
+          created_at?: string
+          custom_items?: Json
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          dropoff_addresses?: string[]
+          estimated_total_volume?: number | null
+          estimated_total_weight?: number | null
+          final_quote_amount?: number
+          gst?: number
+          id?: string
+          payment_details_summary?: Json
+          pickup_addresses?: string[]
+          qst?: number
+          selected_items?: Json
+          service_price?: number
+          service_tier?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      device_sessions: {
+        Row: {
+          created_at: string
+          device_id: string
+          expires_at: string
+          id: string
+          session_data: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          expires_at?: string
+          id?: string
+          session_data?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          expires_at?: string
+          id?: string
+          session_data?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

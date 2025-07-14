@@ -8,8 +8,7 @@ import { QuoteScreen } from "@/components/QuoteScreen";
 import { PaymentScreen } from "@/components/PaymentScreen";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
-import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface Address {
@@ -83,42 +82,44 @@ const Index = () => {
   // Initialize reCAPTCHA for bot protection
   useRecaptcha();
 
-  // Initialize device-based anonymous authentication
+  // Initialize device-based session with Supabase
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
-
-    const initializeDeviceAuth = async () => {
+    const initializeDeviceSession = async () => {
       try {
-        // Listen for auth state changes
-        unsubscribe = onAuthStateChanged(auth, async (user) => {
-          if (user) {
-            // User is already signed in (anonymously)
-            setDeviceUserId(user.uid);
-            console.log("Device UID:", user.uid);
-          } else {
-            // No user signed in, create anonymous user for this device
-            try {
-              const userCredential = await signInAnonymously(auth);
-              setDeviceUserId(userCredential.user.uid);
-              console.log("New device UID created:", userCredential.user.uid);
-            } catch (error) {
-              console.error("Error creating anonymous user:", error);
+        // Generate or retrieve device ID from localStorage
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+          deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          localStorage.setItem('device_id', deviceId);
+        }
+
+        // Create or update device session in Supabase
+        const { data, error } = await supabase
+          .from('device_sessions')
+          .upsert({
+            device_id: deviceId,
+            session_data: { 
+              created_at: new Date().toISOString(),
+              user_agent: navigator.userAgent 
             }
-          }
-        });
+          }, { 
+            onConflict: 'device_id' 
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error creating device session:", error);
+        } else {
+          setDeviceUserId(data.id);
+          console.log("Device session ID:", data.id);
+        }
       } catch (error) {
-        console.error("Error initializing device auth:", error);
+        console.error("Error initializing device session:", error);
       }
     };
 
-    initializeDeviceAuth();
-    
-    // Cleanup function
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
+    initializeDeviceSession();
   }, []);
 
   const handleStart = () => {

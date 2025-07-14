@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
 import { saveBooking, BookingData } from "@/lib/bookingService";
-import { auth } from "@/lib/firebase";
+
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
@@ -175,11 +175,23 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
 
       console.log('reCAPTCHA verification successful:', recaptchaVerification.data);
 
-      // Get the current authenticated user (should already be signed in anonymously)
-      const userId = auth.currentUser?.uid;
+      // Get device session ID from localStorage (set during initialization)
+      const deviceId = localStorage.getItem('device_id');
       
+      if (!deviceId) {
+        throw new Error("Device session required");
+      }
+
+      // Get the device session from Supabase
+      const { data: deviceSession } = await supabase
+        .from('device_sessions')
+        .select('id')
+        .eq('device_id', deviceId)
+        .single();
+
+      const userId = deviceSession?.id;
       if (!userId) {
-        throw new Error("User authentication required");
+        throw new Error("Device session not found");
       }
 
       // Prepare complete booking data
