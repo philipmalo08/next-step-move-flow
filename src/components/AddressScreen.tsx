@@ -62,7 +62,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   };
 
   const getSuggestions = async (addressId: string, query: string) => {
-    if (query.length < 3) return;
+    if (query.length < 2) return;
     
     // Rate limiting check
     const clientId = 'address_suggestions_' + (typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown');

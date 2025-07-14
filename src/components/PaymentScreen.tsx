@@ -27,7 +27,7 @@ interface PaymentScreenProps {
   distance: number;
   onNext: (paymentData: PaymentData, bookingId?: string) => void;
   onBack: () => void;
-  // Full booking data for saving to Firestore
+  // Full booking data for saving to Supabase
   bookingData: Omit<BookingData, 'paymentData'>;
 }
 
@@ -219,7 +219,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
         paymentData: formData
       };
 
-      // Save booking to Firestore
+      // Save booking to Supabase
       const bookingId = await saveBooking(completeBookingData, userId, distance);
       
       toast({
