@@ -87,19 +87,13 @@ export const bookingDataSchema = z.object({
   paymentData: paymentDataSchema
 });
 
-// Sanitization helpers
+// Basic validation helpers - minimal sanitization to preserve user input
 export const sanitizeString = (input: string): string => {
-  return input
-    .replace(/[<>]/g, '') // Remove potential HTML tags
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+=/gi, '') // Remove event handlers
-    .trim();
+  return input.trim();
 };
 
 export const sanitizeAddress = (address: string): string => {
-  return sanitizeString(address)
-    .replace(/[^\w\s,.-]/g, '') // Only allow alphanumeric, spaces, commas, periods, hyphens
-    .substring(0, 500); // Limit length
+  return address.trim().substring(0, 500); // Just trim and limit length
 };
 
 // Rate limiting helper

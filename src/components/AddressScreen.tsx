@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Plus, X, MapPin, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { sanitizeAddress, checkRateLimit } from "@/lib/validation";
+import { checkRateLimit } from "@/lib/validation";
 import { useToast } from "@/hooks/use-toast";
 
 interface Address {
@@ -32,11 +32,8 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   const updateAddress = (id: string, address: string) => {
-    // Sanitize input
-    const sanitizedAddress = sanitizeAddress(address);
-    
-    // Validate length
-    if (sanitizedAddress.length > 500) {
+    // Just validate length without sanitization
+    if (address.length > 500) {
       setValidationErrors(prev => ({ ...prev, [id]: 'Address too long' }));
       return;
     }
@@ -49,12 +46,12 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
     });
     
     setAddresses(prev => prev.map(addr => 
-      addr.id === id ? { ...addr, address: sanitizedAddress } : addr
+      addr.id === id ? { ...addr, address } : addr
     ));
     
     // Get address suggestions
-    if (sanitizedAddress.length > 2) {
-      getSuggestions(id, sanitizedAddress);
+    if (address.length > 2) {
+      getSuggestions(id, address);
     } else {
       setSuggestions(prev => ({ ...prev, [id]: [] }));
     }
@@ -79,7 +76,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
       const { data, error } = await supabase.functions.invoke('maps-api', {
         body: {
           service: 'geocoding',
-          address: sanitizeAddress(query) // Remove the automatic ", Canada" addition
+          address: query
         }
       });
 
@@ -89,7 +86,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
 
       if (data?.results) {
         const addressSuggestions = data.results
-          .map((result: any) => sanitizeAddress(result.formatted_address))
+          .map((result: any) => result.formatted_address)
           .slice(0, 5); // Limit to 5 suggestions
         setSuggestions(prev => ({ ...prev, [addressId]: addressSuggestions }));
       }

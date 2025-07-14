@@ -92,12 +92,8 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   };
 
   const updateField = (field: keyof PaymentData, value: string) => {
-    // For cardholder name, preserve spaces while sanitizing basic input
-    const sanitizedValue = field === 'cardholderName' 
-      ? value.replace(/[<>]/g, '').trim()
-      : value.replace(/[<>]/g, '').trim();
-    
-    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+    // No sanitization - just update the field
+    setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when user starts typing
     if (errors[field]) {
