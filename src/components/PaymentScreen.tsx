@@ -178,7 +178,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
 
       // Verify reCAPTCHA token
       const { data: verificationData, error: verificationError } = await supabase.functions.invoke('verify-recaptcha', {
-        body: { token: recaptchaToken }
+        body: { token: recaptchaToken, action: 'payment_submission' }
       });
 
       if (verificationError || !verificationData?.success) {
