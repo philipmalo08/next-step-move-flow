@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CreditCard, Lock, ArrowRight, User, Mail, Phone } from "lucide-react";
+import { CreditCard, Lock, ArrowRight, User, Mail, Phone, AlertTriangle } from "lucide-react";
 import { saveBooking, BookingData } from "@/lib/bookingService";
-
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
+import { paymentDataSchema } from "@/lib/validation";
+import { sanitizeInput, logSecurityEvent } from "@/lib/security";
 
 interface PaymentScreenProps {
   quote: {
@@ -92,7 +93,11 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   };
 
   const updateField = (field: keyof PaymentData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Sanitize input
+    const sanitizedValue = sanitizeInput(value);
+    
+    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+    
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -126,57 +131,64 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
     return v;
   };
 
-  const validateForm = () => {
-    const newErrors: Partial<PaymentData> = {};
-
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
-    if (!formData.cardNumber.replace(/\s/g, '').trim()) newErrors.cardNumber = 'Card number is required';
-    if (!formData.expiryDate.trim()) newErrors.expiryDate = 'Expiry date is required';
-    if (!formData.cvv.trim()) newErrors.cvv = 'CVV is required';
-    if (!formData.cardholderName.trim()) newErrors.cardholderName = 'Cardholder name is required';
-    if (!formData.billingAddress.trim()) newErrors.billingAddress = 'Billing address is required';
-    if (!formData.billingCity.trim()) newErrors.billingCity = 'City is required';
-    if (!formData.billingPostal.trim()) newErrors.billingPostal = 'Postal code is required';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validateForm = (): boolean => {
+    try {
+      // Use Zod schema for comprehensive validation
+      paymentDataSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error: any) {
+      const newErrors: Partial<PaymentData> = {};
+      
+      if (error.errors) {
+        error.errors.forEach((err: any) => {
+          const field = err.path[0] as keyof PaymentData;
+          newErrors[field] = err.message;
+        });
+      }
+      
+      setErrors(newErrors);
+      logSecurityEvent('payment_form_validation_failed', { 
+        errors: Object.keys(newErrors),
+        userAgent: navigator.userAgent 
+      });
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please correct the errors in the form.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
-    
-    try {
-      // Execute reCAPTCHA
-      const recaptchaToken = await executeRecaptcha('submit_booking');
-      console.log('reCAPTCHA token generated:', recaptchaToken);
 
-      // Verify reCAPTCHA token on server
-      const recaptchaVerification = await supabase.functions.invoke('verify-recaptcha', {
-        body: {
-          token: recaptchaToken,
-          action: 'submit_booking'
-        }
+    try {
+      // Execute reCAPTCHA for additional security
+      const recaptchaToken = await executeRecaptcha('payment_submission');
+
+      // Verify reCAPTCHA token
+      const { data: verificationData, error: verificationError } = await supabase.functions.invoke('verify-recaptcha', {
+        body: { token: recaptchaToken }
       });
 
-      if (recaptchaVerification.error || !recaptchaVerification.data?.success) {
-        console.error('reCAPTCHA verification failed:', recaptchaVerification.error || recaptchaVerification.data);
-        toast({
-          title: "Security Verification Failed",
-          description: "Please try again or contact support if the issue persists.",
-          variant: "destructive",
+      if (verificationError || !verificationData?.success) {
+        logSecurityEvent('recaptcha_verification_failed', { 
+          error: verificationError?.message,
+          success: verificationData?.success 
         });
-        return;
+        throw new Error('Security verification failed. Please try again.');
       }
 
-      console.log('reCAPTCHA verification successful:', recaptchaVerification.data);
-
-      // Get device session ID from localStorage (set during initialization)
-      const deviceId = localStorage.getItem('device_id');
+      // Get secure device session ID from localStorage
+      const deviceId = localStorage.getItem('secure_device_id');
       
       if (!deviceId) {
         throw new Error("Device session required");
