@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
 import { paymentDataSchema } from "@/lib/validation";
-import { sanitizeInput, logSecurityEvent } from "@/lib/security";
+import { sanitizeInput, sanitizeCardholderName, logSecurityEvent } from "@/lib/security";
 
 interface PaymentScreenProps {
   quote: {
@@ -93,8 +93,10 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   };
 
   const updateField = (field: keyof PaymentData, value: string) => {
-    // Sanitize input
-    const sanitizedValue = sanitizeInput(value);
+    // For cardholder name, preserve spaces while sanitizing
+    const sanitizedValue = field === 'cardholderName' 
+      ? sanitizeCardholderName(value)
+      : sanitizeInput(value);
     
     setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
     
@@ -199,9 +201,9 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
         .from('device_sessions')
         .select('id')
         .eq('device_id', deviceId)
-        .single();
+        .maybeSingle();
 
-      const userId = deviceSession?.id;
+      const userId = deviceSession?.id || deviceId;
       if (!userId) {
         throw new Error("Device session not found");
       }

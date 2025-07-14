@@ -86,6 +86,17 @@ export const sanitizeInput = (input: unknown): string => {
     .substring(0, SECURITY_CONFIG.MAX_INPUT_LENGTH);
 };
 
+// Sanitize cardholder name preserving spaces
+export const sanitizeCardholderName = (input: string): string => {
+  return input
+    .replace(/[<>]/g, '') // Remove HTML brackets
+    .replace(/javascript:/gi, '') // Remove javascript protocol
+    .replace(/on\w+=/gi, '') // Remove event handlers
+    .replace(/data:/gi, '') // Remove data URLs
+    .trim()
+    .substring(0, 100); // Limit length for cardholder names
+};
+
 // Log security events
 export const logSecurityEvent = (event: string, details: Record<string, any>) => {
   console.warn(`[SECURITY] ${event}:`, {
