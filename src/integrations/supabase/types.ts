@@ -101,42 +101,12 @@ export type Database = {
         }
         Relationships: []
       }
-      device_sessions: {
-        Row: {
-          created_at: string
-          device_id: string
-          expires_at: string
-          id: string
-          session_data: Json | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          device_id: string
-          expires_at?: string
-          id?: string
-          session_data?: Json | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          device_id?: string
-          expires_at?: string
-          id?: string
-          session_data?: Json | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_device_sessions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

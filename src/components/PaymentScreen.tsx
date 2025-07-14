@@ -180,29 +180,8 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
         throw new Error('Security verification failed. Please try again.');
       }
 
-      // Get secure device session ID from localStorage
-      const deviceId = localStorage.getItem('secure_device_id');
-      
-      if (!deviceId) {
-        throw new Error("Device session required");
-      }
-
-      // Get the device session from Supabase
-      const { data: deviceSession, error: sessionError } = await supabase
-        .from('device_sessions')
-        .select('id')
-        .eq('device_id', deviceId)
-        .maybeSingle();
-
-      if (sessionError) {
-        console.error('Device session error:', sessionError);
-        throw new Error("Failed to retrieve device session");
-      }
-
-      const userId = deviceSession?.id;
-      if (!userId) {
-        throw new Error("Valid device session required. Please refresh the page and try again.");
-      }
+      // Generate a simple user ID for the booking
+      const userId = crypto.randomUUID();
 
       // Prepare complete booking data
       const completeBookingData: BookingData = {
