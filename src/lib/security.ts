@@ -2,7 +2,7 @@
 
 export const SECURITY_CONFIG = {
   // reCAPTCHA configuration
-  RECAPTCHA_SITE_KEY: '6Lek9oErAAAAADbpSLJ0uMlVRCrHLDqwQb_Ze8bB',
+  RECAPTCHA_SITE_KEY: '6LcxIIIrAAAAAH2F07tO0GpMncJPgV1tDgNHwCaj',
   
   // Rate limiting
   MAX_API_REQUESTS_PER_MINUTE: 10,
