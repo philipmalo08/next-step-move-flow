@@ -176,8 +176,8 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
       status: 'confirmed'
     };
 
-    if (!userId) {
-      throw new Error("User must be authenticated to save booking");
+    if (!userId || userId.trim() === '') {
+      throw new Error("Valid user session required to save booking");
     }
     
     const { data, error } = await supabase

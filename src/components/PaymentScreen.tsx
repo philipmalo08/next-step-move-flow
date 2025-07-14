@@ -197,15 +197,20 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
       }
 
       // Get the device session from Supabase
-      const { data: deviceSession } = await supabase
+      const { data: deviceSession, error: sessionError } = await supabase
         .from('device_sessions')
         .select('id')
         .eq('device_id', deviceId)
         .maybeSingle();
 
-      const userId = deviceSession?.id || deviceId;
+      if (sessionError) {
+        console.error('Device session error:', sessionError);
+        throw new Error("Failed to retrieve device session");
+      }
+
+      const userId = deviceSession?.id;
       if (!userId) {
-        throw new Error("Device session not found");
+        throw new Error("Valid device session required. Please refresh the page and try again.");
       }
 
       // Prepare complete booking data

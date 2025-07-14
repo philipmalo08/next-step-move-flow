@@ -22,8 +22,9 @@ const sanitizeInput = (input: string): string => {
 
 const validateInput = (input: string): boolean => {
   if (!input || typeof input !== 'string') return false;
-  if (input.length < 3 || input.length > 500) return false;
-  if (!/^[a-zA-Z0-9\s,.-]+$/.test(input)) return false;
+  if (input.length < 2 || input.length > 500) return false;
+  // Allow common address characters including apostrophes, parentheses, forward slashes, etc.
+  if (!/^[a-zA-Z0-9\s,.'()-/&#]+$/.test(input)) return false;
   return true;
 };
 
