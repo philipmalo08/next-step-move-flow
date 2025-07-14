@@ -81,7 +81,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
       const { data, error } = await supabase.functions.invoke('maps-api', {
         body: {
           service: 'geocoding',
-          address: sanitizeAddress(query) + ', Canada' // Restrict to Canada and sanitize
+          address: sanitizeAddress(query) // Remove the automatic ", Canada" addition
         }
       });
 

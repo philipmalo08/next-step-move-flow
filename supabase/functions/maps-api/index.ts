@@ -97,8 +97,14 @@ const handler = async (req: Request): Promise<Response> => {
       }
       
       const sanitizedAddress = sanitizeInput(address);
-      // Restrict to Canada for security
-      const restrictedAddress = sanitizedAddress.includes('Canada') ? sanitizedAddress : `${sanitizedAddress}, Canada`;
+      // Only add Canada restriction if not already present and if address is too short/generic
+      const needsCanadaRestriction = !sanitizedAddress.toLowerCase().includes('canada') && 
+                                   !sanitizedAddress.toLowerCase().includes('quebec') &&
+                                   !sanitizedAddress.toLowerCase().includes('montreal') &&
+                                   !sanitizedAddress.toLowerCase().includes('toronto') &&
+                                   !sanitizedAddress.toLowerCase().includes('vancouver') &&
+                                   sanitizedAddress.length < 10;
+      const restrictedAddress = needsCanadaRestriction ? `${sanitizedAddress}, Canada` : sanitizedAddress;
       
       url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(restrictedAddress)}&key=${apiKey}&region=ca&components=country:CA`;
     } else if (service === 'distance' && origin && destination) {
