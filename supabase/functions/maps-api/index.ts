@@ -44,7 +44,7 @@ const logSecurityEvent = (event: string, details: Record<string, any>) => {
 };
 
 interface MapsRequest {
-  service: 'geocoding' | 'distance';
+  service: 'geocoding' | 'distance' | 'autocomplete';
   address?: string;
   origin?: string;
   destination?: string;
@@ -79,16 +79,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     let url: string;
     
-    if (service === 'geocoding' && address) {
+    if (service === 'autocomplete' && address) {
+      // Use Places API Autocomplete for address suggestions
+      if (!validateInput(address)) {
+        throw new Error('Invalid address format');
+      }
+      
+      url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(address.trim())}&key=${apiKey}&components=country:ca&types=address`;
+    } else if (service === 'geocoding' && address) {
       // Basic validation only
       if (!validateInput(address)) {
         throw new Error('Invalid address format');
       }
       
-      // Use address as-is, add Canada restriction only for very short queries
-      const addressToUse = address.trim().length < 3 ? `${address.trim()}, Canada` : address.trim();
-      
-      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressToUse)}&key=${apiKey}&region=ca&components=country:CA`;
+      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address.trim())}&key=${apiKey}&region=ca&components=country:CA`;
     } else if (service === 'distance' && origin && destination) {
       // Basic validation only
       if (!validateInput(origin) || !validateInput(destination)) {
@@ -111,6 +115,11 @@ const handler = async (req: Request): Promise<Response> => {
     const data = await response.json();
     
     // Validate response data structure
+    if (service === 'autocomplete' && (!data.predictions || !Array.isArray(data.predictions))) {
+      logSecurityEvent('invalid_autocomplete_response', { clientId });
+      throw new Error('Invalid autocomplete response');
+    }
+    
     if (service === 'geocoding' && (!data.results || !Array.isArray(data.results))) {
       logSecurityEvent('invalid_geocoding_response', { clientId });
       throw new Error('Invalid geocoding response');

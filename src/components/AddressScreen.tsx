@@ -76,7 +76,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
     try {
       const { data, error } = await supabase.functions.invoke('maps-api', {
         body: {
-          service: 'geocoding',
+          service: 'autocomplete',
           address: query
         }
       });
@@ -85,9 +85,9 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
         throw error;
       }
 
-      if (data?.results) {
-        const addressSuggestions = data.results
-          .map((result: any) => result.formatted_address)
+      if (data?.predictions) {
+        const addressSuggestions = data.predictions
+          .map((prediction: any) => prediction.description)
           .slice(0, 5); // Limit to 5 suggestions
         setSuggestions(prev => ({ ...prev, [addressId]: addressSuggestions }));
       }
