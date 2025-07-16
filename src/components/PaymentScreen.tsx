@@ -155,29 +155,43 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   };
 
   const validateForm = (): boolean => {
-    try {
-      // Use Zod schema for comprehensive validation
-      paymentDataSchema.parse(formData);
-      setErrors({});
-      return true;
-    } catch (error: any) {
-      const newErrors: Partial<PaymentData> = {};
-      
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          const field = err.path[0] as keyof PaymentData;
-          newErrors[field] = err.message;
-        });
-      }
-      
-      setErrors(newErrors);
-      return false;
+    const newErrors: Partial<PaymentData> = {};
+    
+    // Validate personal information (required for Stripe)
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
     }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    }
+    
+    // Validate billing address
+    if (!formData.billingAddress.trim()) {
+      newErrors.billingAddress = "Billing address is required";
+    }
+    
+    if (!formData.billingCity.trim()) {
+      newErrors.billingCity = "City is required";
+    }
+    
+    if (!formData.billingPostal.trim()) {
+      newErrors.billingPostal = "Postal code is required";
+    }
+    
+    // Card fields are no longer validated since Stripe handles payment
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleStripePayment = async () => {
     if (!validateForm()) {
       toast({
         title: "Validation Error",
@@ -207,33 +221,59 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
       sessionStorage.setItem('booking_session_id', sessionId);
       const userId = sessionId;
 
-      // Prepare complete booking data
+      // Prepare complete booking data and save to Supabase first
       const completeBookingData: BookingData = {
         ...bookingData,
         paymentData: formData
       };
 
-      // Save booking to Supabase
       const bookingId = await saveBooking(completeBookingData, userId, distance);
       
-      toast({
-        title: "Booking Confirmed!",
-        description: `Your booking has been saved with ID: ${bookingId}`,
+      // Store booking ID for later reference
+      sessionStorage.setItem('pending_booking_id', bookingId);
+
+      // Create Stripe payment session
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
+        body: {
+          amount: Math.round(quote.total * 100), // Convert to cents
+          currency: 'cad',
+          description: `Moving Service - Booking ${bookingId}`,
+          customerEmail: formData.email,
+          customerName: formData.fullName,
+          metadata: {
+            bookingId,
+            userId,
+            distance: distance.toString(),
+            serviceTier: bookingData.serviceTier.name
+          }
+        }
       });
 
-      // Proceed to confirmation screen
-      onNext(formData, bookingId);
+      if (paymentError || !paymentData?.url) {
+        throw new Error('Failed to create payment session');
+      }
+
+      // Store form data temporarily
+      sessionStorage.setItem('payment_form_data', JSON.stringify(formData));
+
+      // Redirect to Stripe Checkout
+      window.open(paymentData.url, '_blank');
       
     } catch (error) {
-      console.error("Error processing booking:", error);
+      console.error("Error processing payment:", error);
       toast({
-        title: "Booking Error",
-        description: "There was an issue saving your booking. Please try again.",
+        title: "Payment Error",
+        description: "There was an issue creating the payment session. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleStripePayment();
   };
 
   return (
@@ -296,77 +336,45 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
             <Card className="p-6 shadow-soft">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-primary" />
-                Payment Information
+                Secure Payment
               </h3>
               
-              {/* Credit Card Logos */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>We accept:</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-5 bg-gradient-to-r from-blue-600 to-blue-400 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">VISA</span>
-                  </div>
-                  <div className="w-8 h-5 bg-gradient-to-r from-red-600 to-orange-400 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">MC</span>
-                  </div>
-                  <div className="w-8 h-5 bg-gradient-to-r from-blue-500 to-green-500 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">AMEX</span>
-                  </div>
-                </div>
-              </div>
-              
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="cardNumber">Card Number *</Label>
-                  <Input
-                    id="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    value={formData.cardNumber}
-                    onChange={(e) => updateField('cardNumber', formatCardNumber(e.target.value))}
-                    maxLength={19}
-                    className={errors.cardNumber ? 'border-destructive' : ''}
-                  />
-                  {errors.cardNumber && <p className="text-xs text-destructive mt-1">{errors.cardNumber}</p>}
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="expiryDate">Expiry Date *</Label>
-                    <Input
-                      id="expiryDate"
-                      placeholder="MM/YY"
-                      value={formData.expiryDate}
-                      onChange={(e) => updateField('expiryDate', formatExpiryDate(e.target.value))}
-                      maxLength={5}
-                      className={errors.expiryDate ? 'border-destructive' : ''}
-                    />
-                    {errors.expiryDate && <p className="text-xs text-destructive mt-1">{errors.expiryDate}</p>}
+                <div className="p-4 bg-muted/30 rounded-lg border border-primary/20">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Lock className="w-5 h-5 text-primary" />
+                    <h4 className="font-medium">Powered by Stripe</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Your payment will be processed securely through Stripe. After clicking "Complete Booking", you'll be redirected to enter your payment information.
+                  </p>
+                  
+                  {/* Payment Methods */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>Accepted payments:</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-5 bg-gradient-to-r from-blue-600 to-blue-400 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">VISA</span>
+                      </div>
+                      <div className="w-8 h-5 bg-gradient-to-r from-red-600 to-orange-400 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">MC</span>
+                      </div>
+                      <div className="w-8 h-5 bg-gradient-to-r from-blue-500 to-green-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">AMEX</span>
+                      </div>
+                      <div className="w-8 h-5 bg-gradient-to-r from-gray-700 to-black rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">📱</span>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div>
-                    <Label htmlFor="cvv">CVV *</Label>
-                    <Input
-                      id="cvv"
-                      placeholder="123"
-                      value={formData.cvv}
-                      onChange={(e) => updateField('cvv', e.target.value.replace(/\D/g, '').substring(0, 4))}
-                      className={errors.cvv ? 'border-destructive' : ''}
-                    />
-                    {errors.cvv && <p className="text-xs text-destructive mt-1">{errors.cvv}</p>}
+                  <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                    <span>• Apple Pay</span>
+                    <span>• Google Pay</span>
+                    <span>• Credit/Debit Cards</span>
                   </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="cardholderName">Cardholder Name *</Label>
-                  <Input
-                    id="cardholderName"
-                    value={formData.cardholderName}
-                    onChange={(e) => updateField('cardholderName', e.target.value)}
-                    className={errors.cardholderName ? 'border-destructive' : ''}
-                  />
-                  {errors.cardholderName && <p className="text-xs text-destructive mt-1">{errors.cardholderName}</p>}
                 </div>
               </div>
             </Card>
@@ -477,8 +485,18 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
             className="group"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "Complete Booking"}
-            {!isSubmitting && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />}
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Creating Payment...
+              </div>
+            ) : (
+              <>
+                <CreditCard className="w-4 h-4 mr-2" />
+                Pay with Stripe
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+              </>
+            )}
           </Button>
         </div>
       </form>

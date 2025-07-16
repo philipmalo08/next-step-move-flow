@@ -1,1 +1,13 @@
 project_id = "eqqggvtodrgbboebvglh"
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.maps-api]
+verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.verify-recaptcha]
+verify_jwt = false
