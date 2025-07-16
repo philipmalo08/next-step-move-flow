@@ -169,21 +169,48 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
           billingPostal: postalCode
         }));
       } else {
+        // Parse Canadian postal code from the full address string
         const addressParts = pickupAddress.split(',');
-        if (addressParts.length >= 3) {
-          const streetAddress = addressParts[0].trim();
-          const cityPart = addressParts[addressParts.length - 3]?.trim() || '';
-          const lastPart = addressParts[addressParts.length - 1].trim();
-          const postalMatch = lastPart.match(/([A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d)/);
-          const postalPart = postalMatch ? postalMatch[1] : '';
-          
-          setFormData(prev => ({
-            ...prev,
-            billingAddress: streetAddress,
-            billingCity: cityPart,
-            billingPostal: postalPart
-          }));
+        const streetAddress = addressParts[0]?.trim() || '';
+        
+        // Find city and postal code from address parts
+        let city = '';
+        let postalCode = '';
+        
+        // Look for Canadian postal code pattern in any part
+        for (let i = 0; i < addressParts.length; i++) {
+          const part = addressParts[i].trim();
+          const canadianPostalMatch = part.match(/([A-Za-z]\d[A-Za-z]\s*\d[A-Za-z]\d)/);
+          if (canadianPostalMatch) {
+            postalCode = canadianPostalMatch[1].toUpperCase();
+            // City is usually in the part before the postal code
+            if (i > 0) {
+              city = addressParts[i - 1]?.trim() || '';
+            }
+            break;
+          }
         }
+        
+        // If no postal code found yet, try the last part
+        if (!postalCode && addressParts.length > 1) {
+          const lastPart = addressParts[addressParts.length - 1].trim();
+          const postalMatch = lastPart.match(/([A-Za-z]\d[A-Za-z]\s*\d[A-Za-z]\d)/);
+          if (postalMatch) {
+            postalCode = postalMatch[1].toUpperCase();
+          }
+        }
+        
+        // If no city found yet, use the second-to-last meaningful part
+        if (!city && addressParts.length >= 2) {
+          city = addressParts[addressParts.length - 2]?.trim() || '';
+        }
+        
+        setFormData(prev => ({
+          ...prev,
+          billingAddress: streetAddress,
+          billingCity: city,
+          billingPostal: postalCode
+        }));
       }
     }
   };

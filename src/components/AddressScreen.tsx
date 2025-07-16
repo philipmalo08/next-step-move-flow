@@ -374,11 +374,20 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               </Button>
               <Button 
                 onClick={() => onNext(addresses, distance)}
-                disabled={!canProceed}
+                disabled={!canProceed || isCalculatingDistance}
                 className="flex-1 bg-primary hover:bg-primary/90"
               >
-                Continue
-                <ArrowRight className="h-4 w-4 ml-2" />
+                {isCalculatingDistance ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Calculating...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>

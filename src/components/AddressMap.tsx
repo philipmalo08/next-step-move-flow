@@ -143,7 +143,7 @@ export const AddressMap: React.FC<AddressMapProps> = ({ addresses, distance, cla
     if (window.google?.maps) return;
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA2CIVa3xLSb0EzCf-JBTD_L24uz24NsKA&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA2CIVa3xLSb0EzCf-JBTD_L24uz24NsKA&libraries=places&loading=async`;
     script.async = true;
     script.defer = true;
     
@@ -151,11 +151,17 @@ export const AddressMap: React.FC<AddressMapProps> = ({ addresses, distance, cla
       // Script loaded, component will re-render and initialize map
     };
     
+    const onError = () => {
+      console.error('Failed to load Google Maps script');
+    };
+    
     script.addEventListener('load', onLoad);
+    script.addEventListener('error', onError);
     document.head.appendChild(script);
 
     return () => {
       script.removeEventListener('load', onLoad);
+      script.removeEventListener('error', onError);
       if (document.head.contains(script)) {
         document.head.removeChild(script);
       }
