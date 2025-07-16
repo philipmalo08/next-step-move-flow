@@ -59,7 +59,7 @@ export interface BookingData {
 // Simplified interface for Supabase storage
 export interface SupabaseBookingData {
   booking_id: string;
-  user_id: string;
+  user_id: string; // Now TEXT to support both auth UUIDs and session IDs
   customer_name: string;
   customer_email: string;
   customer_phone: string;
@@ -179,6 +179,8 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
     if (!userId || userId.trim() === '') {
       throw new Error("Valid user session required to save booking");
     }
+
+    console.log("Attempting to save booking with user_id:", userId);
     
     const { data, error } = await supabase
       .from('bookings')
