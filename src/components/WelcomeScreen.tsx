@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Truck, ArrowRight, Star } from "lucide-react";
+import logoImage from "@/assets/next-movement-logo.png";
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -15,9 +16,14 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-primary rounded-full shadow-glow animate-bounce-gentle">
               <Truck className="w-12 h-12 text-primary-foreground" />
             </div>
-            <h1 className="mt-4 text-3xl md:text-4xl font-bold text-foreground">
-              Next <span className="bg-gradient-primary bg-clip-text text-transparent">Movement</span>
-            </h1>
+            <img 
+              src={logoImage} 
+              alt="Next Movement" 
+              className="mt-4 h-16 md:h-20 w-auto mx-auto"
+              style={{ 
+                filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.1))'
+              }}
+            />
             <p className="mt-3 text-lg text-muted-foreground max-w-xl mx-auto">
               Your move, simplified. Get an instant quote and book your move in minutes.
             </p>

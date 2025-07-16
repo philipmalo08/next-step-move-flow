@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, Minus, X, ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Minus } from "lucide-react";
 
 interface Item {
   id: string;
@@ -16,13 +13,6 @@ interface Item {
   emoji?: string;
 }
 
-interface CustomItem {
-  name: string;
-  length: number;
-  width: number;
-  height: number;
-  weight: number;
-}
 
 // Item catalog with predefined items and their properties (volume in cu ft, weight in lbs)
 const itemCatalog: Record<string, Array<{id: string; name: string; volume: number; weight: number; emoji: string}>> = {
@@ -109,8 +99,6 @@ interface ItemsScreenProps {
 
 export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
   const [items, setItems] = useState<Item[]>([]);
-  const [customItem, setCustomItem] = useState<CustomItem>({ name: '', length: 0, width: 0, height: 0, weight: 0 });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const updateQuantity = (itemData: Omit<Item, 'id' | 'quantity'>, change: number) => {
     setItems(prev => {
@@ -137,23 +125,6 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
     });
   };
 
-  const addCustomItem = () => {
-    if (customItem.name && customItem.weight > 0) {
-      const volume = customItem.length * customItem.width * customItem.height;
-      const newItem: Item = {
-        id: Date.now().toString(),
-        name: customItem.name,
-        category: 'Custom',
-        weight: customItem.weight,
-        volume: volume,
-        quantity: 1,
-        emoji: "📦"
-      };
-      setItems(prev => [...prev, newItem]);
-      setCustomItem({ name: '', length: 0, width: 0, height: 0, weight: 0 });
-      setIsDialogOpen(false);
-    }
-  };
 
   const getItemQuantity = (itemData: Omit<Item, 'id' | 'quantity'>) => {
     return items.find(item => item.name === itemData.name)?.quantity || 0;
@@ -164,7 +135,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
   const totalVolume = items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const customItems = items.filter(item => item.category === 'Custom');
+  
 
   return (
     <div className="min-h-screen bg-gradient-background px-4 py-6">
@@ -228,46 +199,15 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
               </div>
             ))}
 
-            {/* Custom Items */}
+            {/* Instructions */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-primary border-b pb-2">Custom Items</h3>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(true)}
-                  className="flex items-center gap-2"
-                  size="sm"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Custom
-                </Button>
-              </div>
-
-              {customItems.length > 0 && (
-                <div className="space-y-2">
-                  {customItems.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">📦</span>
-                        <div>
-                          <span className="font-medium text-sm">{item.name}</span>
-                          <div className="text-xs text-muted-foreground">Qty: {item.quantity}</div>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setItems(prev => prev.filter(i => i.id !== item.id));
-                        }}
-                        className="text-destructive hover:text-destructive h-8 w-8 p-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <Card className="bg-accent/50 border-0">
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                    <strong>If you are unsure about one of your large items, pick the item that resembles it the most. If you have a small miscellaneous item that is not on the list, choose 1 packed box per item.</strong>
+                  </p>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Navigation */}
@@ -288,79 +228,6 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Custom Item Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="mx-4">
-          <DialogHeader>
-            <DialogTitle>Add Custom Item</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="itemName">Item Name</Label>
-              <Input
-                id="itemName"
-                value={customItem.name}
-                onChange={(e) => setCustomItem(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter item name"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label htmlFor="length">Length (ft)</Label>
-                <Input
-                  id="length"
-                  type="number"
-                  step="0.1"
-                  value={customItem.length}
-                  onChange={(e) => setCustomItem(prev => ({ ...prev, length: parseFloat(e.target.value) || 0 }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="width">Width (ft)</Label>
-                <Input
-                  id="width"
-                  type="number"
-                  step="0.1"
-                  value={customItem.width}
-                  onChange={(e) => setCustomItem(prev => ({ ...prev, width: parseFloat(e.target.value) || 0 }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="height">Height (ft)</Label>
-                <Input
-                  id="height"
-                  type="number"
-                  step="0.1"
-                  value={customItem.height}
-                  onChange={(e) => setCustomItem(prev => ({ ...prev, height: parseFloat(e.target.value) || 0 }))}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="weight">Weight (lbs)</Label>
-              <Input
-                id="weight"
-                type="number"
-                value={customItem.weight}
-                onChange={(e) => setCustomItem(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
-              />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">
-              Cancel
-            </Button>
-            <Button 
-              onClick={addCustomItem}
-              disabled={!customItem.name || customItem.weight <= 0}
-              className="flex-1"
-            >
-              Add Item
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
       
       {/* Copyright Footer */}
       <div className="text-center py-4">
