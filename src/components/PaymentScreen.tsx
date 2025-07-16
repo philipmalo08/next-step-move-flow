@@ -71,8 +71,13 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
       const addressParts = pickupAddress.split(',');
       if (addressParts.length >= 3) {
         const streetAddress = addressParts[0].trim();
-        const cityPart = addressParts[addressParts.length - 2].trim();
-        const postalPart = addressParts[addressParts.length - 1].trim();
+        // The city is typically the second-to-last part before province/country
+        const cityPart = addressParts[addressParts.length - 3]?.trim() || '';
+        // Extract postal code from the last part (should contain postal code and country)
+        const lastPart = addressParts[addressParts.length - 1].trim();
+        // Canadian postal codes are in format like "H1A 1A1" - extract just the postal code
+        const postalMatch = lastPart.match(/([A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d)/);
+        const postalPart = postalMatch ? postalMatch[1] : '';
         
         setFormData(prev => ({
           ...prev,

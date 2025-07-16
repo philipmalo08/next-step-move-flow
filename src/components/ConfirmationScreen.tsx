@@ -162,7 +162,7 @@ export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScre
       {/* Actions */}
       <div className="text-center space-y-4">
         <p className="text-muted-foreground">
-          Need to make changes? Contact us at <span className="font-medium">1-800-MOVE-NOW</span> or <span className="font-medium">support@nextmovement.com</span>
+          Need to make changes? Contact us at <span className="font-medium">(438) 543-0904</span> or <span className="font-medium">mouvementsuivant@outlook.com</span>
         </p>
         
         <Button 
