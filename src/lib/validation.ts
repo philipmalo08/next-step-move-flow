@@ -24,7 +24,7 @@ export const addressArraySchema = z.array(addressSchema)
     'At least one dropoff address required'
   );
 
-// Payment validation schema
+// Payment validation schema (for Stripe embedded elements)
 export const paymentDataSchema = z.object({
   fullName: z.string()
     .min(2, 'Full name must be at least 2 characters')
@@ -33,17 +33,6 @@ export const paymentDataSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string()
     .regex(/^\+?1?[-.\s]?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/, 'Invalid phone number'),
-  cardNumber: z.string()
-    .regex(/^[0-9\s]+$/, 'Card number must contain only numbers and spaces')
-    .refine((val) => val.replace(/\s/g, '').length >= 13, 'Card number too short'),
-  expiryDate: z.string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Invalid expiry date format (MM/YY)'),
-  cvv: z.string()
-    .regex(/^[0-9]{3,4}$/, 'CVV must be 3-4 digits'),
-  cardholderName: z.string()
-    .min(2, 'Cardholder name must be at least 2 characters')
-    .max(100, 'Cardholder name too long')
-    .regex(/^[a-zA-Z\s'-]+$/, 'Cardholder name contains invalid characters'),
   billingAddress: z.string()
     .min(5, 'Billing address must be at least 5 characters')
     .max(500, 'Billing address too long'),

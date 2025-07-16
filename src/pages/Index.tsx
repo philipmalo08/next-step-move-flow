@@ -47,10 +47,6 @@ interface PaymentData {
   fullName: string;
   email: string;
   phone: string;
-  cardNumber: string;
-  expiryDate: string;
-  cvv: string;
-  cardholderName: string;
   billingAddress: string;
   billingCity: string;
   billingPostal: string;

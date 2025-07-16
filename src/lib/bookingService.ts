@@ -36,10 +36,6 @@ export interface BookingData {
     fullName: string;
     email: string;
     phone: string;
-    cardNumber: string;
-    expiryDate: string;
-    cvv: string;
-    cardholderName: string;
     billingAddress: string;
     billingCity: string;
     billingPostal: string;
@@ -90,9 +86,7 @@ export interface SupabaseBookingData {
     fullName: string;
     email: string;
     phone: string;
-    cardholderName: string;
     billingAddress: string;
-    last4: string;
   };
   status: 'confirmed' | 'pending' | 'cancelled';
 }
@@ -163,14 +157,12 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
       estimated_total_weight: totalWeight,
       estimated_total_volume: totalVolume,
       
-      // Payment details summary (without sensitive card details)
+      // Payment details summary
       payment_details_summary: {
         fullName: bookingData.paymentData.fullName,
         email: bookingData.paymentData.email,
         phone: bookingData.paymentData.phone,
-        cardholderName: bookingData.paymentData.cardholderName,
         billingAddress: bookingData.paymentData.billingAddress,
-        last4: bookingData.paymentData.cardNumber.slice(-4)
       },
       
       // Metadata

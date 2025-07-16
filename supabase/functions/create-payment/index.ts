@@ -54,47 +54,22 @@ serve(async (req) => {
       }
     }
 
-    // Create checkout session for one-time payment
-    const session = await stripe.checkout.sessions.create({
+    // Create PaymentIntent for embedded elements
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount), // Ensure it's an integer
+      currency,
       customer: customerId,
-      customer_email: customerId ? undefined : customerEmail,
-      payment_method_types: ["card"],
-      // Enable Apple Pay and Google Pay
-      payment_method_options: {
-        card: {
-          request_three_d_secure: "automatic",
-        },
-      },
-      line_items: [
-        {
-          price_data: {
-            currency,
-            product_data: {
-              name: description,
-              description: "Moving service booking",
-            },
-            unit_amount: Math.round(amount), // Ensure it's an integer
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/payment-cancelled`,
       metadata: metadata || {},
-      // Enable automatic tax calculation if needed
-      automatic_tax: { enabled: false },
-      // Custom fields for additional information
-      custom_fields: [],
-      // Allow promotion codes
-      allow_promotion_codes: true,
+      automatic_payment_methods: {
+        enabled: true,
+      },
     });
 
-    console.log("Stripe checkout session created:", session.id);
+    console.log("Stripe PaymentIntent created:", paymentIntent.id);
 
     return new Response(JSON.stringify({ 
-      url: session.url,
-      sessionId: session.id
+      client_secret: paymentIntent.client_secret,
+      payment_intent_id: paymentIntent.id
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
