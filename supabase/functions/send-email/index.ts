@@ -24,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('SendGrid API key not configured');
     }
 
-    const { to, subject, html, from = 'Next Movement <noreply@yourdomain.com>' }: EmailRequest = await req.json();
+    const { to, subject, html, from = 'mouvementsuivant@outlook.com' }: EmailRequest = await req.json();
 
     const emailData = {
       personalizations: [
@@ -33,7 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
           subject: subject
         }
       ],
-      from: { email: from.includes('<') ? from.split('<')[1].split('>')[0] : from, name: from.includes('<') ? from.split('<')[0].trim() : 'Next Movement' },
+      from: { email: "mouvementsuivant@outlook.com", name: "Next Movement" },
       content: [
         {
           type: 'text/html',

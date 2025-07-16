@@ -7,6 +7,7 @@ export interface BookingData {
     id: string;
     address: string;
     type: 'pickup' | 'dropoff';
+    components?: any[]; // Google address components
   }>;
   serviceTier: {
     id: string;
@@ -276,10 +277,10 @@ const sendBookingConfirmationEmail = async (bookingData: BookingData, bookingId:
           <p>We'll contact you 24 hours before your move to confirm details and provide our team's contact information.</p>
         </div>
         
-        <div class="footer">
-          <p>Thank you for choosing Next Movement!</p>
-          <p>Need help? Contact us at support@nextmovement.com</p>
-        </div>
+         <div class="footer">
+           <p>Thank you for choosing Next Movement!</p>
+           <p>Need help? Contact us at (438) 543-0904 or mouvementsuivant@outlook.com</p>
+         </div>
       </div>
     </body>
     </html>

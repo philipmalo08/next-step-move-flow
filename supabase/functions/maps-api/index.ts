@@ -44,10 +44,11 @@ const logSecurityEvent = (event: string, details: Record<string, any>) => {
 };
 
 interface MapsRequest {
-  service: 'geocoding' | 'distance' | 'autocomplete';
+  service: 'geocoding' | 'distance' | 'autocomplete' | 'place-details';
   address?: string;
   origin?: string;
   destination?: string;
+  placeId?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -70,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { service, address, origin, destination }: MapsRequest = await req.json();
+    const { service, address, origin, destination, placeId }: MapsRequest = await req.json();
     const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
 
     if (!apiKey) {
@@ -86,6 +87,13 @@ const handler = async (req: Request): Promise<Response> => {
       }
       
       url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(address.trim())}&key=${apiKey}&components=country:ca&types=address`;
+    } else if (service === 'place-details' && placeId) {
+      // Use Place Details API to get full address components including postal code
+      if (!validateInput(placeId)) {
+        throw new Error('Invalid place ID format');
+      }
+      
+      url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=address_components,formatted_address&key=${apiKey}`;
     } else if (service === 'geocoding' && address) {
       // Basic validation only
       if (!validateInput(address)) {
@@ -101,7 +109,7 @@ const handler = async (req: Request): Promise<Response> => {
       
       url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin.trim())}&destinations=${encodeURIComponent(destination.trim())}&key=${apiKey}&region=ca`;
     } else {
-      logSecurityEvent('invalid_service_request', { service, hasAddress: !!address, hasOrigin: !!origin, hasDestination: !!destination, clientId });
+      logSecurityEvent('invalid_service_request', { service, hasAddress: !!address, hasOrigin: !!origin, hasDestination: !!destination, hasPlaceId: !!placeId, clientId });
       throw new Error('Invalid request parameters');
     }
 
@@ -118,6 +126,11 @@ const handler = async (req: Request): Promise<Response> => {
     if (service === 'autocomplete' && (!data.predictions || !Array.isArray(data.predictions))) {
       logSecurityEvent('invalid_autocomplete_response', { clientId });
       throw new Error('Invalid autocomplete response');
+    }
+    
+    if (service === 'place-details' && !data.result) {
+      logSecurityEvent('invalid_place_details_response', { clientId });
+      throw new Error('Invalid place details response');
     }
     
     if (service === 'geocoding' && (!data.results || !Array.isArray(data.results))) {

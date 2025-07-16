@@ -67,31 +67,52 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   const handleSameAsPickupChange = (checked: boolean) => {
     setSameAsPickup(checked);
     if (checked && pickupAddress) {
-      // Extract city and postal from pickup address (basic parsing)
-      const addressParts = pickupAddress.split(',');
-      if (addressParts.length >= 3) {
-        const streetAddress = addressParts[0].trim();
-        // The city is typically the second-to-last part before province/country
-        const cityPart = addressParts[addressParts.length - 3]?.trim() || '';
-        // Extract postal code from the last part (should contain postal code and country)
-        const lastPart = addressParts[addressParts.length - 1].trim();
-        // Canadian postal codes are in format like "H1A 1A1" - extract just the postal code
-        const postalMatch = lastPart.match(/([A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d)/);
-        const postalPart = postalMatch ? postalMatch[1] : '';
+      // Try to parse address using Google address components if available
+      // This assumes the address data includes components from Google Places API
+      const addressData = bookingData.addresses?.find(addr => addr.type === 'pickup');
+      
+      if (addressData?.components) {
+        // Extract components from Google Places API response
+        const streetNumber = addressData.components.find((comp: any) => comp.types.includes('street_number'))?.long_name || '';
+        const streetName = addressData.components.find((comp: any) => comp.types.includes('route'))?.long_name || '';
+        const city = addressData.components.find((comp: any) => comp.types.includes('locality'))?.long_name || '';
+        const postalCode = addressData.components.find((comp: any) => comp.types.includes('postal_code'))?.long_name || '';
+        
+        const streetAddress = `${streetNumber} ${streetName}`.trim();
         
         setFormData(prev => ({
           ...prev,
-          billingAddress: streetAddress,
-          billingCity: cityPart,
-          billingPostal: postalPart
+          billingAddress: streetAddress || pickupAddress.split(',')[0]?.trim() || '',
+          billingCity: city,
+          billingPostal: postalCode
         }));
       } else {
-        setFormData(prev => ({
-          ...prev,
-          billingAddress: pickupAddress,
-          billingCity: '',
-          billingPostal: ''
-        }));
+        // Fallback to basic parsing if no Google components available
+        const addressParts = pickupAddress.split(',');
+        if (addressParts.length >= 3) {
+          const streetAddress = addressParts[0].trim();
+          // The city is typically the second-to-last part before province/country
+          const cityPart = addressParts[addressParts.length - 3]?.trim() || '';
+          // Extract postal code from the last part (should contain postal code and country)
+          const lastPart = addressParts[addressParts.length - 1].trim();
+          // Canadian postal codes are in format like "H1A 1A1" - extract just the postal code
+          const postalMatch = lastPart.match(/([A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d)/);
+          const postalPart = postalMatch ? postalMatch[1] : '';
+          
+          setFormData(prev => ({
+            ...prev,
+            billingAddress: streetAddress,
+            billingCity: cityPart,
+            billingPostal: postalPart
+          }));
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            billingAddress: pickupAddress,
+            billingCity: '',
+            billingPostal: ''
+          }));
+        }
       }
     }
   };

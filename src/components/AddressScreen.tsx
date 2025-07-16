@@ -13,6 +13,7 @@ interface Address {
   id: string;
   address: string;
   type: 'pickup' | 'dropoff';
+  components?: any[]; // Store Google address components
 }
 
 interface AddressScreenProps {
@@ -28,7 +29,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   ]);
   const [distance, setDistance] = useState<number>(0);
   const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
-  const [suggestions, setSuggestions] = useState<{[key: string]: string[]}>({});
+  const [suggestions, setSuggestions] = useState<{[key: string]: Array<{description: string; place_id: string}>}>({});
   const [loadingSuggestions, setLoadingSuggestions] = useState<{[key: string]: boolean}>({});
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
@@ -87,7 +88,10 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
 
       if (data?.predictions) {
         const addressSuggestions = data.predictions
-          .map((prediction: any) => prediction.description)
+          .map((prediction: any) => ({
+            description: prediction.description,
+            place_id: prediction.place_id
+          }))
           .slice(0, 5); // Limit to 5 suggestions
         setSuggestions(prev => ({ ...prev, [addressId]: addressSuggestions }));
       }
@@ -103,11 +107,44 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
     }
   };
 
-  const selectSuggestion = (addressId: string, suggestion: string) => {
+  const selectSuggestion = async (addressId: string, suggestion: { description: string; place_id: string }) => {
+    // First, update the display with the selected address
     setAddresses(prev => prev.map(addr => 
-      addr.id === addressId ? { ...addr, address: suggestion } : addr
+      addr.id === addressId ? { ...addr, address: suggestion.description } : addr
     ));
     setSuggestions(prev => ({ ...prev, [addressId]: [] }));
+
+    // Then fetch detailed place information to get postal code and other components
+    try {
+      const { data, error } = await supabase.functions.invoke('maps-api', {
+        body: {
+          service: 'place-details',
+          placeId: suggestion.place_id
+        }
+      });
+
+      if (error) {
+        console.error('Error getting place details:', error);
+        return;
+      }
+
+      if (data?.result?.address_components) {
+        // Store the detailed address components for later use
+        const addressComponents = data.result.address_components;
+        const formattedAddress = data.result.formatted_address;
+        
+        // Update the address with formatted address and store components
+        setAddresses(prev => prev.map(addr => 
+          addr.id === addressId ? { 
+            ...addr, 
+            address: formattedAddress,
+            components: addressComponents 
+          } : addr
+        ));
+      }
+    } catch (error) {
+      console.error('Error fetching place details:', error);
+    }
   };
 
   const addStop = (type: 'pickup' | 'dropoff') => {
@@ -217,7 +254,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                               className="w-full text-left px-3 py-2 text-sm hover:bg-muted focus:bg-muted focus:outline-none"
                               onClick={() => selectSuggestion(addr.id, suggestion)}
                             >
-                              {suggestion}
+                              {suggestion.description}
                             </button>
                           ))}
                         </div>
@@ -286,7 +323,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                               className="w-full text-left px-3 py-2 text-sm hover:bg-muted focus:bg-muted focus:outline-none"
                               onClick={() => selectSuggestion(addr.id, suggestion)}
                             >
-                              {suggestion}
+                              {suggestion.description}
                             </button>
                           ))}
                         </div>
