@@ -1,21 +1,17 @@
 import { Canvas } from '@react-three/fiber';
-import { Text3D, Center, Float, OrbitControls } from '@react-three/drei';
+import { Center, Float, OrbitControls } from '@react-three/drei';
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-function AnimatedText({ 
-  children, 
+function Letter3D({ 
   position, 
   color = '#000000', 
-  fontSize = 1,
-  ...props 
+  scale = 1
 }: {
-  children: string;
   position: [number, number, number];
   color?: string;
-  fontSize?: number;
-  [key: string]: any;
+  scale?: number;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   
@@ -27,32 +23,19 @@ function AnimatedText({
 
   return (
     <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
-      <Text3D
-        ref={meshRef}
-        font="/fonts/helvetiker_regular.typeface.json"
-        position={position}
-        size={fontSize}
-        height={0.2}
-        curveSegments={12}
-        bevelEnabled
-        bevelThickness={0.02}
-        bevelSize={0.02}
-        bevelOffset={0}
-        bevelSegments={5}
-        {...props}
-      >
-        {children}
+      <mesh ref={meshRef} position={position} scale={scale}>
+        <boxGeometry args={[0.6, 0.8, 0.2]} />
         <meshStandardMaterial 
           color={color}
           metalness={0.3}
           roughness={0.4}
         />
-      </Text3D>
+      </mesh>
     </Float>
   );
 }
 
-function Arrow({ 
+function Arrow3D({ 
   position, 
   rotation, 
   color = '#3b82f6',
@@ -92,9 +75,6 @@ function Logo3DScene() {
       <directionalLight 
         position={[10, 10, 5]} 
         intensity={1}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
       />
       <pointLight position={[-10, -10, -10]} intensity={0.3} />
       
@@ -102,28 +82,18 @@ function Logo3DScene() {
         <group>
           {/* NEXT line */}
           <group position={[0, 0.5, 0]}>
-            <AnimatedText 
-              position={[-2.5, 0, 0]} 
-              color="#3b82f6" 
-              fontSize={0.8}
-            >
-              N
-            </AnimatedText>
-            <Arrow 
+            <Letter3D position={[-2.5, 0, 0]} color="#3b82f6" />
+            <Arrow3D 
               position={[-1.8, 0.3, 0]} 
               rotation={[0, 0, 0]} 
               color="#3b82f6"
               scale={0.2}
             />
-            <AnimatedText 
-              position={[-1.2, 0, 0]} 
-              color="#000000" 
-              fontSize={0.8}
-            >
-              EXT
-            </AnimatedText>
-            <Arrow 
-              position={[0.5, 0, 0]} 
+            <Letter3D position={[-1.2, 0, 0]} color="#000000" />
+            <Letter3D position={[-0.6, 0, 0]} color="#000000" />
+            <Letter3D position={[0, 0, 0]} color="#000000" />
+            <Arrow3D 
+              position={[0.6, 0, 0]} 
               rotation={[0, 0, -Math.PI / 2]} 
               color="#000000"
               scale={0.2}
@@ -132,21 +102,15 @@ function Logo3DScene() {
           
           {/* MOVEMENT line */}
           <group position={[0, -0.5, 0]}>
-            <AnimatedText 
-              position={[-2.8, 0, 0]} 
-              color="#dc2626" 
-              fontSize={0.8}
-            >
-              M
-            </AnimatedText>
-            <AnimatedText 
-              position={[-1.8, 0, 0]} 
-              color="#000000" 
-              fontSize={0.8}
-            >
-              OVEMENT
-            </AnimatedText>
-            <Arrow 
+            <Letter3D position={[-2.8, 0, 0]} color="#dc2626" />
+            <Letter3D position={[-2.2, 0, 0]} color="#000000" />
+            <Letter3D position={[-1.6, 0, 0]} color="#000000" />
+            <Letter3D position={[-1.0, 0, 0]} color="#000000" />
+            <Letter3D position={[-0.4, 0, 0]} color="#000000" />
+            <Letter3D position={[0.2, 0, 0]} color="#000000" />
+            <Letter3D position={[0.8, 0, 0]} color="#000000" />
+            <Letter3D position={[1.4, 0, 0]} color="#000000" />
+            <Arrow3D 
               position={[2.2, 0, 0]} 
               rotation={[0, 0, -Math.PI / 2]} 
               color="#3b82f6"
