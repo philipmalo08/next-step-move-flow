@@ -170,10 +170,10 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
 
       if (!pickup || !dropoff) {
         setDistance(0);
+        setIsCalculatingDistance(false);
         return;
       }
 
-      setIsCalculatingDistance(true);
       try {
         const { data, error } = await supabase.functions.invoke('maps-api', {
           body: {
@@ -199,8 +199,19 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
       }
     };
 
+    // Set calculating state immediately when addresses change
+    const pickup = addresses.find(addr => addr.type === 'pickup' && addr.address.trim());
+    const dropoff = addresses.find(addr => addr.type === 'dropoff' && addr.address.trim());
+    
+    if (pickup && dropoff) {
+      setIsCalculatingDistance(true);
+    }
+
     const timeoutId = setTimeout(calculateDistance, 1000); // Debounce API calls
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      // Don't reset calculating state here as it should be handled by calculateDistance
+    };
   }, [addresses]);
 
   return (
