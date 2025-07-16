@@ -20,9 +20,6 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               src={logoImage} 
               alt="Next Movement" 
               className="mt-4 h-16 md:h-20 w-auto mx-auto"
-              style={{ 
-                filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.1))'
-              }}
             />
             <p className="mt-3 text-lg text-muted-foreground max-w-xl mx-auto">
               Your move, simplified. Get an instant quote and book your move in minutes.
