@@ -53,10 +53,40 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
   const { toast } = useToast();
   const { executeRecaptcha } = useRecaptcha();
 
+  const validateFormData = (): boolean => {
+    const requiredFields = ['fullName', 'email', 'phone', 'billingAddress', 'billingCity', 'billingPostal'];
+    const emptyFields = requiredFields.filter(field => !formData[field as keyof PaymentData]?.trim());
+    
+    if (emptyFields.length > 0) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields before proceeding with payment.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    // Email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!stripe || !elements) {
+      return;
+    }
+
+    if (!validateFormData()) {
       return;
     }
 
@@ -262,19 +292,19 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
     return Object.keys(newErrors).length === 0;
   };
 
-  // Create PaymentIntent when form is valid
+  // Create PaymentIntent when quote is available
   useEffect(() => {
     const createPaymentIntent = async () => {
-      if (!validateForm() || !quote?.total) return;
+      if (!quote?.total) return;
 
       try {
         const { data, error } = await supabase.functions.invoke('create-payment', {
           body: {
             amount: Math.round(quote.total * 100), // Convert to cents
             currency: 'cad',
-            description: `Moving Service`,
-            customerEmail: formData.email,
-            customerName: formData.fullName,
+            description: `Moving Service - ${bookingData.serviceTier.name}`,
+            customerEmail: formData.email || "guest@example.com",
+            customerName: formData.fullName || "Guest Customer",
             metadata: {
               distance: distance.toString(),
               serviceTier: bookingData.serviceTier.name
@@ -286,10 +316,14 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
 
         if (data?.client_secret) {
           setClientSecret(data.client_secret);
-          setIsFormValid(true);
         }
       } catch (error) {
         console.error('Payment intent creation error:', error);
+        toast({
+          title: "Payment Setup Error",
+          description: "Failed to initialize payment. Please try again.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -415,7 +449,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
           </Card>
 
           {/* Stripe Elements Payment Form */}
-          {clientSecret && isFormValid && (
+          {clientSecret && (
             <Card className="p-6 shadow-soft">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Lock className="w-5 h-5 text-primary" />
