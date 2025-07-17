@@ -22,19 +22,23 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                 <div className="flex items-center text-4xl md:text-5xl font-bold">
                   <span className="text-blue-600 relative">
                     N
-                    <svg className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -top-3 -right-1 w-6 h-6 md:w-7 md:h-7" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2L12 22M12 2L6 8M12 2L18 8" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </span>
-                  <span className="text-black">EXT</span>
-                  <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <span className="text-black">EX</span>
+                  <span className="text-blue-600 relative">
+                    T
+                    <svg className="absolute -top-3 -right-1 w-6 h-6 md:w-7 md:h-7" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
                 </div>
                 {/* MOVEMENT line */}
                 <div className="flex items-center text-4xl md:text-5xl font-bold">
                   <span className="text-red-600">M</span>
-                  <span className="text-black">OVEMENT</span>
+                  <span className="text-black">OVEMEN</span>
+                  <span className="text-blue-600">T</span>
                   <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
