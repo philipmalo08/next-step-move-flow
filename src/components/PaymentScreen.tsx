@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -259,6 +260,20 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <PaymentElement />
+        
+        {/* Terms and Conditions */}
+        <div className="text-center text-sm text-muted-foreground">
+          By completing this booking, you agree to our{" "}
+          <Link 
+            to="/terms-conditions" 
+            className="text-primary hover:underline font-medium"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Terms and Conditions
+          </Link>
+        </div>
+        
         <Button 
           type="submit" 
           disabled={!stripe || isLoading} 

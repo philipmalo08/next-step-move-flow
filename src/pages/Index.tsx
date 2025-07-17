@@ -8,6 +8,7 @@ import { QuoteScreen } from "@/components/QuoteScreen";
 import { PaymentScreen } from "@/components/PaymentScreen";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
+import { HelpSupportButton } from "@/components/HelpSupportButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 
@@ -134,7 +135,12 @@ const Index = () => {
 
 
   if (currentStep === 0) {
-    return <WelcomeScreen onStart={handleStart} />;
+    return (
+      <>
+        <WelcomeScreen onStart={handleStart} />
+        <HelpSupportButton />
+      </>
+    );
   }
 
   return (
@@ -221,6 +227,8 @@ const Index = () => {
           />
         )}
       </div>
+      
+      <HelpSupportButton />
     </div>
   );
 };

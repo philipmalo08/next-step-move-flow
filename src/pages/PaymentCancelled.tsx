@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { XCircle, ArrowLeft, Home } from "lucide-react";
+import { HelpSupportButton } from "@/components/HelpSupportButton";
 
 export default function PaymentCancelled() {
   return (
@@ -48,6 +49,8 @@ export default function PaymentCancelled() {
           </div>
         </Card>
       </div>
+      
+      <HelpSupportButton />
     </div>
   );
 }

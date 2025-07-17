@@ -3,6 +3,7 @@ import { useSearchParams, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Home, Receipt } from "lucide-react";
+import { HelpSupportButton } from "@/components/HelpSupportButton";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function PaymentSuccess() {
@@ -105,6 +106,8 @@ export default function PaymentSuccess() {
           </div>
         </Card>
       </div>
+      
+      <HelpSupportButton />
     </div>
   );
 }
