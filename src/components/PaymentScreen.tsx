@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
 
-const stripePromise = loadStripe('pk_test_51RkHNORATEydiMXFiY8vMoWlYzxjYCzLgMyG8RwkMKUhI4GHLbWvUQQX9GHJFm4F0qrH0n0zlkSsLQhDlFHhIGpm00jrnJMCWw');
+// Replace with your actual Stripe publishable key
+const stripePromise = loadStripe('pk_test_YOUR_ACTUAL_PUBLISHABLE_KEY_HERE');
 
 interface PaymentScreenProps {
   quote: {
