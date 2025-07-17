@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,8 +50,91 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentRequest, setPaymentRequest] = useState<any>(null);
+  const [canMakePayment, setCanMakePayment] = useState(false);
   const { toast } = useToast();
   const { executeRecaptcha } = useRecaptcha();
+
+  // Set up Payment Request for Google Pay and Apple Pay
+  useEffect(() => {
+    if (stripe) {
+      const pr = stripe.paymentRequest({
+        country: 'CA',
+        currency: 'cad',
+        total: {
+          label: 'Moving Service',
+          amount: Math.round(quote.total * 100), // Convert to cents
+        },
+        requestPayerName: true,
+        requestPayerEmail: true,
+        requestPayerPhone: true,
+      });
+
+      // Check if Payment Request is available
+      pr.canMakePayment().then(result => {
+        if (result) {
+          setPaymentRequest(pr);
+          setCanMakePayment(true);
+        }
+      });
+
+      pr.on('paymentmethod', async (e) => {
+        try {
+          setIsLoading(true);
+          
+          // Execute reCAPTCHA for additional security
+          const recaptchaToken = await executeRecaptcha('payment_submission');
+
+          // Verify reCAPTCHA token
+          const { data: verificationData, error: verificationError } = await supabase.functions.invoke('verify-recaptcha', {
+            body: { token: recaptchaToken, action: 'payment_submission' }
+          });
+
+          if (verificationError || !verificationData.success) {
+            throw new Error('Security verification failed. Please try again.');
+          }
+
+          const paymentData = {
+            fullName: e.paymentMethod.billing_details.name || '',
+            email: e.paymentMethod.billing_details.email || '',
+            phone: e.paymentMethod.billing_details.phone || '',
+            billingAddress: e.paymentMethod.billing_details.address?.line1 || '',
+            billingCity: e.paymentMethod.billing_details.address?.city || '',
+            billingPostal: e.paymentMethod.billing_details.address?.postal_code || '',
+          };
+
+          // Save booking - returns a booking ID string
+          const bookingId = await saveBooking({
+            ...bookingData,
+            paymentData,
+          });
+
+          if (bookingId) {
+            // Complete the payment request
+            e.complete('success');
+            toast({
+              title: "Payment Successful!",
+              description: "Your booking has been confirmed.",
+            });
+            window.location.href = `/payment-success?booking_id=${bookingId}`;
+          } else {
+            e.complete('fail');
+            throw new Error('Failed to create booking');
+          }
+        } catch (error) {
+          console.error('Error processing payment:', error);
+          e.complete('fail');
+          toast({
+            title: "Payment Error",
+            description: error instanceof Error ? error.message : "There was an issue processing the payment. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      });
+    }
+  }, [stripe, quote.total, executeRecaptcha, bookingData]);
 
   const validateFormData = (): boolean => {
     const requiredFields = ['fullName', 'email', 'phone', 'billingAddress', 'billingCity', 'billingPostal'];
@@ -148,17 +231,44 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
-      <Button 
-        type="submit" 
-        disabled={!stripe || isLoading} 
-        className="w-full"
-        size="lg"
-      >
-        {isLoading ? 'Processing...' : `Complete Booking - $${quote?.total?.toFixed(2) || 0}`}
-      </Button>
-    </form>
+    <div className="space-y-6">
+      {/* Google Pay and Apple Pay buttons */}
+      {canMakePayment && paymentRequest && (
+        <div className="space-y-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-muted" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or pay with</span>
+            </div>
+          </div>
+          <PaymentRequestButtonElement 
+            options={{ paymentRequest, style: { paymentRequestButton: { height: '48px' } } }} 
+          />
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-muted" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or pay with card</span>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <PaymentElement />
+        <Button 
+          type="submit" 
+          disabled={!stripe || isLoading} 
+          className="w-full"
+          size="lg"
+        >
+          {isLoading ? 'Processing...' : `Complete Booking - $${quote?.total?.toFixed(2) || 0}`}
+        </Button>
+      </form>
+    </div>
   );
 };
 

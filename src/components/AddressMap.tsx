@@ -35,108 +35,116 @@ export const AddressMap: React.FC<AddressMapProps> = ({ addresses, distance, cla
   const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!mapRef.current || !window.google?.maps) return;
+    const initializeMap = () => {
+      if (!mapRef.current || !window.google?.maps) return;
 
-    const pickup = addresses.find(addr => addr.type === 'pickup' && addr.address.trim());
-    const dropoff = addresses.find(addr => addr.type === 'dropoff' && addr.address.trim());
+      const pickup = addresses.find(addr => addr.type === 'pickup' && addr.address.trim());
+      const dropoff = addresses.find(addr => addr.type === 'dropoff' && addr.address.trim());
 
-    if (!pickup || !dropoff) return;
+      if (!pickup || !dropoff) return;
 
-    try {
-      // Initialize map
-      const map = new window.google.maps.Map(mapRef.current, {
-        zoom: 11,
-        center: { lat: 45.5017, lng: -73.5673 }, // Montreal center
-        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-        styles: [
-          {
-            featureType: "all",
-            elementType: "geometry.fill",
-            stylers: [{ color: "#f5f5f5" }]
-          },
-          {
-            featureType: "road",
-            elementType: "geometry",
-            stylers: [{ color: "#ffffff" }]
-          },
-          {
-            featureType: "water",
-            elementType: "geometry",
-            stylers: [{ color: "#c9c9c9" }]
+      try {
+        // Initialize map
+        const map = new window.google.maps.Map(mapRef.current, {
+          zoom: 11,
+          center: { lat: 45.5017, lng: -73.5673 }, // Montreal center
+          mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+          styles: [
+            {
+              featureType: "all",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#f5f5f5" }]
+            },
+            {
+              featureType: "road",
+              elementType: "geometry",
+              stylers: [{ color: "#ffffff" }]
+            },
+            {
+              featureType: "water",
+              elementType: "geometry",
+              stylers: [{ color: "#c9c9c9" }]
+            }
+          ]
+        });
+
+        mapInstanceRef.current = map;
+
+        // Create directions service and renderer
+        const directionsService = new window.google.maps.DirectionsService();
+        const directionsRenderer = new window.google.maps.DirectionsRenderer({
+          suppressMarkers: false,
+        });
+
+        directionsRenderer.setMap(map);
+
+        // Calculate and display route
+        directionsService.route({
+          origin: pickup.address,
+          destination: dropoff.address,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+          region: 'CA'
+        }, (result: any, status: string) => {
+          if (status === 'OK' && result) {
+            directionsRenderer.setDirections(result);
+            
+            // Add custom markers for pickup and dropoff
+            const route = result.routes[0];
+            const leg = route.legs[0];
+            
+            // Pickup marker (green)
+            new window.google.maps.Marker({
+              position: leg.start_location,
+              map: map,
+              title: 'Pickup Location',
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: '#16a34a',
+                fillOpacity: 1,
+                strokeColor: '#ffffff',
+                strokeWeight: 2,
+              }
+            });
+            
+            // Dropoff marker (red)
+            new window.google.maps.Marker({
+              position: leg.end_location,
+              map: map,
+              title: 'Dropoff Location',
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: '#dc2626',
+                fillOpacity: 1,
+                strokeColor: '#ffffff',
+                strokeWeight: 2,
+              }
+            });
+          } else {
+            console.error('Directions request failed:', status);
+            
+            // Fallback: just show the map centered on Montreal
+            map.setCenter({ lat: 45.5017, lng: -73.5673 });
           }
-        ]
-      });
+        });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    };
 
-      mapInstanceRef.current = map;
-
-      // Create directions service and renderer
-      const directionsService = new window.google.maps.DirectionsService();
-      const directionsRenderer = new window.google.maps.DirectionsRenderer({
-        suppressMarkers: false,
-      });
-
-      directionsRenderer.setMap(map);
-
-      // Calculate and display route
-      directionsService.route({
-        origin: pickup.address,
-        destination: dropoff.address,
-        travelMode: window.google.maps.TravelMode.DRIVING,
-        region: 'CA'
-      }, (result: any, status: string) => {
-        if (status === 'OK' && result) {
-          directionsRenderer.setDirections(result);
-          
-          // Add custom markers for pickup and dropoff
-          const route = result.routes[0];
-          const leg = route.legs[0];
-          
-          // Pickup marker (green)
-          new window.google.maps.Marker({
-            position: leg.start_location,
-            map: map,
-            title: 'Pickup Location',
-            icon: {
-              path: window.google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-              fillColor: '#16a34a',
-              fillOpacity: 1,
-              strokeColor: '#ffffff',
-              strokeWeight: 2,
-            }
-          });
-          
-          // Dropoff marker (red)
-          new window.google.maps.Marker({
-            position: leg.end_location,
-            map: map,
-            title: 'Dropoff Location',
-            icon: {
-              path: window.google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-              fillColor: '#dc2626',
-              fillOpacity: 1,
-              strokeColor: '#ffffff',
-              strokeWeight: 2,
-            }
-          });
-        } else {
-          console.error('Directions request failed:', status);
-          
-          // Fallback: just show the map centered on Montreal
-          map.setCenter({ lat: 45.5017, lng: -73.5673 });
-        }
-      });
-    } catch (error) {
-      console.error('Error initializing map:', error);
-    }
+    // Add a delay to ensure the component is mounted and visible
+    const timer = setTimeout(() => {
+      initializeMap();
+    }, 100);
 
     return () => {
+      clearTimeout(timer);
       if (mapInstanceRef.current) {
         mapInstanceRef.current = null;
       }
     };
-  }, [addresses]);
+  }, [addresses, window.google?.maps]);
 
   // Load Google Maps script if not already loaded
   useEffect(() => {
