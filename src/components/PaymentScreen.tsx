@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
 
-const stripePromise = loadStripe('pk_test_51RkHNORATEydiMXF2HU30fVHXrYPMq4zvE9iXgIDJu2eqj5IbDK7eOhL1KM5dfGV9JqMBK9CH6HIWERUfi21JqUh008FtyrUB5');
+const stripePromise = loadStripe('pk_test_51RkHNORATEydiMXF2HU30fVHXrYPMq4zvE9iXgIDJu2eqj5IbDK7eOhL1KM5dfGV9JqMBK9CH6HIWERUfi21JqUh008FtyrUB5'); // In production, this should be an environment variable
 
 interface PaymentScreenProps {
   quote: {

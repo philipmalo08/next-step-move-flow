@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-const RECAPTCHA_SITE_KEY = '6LcxIIIrAAAAAH2F07tO0GpMncJPgV1tDgNHwCaj';
+const RECAPTCHA_SITE_KEY = '6LcxIIIrAAAAAH2F07tO0GpMncJPgV1tDgNHwCaj'; // In production, this should be an environment variable
 
 export const useRecaptcha = () => {
   // Execute reCAPTCHA on page load for general protection

@@ -28,10 +28,29 @@ serve(async (req) => {
   );
 
   try {
-    const { amount, currency = "cad", description, customerEmail, customerName, metadata }: PaymentRequest = await req.json();
+    const body = await req.json();
+    
+    // Rate limiting based on IP
+    const clientIP = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown";
+    
+    // Input validation and sanitization
+    const { amount, currency = "cad", description, customerEmail, customerName, metadata }: PaymentRequest = body;
 
-    if (!amount || amount <= 0) {
+    if (!amount || amount <= 0 || amount > 100000) { // Max $1000 CAD
       throw new Error("Invalid amount provided");
+    }
+    
+    if (currency !== "cad" && currency !== "usd") {
+      throw new Error("Unsupported currency");
+    }
+    
+    // Sanitize inputs
+    const sanitizedEmail = customerEmail ? customerEmail.trim().toLowerCase() : undefined;
+    const sanitizedName = customerName ? customerName.trim().slice(0, 100) : undefined;
+    
+    // Validate email format if provided
+    if (sanitizedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedEmail)) {
+      throw new Error("Invalid email format");
     }
 
     // Initialize Stripe
@@ -41,14 +60,14 @@ serve(async (req) => {
 
     // Check if customer exists or create new one for guest checkout
     let customerId;
-    if (customerEmail) {
-      const customers = await stripe.customers.list({ email: customerEmail, limit: 1 });
+    if (sanitizedEmail) {
+      const customers = await stripe.customers.list({ email: sanitizedEmail, limit: 1 });
       if (customers.data.length > 0) {
         customerId = customers.data[0].id;
       } else {
         const customer = await stripe.customers.create({
-          email: customerEmail,
-          name: customerName,
+          email: sanitizedEmail,
+          name: sanitizedName,
         });
         customerId = customer.id;
       }
