@@ -16,32 +16,11 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-primary rounded-full shadow-glow animate-bounce-gentle">
               <Truck className="w-12 h-12 text-primary-foreground" />
             </div>
-            <div className="mt-4 mx-auto text-center">
-              <div className="inline-flex flex-col items-center gap-1">
-                {/* NEXT line */}
-                <div className="flex items-center text-4xl md:text-5xl font-bold">
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative">
-                    N
-                    <svg className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L12 22M12 2L6 8M12 2L18 8" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">EXT</span>
-                  <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                {/* MOVEMENT line */}
-                <div className="flex items-center text-4xl md:text-5xl font-bold">
-                  <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">M</span>
-                  <span className="bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">OVEMEN</span>
-                  <span className="text-blue-600">T</span>
-                  <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
+            <img 
+              src={logoImage} 
+              alt="Next Movement" 
+              className="mt-4 h-16 md:h-20 w-auto mx-auto"
+            />
             <p className="mt-3 text-lg text-muted-foreground max-w-xl mx-auto">
               Your move, simplified. Get an instant quote and book your move in minutes.
             </p>
