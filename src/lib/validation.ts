@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { sanitizeEmail, sanitizePhone, sanitizeAddress, sanitizeText } from "./sanitization";
 
 // Address validation schema
 export const addressSchema = z.object({
@@ -24,24 +25,28 @@ export const addressArraySchema = z.array(addressSchema)
     'At least one dropoff address required'
   );
 
-// Payment validation schema (for Stripe embedded elements)
+// Payment validation schema with enhanced security
 export const paymentDataSchema = z.object({
   fullName: z.string()
     .min(2, 'Full name must be at least 2 characters')
     .max(100, 'Full name too long')
-    .regex(/^[a-zA-Z\s'-]+$/, 'Full name contains invalid characters'),
-  email: z.string().email('Invalid email address'),
+    .transform(val => sanitizeText(val, 100)),
+  email: z.string().email('Invalid email address')
+    .transform(val => sanitizeEmail(val)),
   phone: z.string()
-    .regex(/^\+?1?[-.\s]?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/, 'Invalid phone number'),
+    .regex(/^\+?1?[-.\s]?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/, 'Invalid phone number')
+    .transform(val => sanitizePhone(val)),
   billingAddress: z.string()
     .min(5, 'Billing address must be at least 5 characters')
-    .max(500, 'Billing address too long'),
+    .max(500, 'Billing address too long')
+    .transform(val => sanitizeAddress(val)),
   billingCity: z.string()
     .min(2, 'City must be at least 2 characters')
     .max(100, 'City name too long')
-    .regex(/^[a-zA-Z\s'-]+$/, 'City contains invalid characters'),
+    .transform(val => sanitizeText(val, 100)),
   billingPostal: z.string()
     .regex(/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/, 'Invalid Canadian postal code')
+    .transform(val => sanitizeText(val, 20))
 });
 
 // Booking data validation schema
@@ -79,10 +84,6 @@ export const bookingDataSchema = z.object({
 // Basic validation helpers - minimal sanitization to preserve user input
 export const sanitizeString = (input: string): string => {
   return input.trim();
-};
-
-export const sanitizeAddress = (address: string): string => {
-  return address.trim().substring(0, 500); // Just trim and limit length
 };
 
 // Rate limiting helper

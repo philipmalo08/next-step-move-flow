@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getUserIdentifier } from "./sessionManager";
+import { paymentDataSchema } from "./validation";
 
 export interface BookingData {
   date: Date;
@@ -95,6 +97,9 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
   try {
     console.log("Starting saveBooking with userId:", userId);
     
+    // Validate and sanitize payment data
+    const validatedPaymentData = paymentDataSchema.parse(bookingData.paymentData);
+    
     // Generate a unique booking ID
     const bookingId = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
     
@@ -122,14 +127,16 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
       }));
     
     // Prepare data for Supabase storage
+    const finalUserId = userId || await getUserIdentifier();
+    
     const bookingRecord = {
       booking_id: bookingId,
-      user_id: userId || '',
+      user_id: finalUserId,
       
-      // Personal information
-      customer_name: bookingData.paymentData.fullName,
-      customer_email: bookingData.paymentData.email,
-      customer_phone: bookingData.paymentData.phone,
+      // Personal information (using validated data)
+      customer_name: validatedPaymentData.fullName,
+      customer_email: validatedPaymentData.email,
+      customer_phone: validatedPaymentData.phone,
       
       // Booking details
       booking_date: bookingData.date.toISOString().split('T')[0], // Convert to date string
@@ -157,23 +164,23 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
       estimated_total_weight: totalWeight,
       estimated_total_volume: totalVolume,
       
-      // Payment details summary
+      // Payment details summary (using validated data)
       payment_details_summary: {
-        fullName: bookingData.paymentData.fullName,
-        email: bookingData.paymentData.email,
-        phone: bookingData.paymentData.phone,
-        billingAddress: bookingData.paymentData.billingAddress,
+        fullName: validatedPaymentData.fullName,
+        email: validatedPaymentData.email,
+        phone: validatedPaymentData.phone,
+        billingAddress: validatedPaymentData.billingAddress,
       },
       
       // Metadata
       status: 'confirmed'
     };
 
-    if (!userId || userId.trim() === '') {
+    if (!finalUserId || finalUserId.trim() === '') {
       throw new Error("Valid user session required to save booking");
     }
 
-    console.log("Attempting to save booking with user_id:", userId);
+    console.log("Attempting to save booking with user_id:", finalUserId);
     
     const { data, error } = await supabase
       .from('bookings')
