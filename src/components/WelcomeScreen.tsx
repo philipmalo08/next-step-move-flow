@@ -20,21 +20,22 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="inline-flex flex-col items-center gap-1">
                 {/* NEXT line */}
                 <div className="flex items-center text-4xl md:text-5xl font-bold">
-                  <span className="text-blue-600 relative">
+                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent relative">
                     N
-                    <svg className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2L12 22M12 2L6 8M12 2L18 8" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </span>
-                  <span className="text-black">EXT</span>
-                  <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-black" viewBox="0 0 24 24" fill="currentColor">
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">EXT</span>
+                  <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
                 {/* MOVEMENT line */}
                 <div className="flex items-center text-4xl md:text-5xl font-bold">
-                  <span className="text-red-600">M</span>
-                  <span className="text-black">OVEMENT</span>
+                  <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">M</span>
+                  <span className="bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">OVEMEN</span>
+                  <span className="text-blue-600">T</span>
                   <svg className="ml-1 w-4 h-4 md:w-5 md:h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M2 12L22 12M22 12L16 6M22 12L16 18" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
