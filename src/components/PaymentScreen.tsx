@@ -267,8 +267,6 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
           <Link 
             to="/terms-conditions" 
             className="text-primary hover:underline font-medium"
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Terms and Conditions
           </Link>

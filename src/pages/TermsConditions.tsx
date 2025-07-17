@@ -132,8 +132,6 @@ const TermsConditions = () => {
                   Additional charges may apply for:
                 </p>
                 <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground">
-                  <li>Stairs or elevator usage not disclosed during booking</li>
-                  <li>Long carry distances from truck to building entrance</li>
                   <li>Packing services requested on moving day</li>
                   <li>Waiting time due to customer delays</li>
                 </ul>
