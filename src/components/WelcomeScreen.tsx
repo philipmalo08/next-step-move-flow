@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Truck, ArrowRight, Star } from "lucide-react";
-import logoImage from "@/assets/next-movement-logo-generated.png";
+import logoImage from "@/assets/next-movement-logo-gradient-bg.png";
 
 interface WelcomeScreenProps {
   onStart: () => void;
