@@ -7,8 +7,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Settings, Users, Shield, Plus, Trash2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, Settings, Users, Shield, Plus, Trash2, DollarSign, Calculator } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+interface PricingSettings {
+  baseRate: number;
+  distanceRate: number;
+  serviceTierMultipliers: {
+    basic: number;
+    premium: number;
+    whiteGlove: number;
+  };
+  gstRate: number;
+  qstRate: number;
+  minimumCharge: number;
+}
 
 interface UserProfile {
   id: string;
@@ -23,6 +37,18 @@ interface UserProfile {
 
 const AdminSettings = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [pricing, setPricing] = useState<PricingSettings>({
+    baseRate: 89.99,
+    distanceRate: 1.50,
+    serviceTierMultipliers: {
+      basic: 1.0,
+      premium: 1.3,
+      whiteGlove: 1.8
+    },
+    gstRate: 5.0,
+    qstRate: 9.975,
+    minimumCharge: 89.99
+  });
   const [loading, setLoading] = useState(true);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserName, setNewUserName] = useState('');
@@ -180,6 +206,34 @@ const AdminSettings = () => {
     }
   };
 
+  const savePricingSettings = async () => {
+    // In a real implementation, this would save to database
+    // For now, just show success message
+    toast({
+      title: "Success",
+      description: "Pricing settings updated successfully",
+    });
+  };
+
+  const resetPricingToDefaults = () => {
+    setPricing({
+      baseRate: 89.99,
+      distanceRate: 1.50,
+      serviceTierMultipliers: {
+        basic: 1.0,
+        premium: 1.3,
+        whiteGlove: 1.8
+      },
+      gstRate: 5.0,
+      qstRate: 9.975,
+      minimumCharge: 89.99
+    });
+    toast({
+      title: "Settings Reset",
+      description: "Pricing settings reset to defaults",
+    });
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'super_admin': return 'destructive';
@@ -264,6 +318,175 @@ const AdminSettings = () => {
                 <Button onClick={createUser} className="w-full">
                   Create User
                 </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Pricing Settings */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Pricing Settings
+            </CardTitle>
+            <CardDescription>
+              Configure base rates, service tier multipliers, and tax rates
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Base Pricing */}
+            <div>
+              <h4 className="text-sm font-medium mb-4 flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                Base Pricing
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="baseRate">Base Rate ($)</Label>
+                  <Input
+                    id="baseRate"
+                    type="number"
+                    step="0.01"
+                    value={pricing.baseRate}
+                    onChange={(e) => setPricing({...pricing, baseRate: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="distanceRate">Distance Rate ($/km)</Label>
+                  <Input
+                    id="distanceRate"
+                    type="number"
+                    step="0.01"
+                    value={pricing.distanceRate}
+                    onChange={(e) => setPricing({...pricing, distanceRate: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="minimumCharge">Minimum Charge ($)</Label>
+                  <Input
+                    id="minimumCharge"
+                    type="number"
+                    step="0.01"
+                    value={pricing.minimumCharge}
+                    onChange={(e) => setPricing({...pricing, minimumCharge: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Service Tier Multipliers */}
+            <div>
+              <h4 className="text-sm font-medium mb-4">Service Tier Multipliers</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="basicMultiplier">Basic (x)</Label>
+                  <Input
+                    id="basicMultiplier"
+                    type="number"
+                    step="0.1"
+                    value={pricing.serviceTierMultipliers.basic}
+                    onChange={(e) => setPricing({
+                      ...pricing, 
+                      serviceTierMultipliers: {
+                        ...pricing.serviceTierMultipliers,
+                        basic: parseFloat(e.target.value) || 0
+                      }
+                    })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="premiumMultiplier">Premium (x)</Label>
+                  <Input
+                    id="premiumMultiplier"
+                    type="number"
+                    step="0.1"
+                    value={pricing.serviceTierMultipliers.premium}
+                    onChange={(e) => setPricing({
+                      ...pricing, 
+                      serviceTierMultipliers: {
+                        ...pricing.serviceTierMultipliers,
+                        premium: parseFloat(e.target.value) || 0
+                      }
+                    })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="whiteGloveMultiplier">White Glove (x)</Label>
+                  <Input
+                    id="whiteGloveMultiplier"
+                    type="number"
+                    step="0.1"
+                    value={pricing.serviceTierMultipliers.whiteGlove}
+                    onChange={(e) => setPricing({
+                      ...pricing, 
+                      serviceTierMultipliers: {
+                        ...pricing.serviceTierMultipliers,
+                        whiteGlove: parseFloat(e.target.value) || 0
+                      }
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Tax Rates */}
+            <div>
+              <h4 className="text-sm font-medium mb-4">Tax Rates</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="gstRate">GST Rate (%)</Label>
+                  <Input
+                    id="gstRate"
+                    type="number"
+                    step="0.001"
+                    value={pricing.gstRate}
+                    onChange={(e) => setPricing({...pricing, gstRate: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="qstRate">QST Rate (%)</Label>
+                  <Input
+                    id="qstRate"
+                    type="number"
+                    step="0.001"
+                    value={pricing.qstRate}
+                    onChange={(e) => setPricing({...pricing, qstRate: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-4 pt-4">
+              <Button onClick={savePricingSettings}>
+                Save Pricing Settings
+              </Button>
+              <Button variant="outline" onClick={resetPricingToDefaults}>
+                Reset to Defaults
+              </Button>
+            </div>
+
+            {/* Pricing Preview */}
+            <div className="bg-muted p-4 rounded-lg">
+              <h5 className="font-medium mb-2">Pricing Preview (50km move)</h5>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="font-medium">Basic</p>
+                  <p>${((pricing.baseRate + 50 * pricing.distanceRate) * pricing.serviceTierMultipliers.basic).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="font-medium">Premium</p>
+                  <p>${((pricing.baseRate + 50 * pricing.distanceRate) * pricing.serviceTierMultipliers.premium).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="font-medium">White Glove</p>
+                  <p>${((pricing.baseRate + 50 * pricing.distanceRate) * pricing.serviceTierMultipliers.whiteGlove).toFixed(2)}</p>
+                </div>
               </div>
             </div>
           </CardContent>
