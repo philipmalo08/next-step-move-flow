@@ -9,6 +9,7 @@ import { PaymentScreen } from "@/components/PaymentScreen";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { StepIndicator } from "@/components/StepIndicator";
 import { HelpSupportButton } from "@/components/HelpSupportButton";
+import Chatbot from "@/components/Chatbot";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 
@@ -138,7 +139,8 @@ const Index = () => {
     return (
       <>
         <WelcomeScreen onStart={handleStart} />
-        <HelpSupportButton />
+      <HelpSupportButton />
+      <Chatbot />
       </>
     );
   }
