@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Phone, Mail, HelpCircle } from "lucide-react";
+import { Phone, Mail, HelpCircle, FileQuestion } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const HelpSupportButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,13 @@ export const HelpSupportButton = () => {
           </DialogHeader>
           
           <div className="space-y-6 py-4">
+            <Link to="/faq" onClick={() => setIsOpen(false)} className="block">
+              <Button variant="outline" className="w-full justify-start">
+                <FileQuestion className="w-4 h-4 mr-2" />
+                View FAQ
+              </Button>
+            </Link>
+            
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center space-x-3 p-4 bg-muted rounded-lg">
                 <Phone className="w-5 h-5 text-primary" />
