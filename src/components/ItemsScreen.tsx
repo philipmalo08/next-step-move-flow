@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, Plus, Minus } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Item {
   id: string;
@@ -99,6 +100,7 @@ interface ItemsScreenProps {
 
 export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
   const [items, setItems] = useState<Item[]>([]);
+  const { t } = useLanguage();
 
   const updateQuantity = (itemData: Omit<Item, 'id' | 'quantity'>, change: number) => {
     setItems(prev => {
@@ -142,7 +144,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
       <div className="max-w-2xl mx-auto">
         <Card className="shadow-lg">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl sm:text-2xl">What items are you moving?</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">{t('items.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Summary */}
@@ -150,9 +152,9 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
               <Card className="bg-accent/50 border-0">
                 <CardContent className="pt-4 pb-4">
                   <div className="text-center">
-                    <h3 className="font-semibold mb-3 text-lg">Current Selection</h3>
+                    <h3 className="font-semibold mb-3 text-lg">{t('items.currentSelection')}</h3>
                     <div className="text-2xl font-bold text-primary">
-                      {totalItems} {totalItems === 1 ? 'Item' : 'Items'}
+                      {totalItems} {totalItems === 1 ? t('items.item') : t('items.items')}
                     </div>
                   </div>
                 </CardContent>
@@ -162,7 +164,15 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
             {/* Categories */}
             {Object.entries(itemCatalog).map(([category, items]) => (
               <div key={category} className="space-y-3">
-                <h3 className="text-lg font-semibold text-primary border-b pb-2">{category}</h3>
+                <h3 className="text-lg font-semibold text-primary border-b pb-2">{
+                  category === 'Living Room' ? t('items.categories.livingRoom') :
+                  category === 'Bedroom' ? t('items.categories.bedroom') :
+                  category === 'Kitchen' ? t('items.categories.kitchen') :
+                  category === 'Office' ? t('items.categories.office') :
+                  category === 'Appliances' ? t('items.categories.appliances') :
+                  category === 'Miscellaneous' ? t('items.categories.miscellaneous') :
+                  category
+                }</h3>
                 <div className="space-y-2">
                   {items.map((item) => {
                     const quantity = getItemQuantity({...item, category});
@@ -204,7 +214,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
               <Card className="bg-accent/50 border-0">
                 <CardContent className="pt-4 pb-4">
                   <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                    <strong>If you are unsure about one of your large items, pick the item that resembles it the most. If you have a small miscellaneous item that is not on the list, choose 1 packed box per item.</strong>
+                    <strong>{t('items.instructions')}</strong>
                   </p>
                 </CardContent>
               </Card>
@@ -214,14 +224,14 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
             <div className="flex gap-3 pt-6">
               <Button variant="outline" onClick={onBack} className="flex-1">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                {t('back')}
               </Button>
               <Button 
                 onClick={() => onNext(items)}
                 disabled={totalItems === 0}
                 className="flex-1 bg-primary hover:bg-primary/90"
               >
-                Get Quote
+                {t('items.getQuote')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
@@ -231,7 +241,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
       
       {/* Copyright Footer */}
       <div className="text-center py-4">
-        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground">{t('welcome.copyright')}</p>
       </div>
     </div>
   );

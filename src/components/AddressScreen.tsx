@@ -245,7 +245,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                     <div className="flex-1 relative">
                       <Input
                         id={`address-${addr.id}`}
-                        placeholder={index === 0 ? "Enter pickup address" : "Additional pickup location"}
+                        placeholder={index === 0 ? t('address.placeholder') : t('address.addPickup')}
                         value={addr.address}
                         onChange={(e) => updateAddress(addr.id, e.target.value)}
                         className={`text-sm ${validationErrors[addr.id] ? 'border-destructive' : ''}`}
@@ -297,7 +297,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-red-600" />
-                <Label className="text-sm font-semibold">Dropoff Location{dropoffAddresses.length > 1 ? 's' : ''}</Label>
+                <Label className="text-sm font-semibold">{t('address.dropoff')}{dropoffAddresses.length > 1 ? 's' : ''}</Label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -314,7 +314,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                     <div className="flex-1 relative">
                       <Input
                         id={`address-${addr.id}`}
-                        placeholder={index === 0 ? "Enter dropoff address" : "Additional dropoff location"}
+                        placeholder={index === 0 ? t('address.placeholder') : t('address.addDropoff')}
                         value={addr.address}
                         onChange={(e) => updateAddress(addr.id, e.target.value)}
                         className={`text-sm ${validationErrors[addr.id] ? 'border-destructive' : ''}`}
@@ -367,11 +367,11 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <p className="text-sm font-medium">
-                    Estimated distance: {distance.toFixed(1)} km
+                    {t('estimatedDistance')}: {distance.toFixed(1)} km
                   </p>
                   {isCalculatingDistance && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Calculating route...
+                      {t('calculatingRoute')}...
                     </p>
                   )}
                 </div>
@@ -383,7 +383,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
             <div className="flex gap-3 pt-4">
               <Button variant="outline" onClick={onBack} className="flex-1">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                {t('back')}
               </Button>
               <Button 
                 onClick={() => onNext(addresses, distance)}
@@ -393,11 +393,11 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
                 {isCalculatingDistance ? (
                   <>
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                    Calculating...
+                    {t('calculatingRoute')}...
                   </>
                 ) : (
                   <>
-                    Continue
+                    {t('continue')}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </>
                 )}
@@ -408,7 +408,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
         
         {/* Copyright Footer */}
         <div className="text-center py-4">
-          <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">{t('welcome.copyright')}</p>
         </div>
       </div>
     </div>

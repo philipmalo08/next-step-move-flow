@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Calculator, MapPin, Package, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Item {
   id: string;
@@ -41,6 +42,7 @@ interface QuoteData {
 export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: QuoteScreenProps) {
   const [quote, setQuote] = useState<QuoteData | null>(null);
   const [isCalculating, setIsCalculating] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Simulate quote calculation
@@ -86,16 +88,16 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
     return (
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-2">Calculating Your Quote</h2>
-          <p className="text-muted-foreground">Please wait while we prepare your instant quote</p>
+          <h2 className="text-3xl font-bold text-foreground mb-2">{t('quote.calculating')}</h2>
+          <p className="text-muted-foreground">{t('quote.calculatingDesc')}</p>
         </div>
 
         <Card className="p-8 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-full animate-pulse mb-4">
             <Calculator className="w-8 h-8 text-primary-foreground" />
           </div>
-          <p className="text-lg font-medium mb-2">Analyzing your items...</p>
-          <p className="text-muted-foreground">This will only take a moment</p>
+          <p className="text-lg font-medium mb-2">{t('quote.analyzingItems')}</p>
+          <p className="text-muted-foreground">{t('quote.analyzingDesc')}</p>
         </Card>
       </div>
     );
@@ -110,8 +112,8 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-success rounded-full mb-4">
             <CheckCircle className="w-8 h-8 text-accent-foreground" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Your Instant Quote</h2>
-          <p className="text-muted-foreground">Here's your personalized moving quote</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t('quote.title')}</h2>
+          <p className="text-muted-foreground">{t('quote.subtitle')}</p>
         </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -119,46 +121,46 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
         <Card className="p-6 shadow-soft">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Calculator className="w-5 h-5 text-primary" />
-            Quote Breakdown
+            {t('quote.breakdown')}
           </h3>
           
           <div className="space-y-4">
             <div className="flex justify-between">
-              <span>Base Service Fee</span>
+              <span>{t('quote.baseService')}</span>
               <span>${quote.baseServiceFee.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between">
-              <span>Items Cost ({totalWeight} lbs)</span>
+              <span>{t('quote.itemCost')} ({totalWeight} lbs)</span>
               <span>${quote.itemCost.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between">
-              <span>Distance Fee ({distance.toFixed(1)} km)</span>
+              <span>{t('quote.distanceFee')} ({distance.toFixed(1)} km)</span>
               <span>${quote.distanceFee.toFixed(2)}</span>
             </div>
             
             <Separator />
             
             <div className="flex justify-between font-medium">
-              <span>Subtotal</span>
+              <span>{t('quote.subtotal')}</span>
               <span>${quote.subtotal.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>GST (5%)</span>
+              <span>{t('quote.gst')}</span>
               <span>${quote.gst.toFixed(2)}</span>
             </div>
             
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>QST (9.975%)</span>
+              <span>{t('quote.qst')}</span>
               <span>${quote.qst.toFixed(2)}</span>
             </div>
             
             <Separator />
             
             <div className="flex justify-between text-xl font-bold text-primary">
-              <span>Total</span>
+              <span>{t('quote.total')}</span>
               <span>${quote.total.toFixed(2)}</span>
             </div>
           </div>
@@ -168,7 +170,7 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
         <div className="space-y-6">
           {/* Service Tier */}
           <Card className="p-4 shadow-soft">
-            <h4 className="font-semibold mb-2">Selected Service</h4>
+            <h4 className="font-semibold mb-2">{t('quote.selectedService')}</h4>
             <p className="text-primary font-medium">{serviceTier.name}</p>
           </Card>
 
@@ -176,12 +178,12 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
           <Card className="p-4 shadow-soft">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <Package className="w-4 h-4" />
-              Items Summary
+              {t('quote.itemsSummary')}
             </h4>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-primary">{totalItems}</p>
-                <p className="text-sm text-muted-foreground">Items</p>
+                <p className="text-sm text-muted-foreground">{t('quote.items')}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-primary">{totalWeight.toLocaleString()}</p>
@@ -198,7 +200,7 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
           <Card className="p-4 shadow-soft">
             <h4 className="font-semibold mb-2 flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              Distance
+              {t('quote.distance')}
             </h4>
             <p className="text-2xl font-bold text-primary">{distance.toFixed(1)} km</p>
           </Card>
@@ -207,34 +209,34 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
 
       {/* What's Included */}
       <Card className="p-6 bg-gradient-primary/5 border-primary/20">
-        <h3 className="text-lg font-semibold mb-4">What's Included in Your Quote</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('quote.whatsIncluded')}</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-accent" />
-              <span className="text-sm">Professional moving team</span>
+              <span className="text-sm">{t('quote.included1')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-accent" />
-              <span className="text-sm">All necessary equipment</span>
+              <span className="text-sm">{t('quote.included2')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-accent" />
-              <span className="text-sm">Loading and unloading</span>
+              <span className="text-sm">{t('quote.included3')}</span>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-accent" />
-              <span className="text-sm">Transportation between locations</span>
+              <span className="text-sm">{t('quote.included4')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-accent" />
-              <span className="text-sm">Basic insurance coverage</span>
+              <span className="text-sm">{t('quote.included5')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-accent" />
-              <span className="text-sm">No hidden fees</span>
+              <span className="text-sm">{t('quote.included6')}</span>
             </div>
           </div>
         </div>
@@ -244,13 +246,13 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
         <div className="flex gap-3 pt-4">
           <Button variant="outline" onClick={onBack} className="flex-1">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            {t('back')}
           </Button>
           <Button 
             onClick={() => onNext(quote)}
             className="flex-1 group"
           >
-            Book This Move
+            {t('quote.bookThisMove')}
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
           </Button>
         </div>
@@ -258,7 +260,7 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
       
       {/* Copyright Footer */}
       <div className="text-center py-4">
-        <p className="text-xs text-muted-foreground">© 2021 Next Movement. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground">{t('welcome.copyright')}</p>
       </div>
     </div>
   );
