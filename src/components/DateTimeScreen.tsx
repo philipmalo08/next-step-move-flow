@@ -5,8 +5,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { fr } from "date-fns/locale/fr";
-import { enCA } from "date-fns/locale/en-CA";
 
 interface DateTimeScreenProps {
   onNext: (date: Date, time: string) => void;
@@ -59,7 +57,6 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
                 today.setHours(0, 0, 0, 0);
                 return date < today;
               }}
-              locale={language === 'fr' ? fr : enCA}
               className="rounded-lg border p-3"
             />
           </div>
