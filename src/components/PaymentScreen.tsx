@@ -457,12 +457,15 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
     return () => clearTimeout(timeoutId);
   }, [formData, quote?.total, distance, bookingData.serviceTier.name]);
 
+  const { language } = useLanguage();
+  
   const options = {
     clientSecret,
     appearance: {
       theme: 'stripe' as const,
     },
-  };
+    locale: language === 'fr' ? 'fr' : 'en',
+  } as const;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-4 space-y-6">
@@ -579,7 +582,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
             <Card className="p-6 shadow-soft">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Lock className="w-5 h-5 text-primary" />
-                Payment Information
+                {t('payment.paymentInfo')}
               </h3>
               
               <Elements options={options} stripe={stripePromise}>

@@ -147,6 +147,7 @@ const translations = {
     'payment.completeBooking': 'Complete Booking',
     'payment.termsText': 'By completing this booking, you agree to our',
     'payment.termsLink': 'Terms and Conditions',
+    'payment.paymentInfo': 'Payment Information',
     
     // Common translations
     'back': 'Back',
@@ -518,6 +519,7 @@ const translations = {
     'payment.completeBooking': 'Finaliser la Réservation',
     'payment.termsText': 'En finalisant cette réservation, vous acceptez nos',
     'payment.termsLink': 'Conditions Générales',
+    'payment.paymentInfo': 'Information de Paiement',
     
     // Common translations
     'back': 'Retour',
