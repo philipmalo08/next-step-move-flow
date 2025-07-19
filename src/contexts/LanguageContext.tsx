@@ -85,6 +85,14 @@ const translations = {
     'welcome.trust.insured': 'Fully Insured',
     'welcome.copyright': '© 2021 Next Movement. All rights reserved.',
     
+    // Step Indicator
+    'steps.address': 'Address',
+    'steps.service': 'Service', 
+    'steps.items': 'Items',
+    'steps.quote': 'Quote',
+    'steps.payment': 'Payment',
+    'steps.confirmation': 'Confirmation',
+    
     // Common translations
     'back': 'Back',
     'continue': 'Continue',
@@ -384,6 +392,14 @@ const translations = {
     'welcome.trust.customers': '1000+ Clients Satisfaits',
     'welcome.trust.insured': 'Entièrement Assuré',
     'welcome.copyright': '© 2021 Next Movement. Tous droits réservés.',
+    
+    // Step Indicator
+    'steps.address': 'Adresse',
+    'steps.service': 'Service',
+    'steps.items': 'Articles', 
+    'steps.quote': 'Devis',
+    'steps.payment': 'Paiement',
+    'steps.confirmation': 'Confirmation',
     
     // Common translations
     'back': 'Retour',
