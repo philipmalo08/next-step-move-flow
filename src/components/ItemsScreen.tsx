@@ -27,36 +27,36 @@ const itemCatalog: Record<string, Array<{id: string; name: string; volume: numbe
 // Populate itemCatalog from the user's itemData
 const rawItemData = {
   // Bedroom
-  "queenBedFrame": { emoji: "🛏️", name: "Queen Bed Frame", volume: 35, weight: 125, category: "Bedroom" },
-  "queenMattress": { emoji: "🛌", name: "Queen Mattress", volume: 65, weight: 85, category: "Bedroom" },
+  "queenBedFrame": { emoji: "🛏️", name: "Bed Frame", volume: 35, weight: 125, category: "Bedroom" },
+  "queenMattress": { emoji: "🛌", name: "Mattress", volume: 65, weight: 85, category: "Bedroom" },
   "nightstand": { emoji: "🗃️", name: "Nightstand", volume: 8, weight: 40, category: "Bedroom" },
-  "dresser6Drawer": { emoji: "🗄️", name: "Dresser (6-drawer)", volume: 40, weight: 150, category: "Bedroom" },
+  "dresser6Drawer": { emoji: "🗄️", name: "Dresser", volume: 40, weight: 150, category: "Bedroom" },
   "chestOfDrawers": { emoji: "🗄️", name: "Chest of Drawers", volume: 40, weight: 150, category: "Bedroom" },
-  "mirrorLarge": { emoji: "🪞", name: "Mirror (Large)", volume: 8, weight: 35, category: "Bedroom" },
+  "mirrorLarge": { emoji: "🪞", name: "Mirror", volume: 8, weight: 35, category: "Bedroom" },
   "wardrobe": { emoji: "👚", name: "Wardrobe", volume: 63, weight: 225, category: "Bedroom" },
   "crib": { emoji: "👶", name: "Crib", volume: 20, weight: 60, category: "Bedroom" },
 
   // Living Room
   "sofa3Seater": { emoji: "🛋️", name: "Sofa (3-seater)", volume: 52, weight: 200, category: "Living Room" },
-  "loveseat": { emoji: "🛋️", name: "Loveseat", volume: 38, weight: 125, category: "Living Room" },
+  "loveseat": { emoji: "🛋️", name: "Loveseat (2-seater)", volume: 38, weight: 125, category: "Living Room" },
   "recliner": { emoji: "💺", name: "Recliner", volume: 28, weight: 88, category: "Living Room" },
   "coffeeTable": { emoji: "☕", name: "Coffee Table", volume: 15, weight: 63, category: "Living Room" },
   "endTable": { emoji: "🗄️", name: "End Table", volume: 8, weight: 30, category: "Living Room" },
   "tvStandConsole": { emoji: "📺", name: "TV Stand/Console", volume: 20, weight: 95, category: "Living Room" },
   "entertainmentCenter": { emoji: "🎮", name: "Entertainment Center", volume: 75, weight: 225, category: "Living Room" },
-  "flatScreenTv55": { emoji: "🖥️", name: "Flat Screen TV (55'')", volume: 13, weight: 48, category: "Living Room" },
+  "flatScreenTv55": { emoji: "🖥️", name: "Flat Screen TV", volume: 13, weight: 48, category: "Living Room" },
   "cabinet": { emoji: "🏺", name: "Cabinet", volume: 50, weight: 225, category: "Living Room" },
   "buffetSideboard": { emoji: "🍽️", name: "Buffet/Sideboard", volume: 33, weight: 160, category: "Living Room" },
 
   // Kitchen
-  "diningTable6Person": { emoji: "🍽️", name: "Dining Table (6-person)", volume: 40, weight: 150, category: "Kitchen" },
+  "diningTable6Person": { emoji: "🍽️", name: "Dining Table", volume: 40, weight: 150, category: "Kitchen" },
   "diningChair": { emoji: "🪑", name: "Dining Chair", volume: 6, weight: 20, category: "Kitchen" },
-  "refrigeratorFullSize": { emoji: "❄️", name: "Refrigerator (Full-size)", volume: 58, weight: 300, category: "Kitchen" },
+  "refrigeratorFullSize": { emoji: "❄️", name: "Refrigerator", volume: 58, weight: 300, category: "Kitchen" },
   "microwave": { emoji: "♨️", name: "Microwave", volume: 8, weight: 40, category: "Kitchen" },
   "kitchenCartIsland": { emoji: "🛒", name: "Kitchen Cart/Island", volume: 20, weight: 75, category: "Kitchen" },
 
   // Office
-  "officeDeskStandard": { emoji: "🧑‍💻", name: "Office Desk (Standard)", volume: 30, weight: 140, category: "Office" },
+  "officeDeskStandard": { emoji: "🧑‍💻", name: "Office Desk", volume: 30, weight: 140, category: "Office" },
   "officeChair": { emoji: "🪑", name: "Office Chair", volume: 13, weight: 40, category: "Office" },
   "filingCabinet2Drawer": { emoji: "🗄️", name: "Filing Cabinet (2-drawer)", volume: 20, weight: 100, category: "Office" },
   "bookcaseLarge": { emoji: "📚", name: "Bookcase (Large)", volume: 33, weight: 150, category: "Office" },
