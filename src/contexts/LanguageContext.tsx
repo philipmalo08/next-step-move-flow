@@ -502,7 +502,7 @@ const translations = {
     'servicetier.features.bins': '20 bacs de déménagement fournis qui sont récupérés à la fin du déménagement',
     
     // Payment Screen
-    'payment.title': 'Détails de Paiement',
+    'payment.title': 'Information de Paiement',
     'payment.subtitle': 'Complétez votre réservation avec un paiement sécurisé',
     'payment.personalInfo': 'Informations Personnelles',
     'payment.fullName': 'Nom Complet',
