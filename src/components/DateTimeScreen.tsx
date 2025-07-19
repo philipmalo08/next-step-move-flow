@@ -5,8 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { fr } from "date-fns/locale/fr";
-import { enCA } from "date-fns/locale/en-CA";
+import { fr, enCA } from "date-fns/locale";
 
 interface DateTimeScreenProps {
   onNext: (date: Date, time: string) => void;
