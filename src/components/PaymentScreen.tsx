@@ -265,12 +265,12 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
         
         {/* Terms and Conditions */}
         <div className="text-center text-sm text-muted-foreground">
-          By completing this booking, you agree to our{" "}
+          {t('payment.termsText')}{" "}
           <Link 
             to="/terms-conditions" 
             className="text-primary hover:underline font-medium"
           >
-            Terms and Conditions
+            {t('payment.termsLink')}
           </Link>
         </div>
         

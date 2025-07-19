@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { fr, enCA } from "date-fns/locale";
 
 interface DateTimeScreenProps {
   onNext: (date: Date, time: string) => void;
@@ -14,7 +15,7 @@ interface DateTimeScreenProps {
 // Moved timeSlots inside component to access t function
 
 export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
 
@@ -57,6 +58,7 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
                 today.setHours(0, 0, 0, 0);
                 return date < today;
               }}
+              locale={language === 'fr' ? fr : enCA}
               className="rounded-lg border p-3"
             />
           </div>
