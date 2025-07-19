@@ -14,8 +14,9 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
   // Map step titles to translation keys
   const getTranslatedTitle = (title: string) => {
     const keyMap: { [key: string]: string } = {
-      'Address': 'steps.address',
-      'Service': 'steps.service', 
+      'Addresses': 'steps.address',
+      'Date & Time': 'steps.datetime',
+      'Service Tier': 'steps.service', 
       'Items': 'steps.items',
       'Quote': 'steps.quote',
       'Payment': 'steps.payment',

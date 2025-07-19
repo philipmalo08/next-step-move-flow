@@ -86,7 +86,7 @@ const translations = {
     'welcome.copyright': '© 2021 Next Movement. All rights reserved.',
     
     // Step Indicator
-    'steps.address': 'Address',
+    'steps.address': 'Addresses',
     'steps.service': 'Service Tier', 
     'steps.items': 'Items',
     'steps.quote': 'Quote',
@@ -187,12 +187,12 @@ const translations = {
     'items.instructions': 'If you are unsure about one of your large items, pick the item that resembles it the most. If you have a small miscellaneous item that is not on the list, choose 1 packed box per item.',
     
     // Item Names
-    'items.names.bedFrame': 'Bed Frame',
-    'items.names.mattress': 'Mattress',
+    'items.names.queenBedFrame': 'Bed Frame',
+    'items.names.queenMattress': 'Mattress',
     'items.names.nightstand': 'Nightstand',
-    'items.names.dresser': 'Dresser',
+    'items.names.dresser6Drawer': 'Dresser',
     'items.names.chestOfDrawers': 'Chest of Drawers',
-    'items.names.mirror': 'Mirror',
+    'items.names.mirrorLarge': 'Mirror',
     'items.names.wardrobe': 'Wardrobe',
     'items.names.crib': 'Crib',
     'items.names.sofa3Seater': 'Sofa (3-seater)',

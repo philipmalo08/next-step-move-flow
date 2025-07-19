@@ -180,7 +180,7 @@ export const ItemsScreen = ({ onNext, onBack }: ItemsScreenProps) => {
                        <div key={item.name} className="flex items-center justify-between p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{item.emoji}</span>
-                          <span className="font-medium text-sm sm:text-base">{t(`items.names.${item.id}`) || item.name}</span>
+                          <span className="font-medium text-sm sm:text-base">{t(`items.names.${item.id}`) !== `items.names.${item.id}` ? t(`items.names.${item.id}`) : item.name}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Button
