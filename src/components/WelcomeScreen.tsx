@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Truck, ArrowRight, Star } from "lucide-react";
-import logoImage from "@/assets/nextmovement-final.PNG?url";
+import logoImageEn from "@/assets/nextmovement-final.PNG?url";
+import logoImageFr from "@/assets/mouvementsuivant-final.PNG?url";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WelcomeScreenProps {
@@ -8,7 +9,8 @@ interface WelcomeScreenProps {
 }
 
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const logoImage = language === 'fr' ? logoImageFr : logoImageEn;
   return (
     <div className="min-h-screen bg-gradient-background flex flex-col">
       <div className="flex-1 flex items-center justify-center px-4 py-6">
