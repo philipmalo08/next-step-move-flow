@@ -56,7 +56,7 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
   const [canMakePayment, setCanMakePayment] = useState(false);
   const { toast } = useToast();
   const { executeRecaptcha } = useRecaptcha();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   // Set up Payment Request for Google Pay and Apple Pay
   useEffect(() => {
@@ -280,7 +280,7 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
           className="w-full"
           size="lg"
         >
-          {isLoading ? 'Processing...' : `Complete Booking - $${quote?.total?.toFixed(2) || 0}`}
+          {isLoading ? t('payment.processing') : `${t('payment.completeBooking')} - $${quote?.total?.toFixed(2) || 0}`}
         </Button>
       </form>
     </div>
@@ -288,6 +288,7 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
 };
 
 export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, bookingData }: PaymentScreenProps) {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<PaymentData>({
     fullName: '',
     email: '',
@@ -466,8 +467,8 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
   return (
     <div className="max-w-4xl mx-auto px-4 py-4 space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Payment Details</h2>
-        <p className="text-muted-foreground">Complete your booking with secure payment</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t('payment.title')}</h2>
+        <p className="text-muted-foreground">{t('payment.subtitle')}</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -477,12 +478,12 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
           <Card className="p-6 shadow-soft">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
-              Personal Information
+              {t('payment.personalInfo')}
             </h3>
             
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="fullName">Full Name *</Label>
+                <Label htmlFor="fullName">{t('payment.fullName')} *</Label>
                 <Input
                   id="fullName"
                   value={formData.fullName}
@@ -493,7 +494,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
               </div>
               
               <div>
-                <Label htmlFor="email">Email Address *</Label>
+                <Label htmlFor="email">{t('payment.email')} *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -504,8 +505,8 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
                 {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
               </div>
               
-              <div className="md:col-span-2">
-                <Label htmlFor="phone">Phone Number *</Label>
+               <div className="md:col-span-2">
+                <Label htmlFor="phone">{t('payment.phone')} *</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -521,20 +522,20 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
           {/* Billing Address */}
           <Card className="p-6 shadow-soft">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Billing Address</h3>
+              <h3 className="text-lg font-semibold">{t('payment.billingInfo')}</h3>
               <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="same-as-pickup" 
                   checked={sameAsPickup}
                   onCheckedChange={(checked) => handleSameAsPickupChange(checked as boolean)}
                 />
-                <Label htmlFor="same-as-pickup" className="text-sm">Same as pickup address</Label>
+                <Label htmlFor="same-as-pickup" className="text-sm">{t('payment.sameAsPickup')}</Label>
               </div>
             </div>
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="billingAddress">Street Address *</Label>
+                <Label htmlFor="billingAddress">{t('payment.address')} *</Label>
                 <Input
                   id="billingAddress"
                   value={formData.billingAddress}
@@ -547,7 +548,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="billingCity">City *</Label>
+                  <Label htmlFor="billingCity">{t('payment.city')} *</Label>
                   <Input
                     id="billingCity"
                     value={formData.billingCity}
@@ -559,7 +560,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
                 </div>
                 
                 <div>
-                  <Label htmlFor="billingPostal">Postal Code *</Label>
+                  <Label htmlFor="billingPostal">{t('payment.postalCode')} *</Label>
                   <Input
                     id="billingPostal"
                     value={formData.billingPostal}
@@ -596,7 +597,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
         {/* Order Summary */}
         <div>
           <Card className="p-6 shadow-soft sticky top-6">
-            <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('payment.orderSummary')}</h3>
             
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -626,7 +627,7 @@ export function PaymentScreen({ quote, pickupAddress, distance, onNext, onBack, 
                 onClick={onBack}
                 className="w-full"
               >
-                Back to Quote
+                {t('back')}
               </Button>
             </div>
           </Card>

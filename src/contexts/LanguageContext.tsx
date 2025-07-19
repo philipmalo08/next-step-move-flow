@@ -93,6 +93,58 @@ const translations = {
     'steps.payment': 'Payment',
     'steps.confirmation': 'Confirmation',
     
+    // Date Time Screen
+    'datetime.title': 'When would you like to move?',
+    'datetime.subtitle': 'Select your preferred date and time slot',
+    'datetime.selectDate': 'Select Date',
+    'datetime.selectTime': 'Select Time',
+    'datetime.selectedDate': 'Selected Date',
+    'datetime.selectedTime': 'Selected Time',
+    'datetime.morning': 'Morning',
+    'datetime.morningTime': '8:00 AM - 12:00 PM',
+    'datetime.afternoon': 'Afternoon', 
+    'datetime.afternoonTime': '12:00 PM - 5:00 PM',
+    'datetime.evening': 'Evening',
+    'datetime.eveningTime': '5:00 PM - 8:00 PM',
+    
+    // Service Tier Screen
+    'servicetier.title': 'Choose Your Service Level',
+    'servicetier.basic': 'Basic',
+    'servicetier.premium': 'Premium',
+    'servicetier.whiteglove': 'White Glove',
+    'servicetier.popular': 'Popular',
+    'servicetier.selectedService': 'Selected Service',
+    'servicetier.basic.description': 'Standard move. Furniture protected with moving blankets. Packing boxes not included.',
+    'servicetier.premium.description': 'Includes furniture disassembly/assembly, plus standard furniture protection.',
+    'servicetier.whiteglove.description': 'Full-service move including disassembly/reassembly of furniture, and packing services with eco-friendly reusable bins for your small items.',
+    'servicetier.features.professional': 'Professional moving team',
+    'servicetier.features.protection': 'Furniture protection with blankets',
+    'servicetier.features.liability': 'Standard liability coverage',
+    'servicetier.features.loading': 'Loading & unloading',
+    'servicetier.features.everything': 'Everything in Basic',
+    'servicetier.features.enhanced': 'Enhanced liability coverage',
+    'servicetier.features.disassembly': 'Furniture disassembly/assembly',
+    'servicetier.features.everythingPremium': 'Everything in Premium',
+    'servicetier.features.packing': 'Full packing & unpacking',
+    'servicetier.features.setup': 'Setup & arrangement service',
+    'servicetier.features.bins': '20 moving bins provided that are retrieved at the end of the move',
+    
+    // Payment Screen
+    'payment.title': 'Payment Details',
+    'payment.subtitle': 'Complete your booking with secure payment',
+    'payment.personalInfo': 'Personal Information',
+    'payment.fullName': 'Full Name',
+    'payment.email': 'Email Address',
+    'payment.phone': 'Phone Number',
+    'payment.billingInfo': 'Billing Information',
+    'payment.sameAsPickup': 'Same as pickup address',
+    'payment.address': 'Address',
+    'payment.city': 'City',
+    'payment.postalCode': 'Postal Code',
+    'payment.orderSummary': 'Order Summary',
+    'payment.processing': 'Processing...',
+    'payment.completeBooking': 'Complete Booking',
+    
     // Common translations
     'back': 'Back',
     'continue': 'Continue',
@@ -108,27 +160,6 @@ const translations = {
     'address.addDropoff': 'Add Drop-off Location',
     'address.placeholder': 'Enter address...',
     
-    // Date & Time Screen
-    'datetime.title': 'When do you want to move?',
-    'datetime.subtitle': 'Select your preferred date and time',
-    'datetime.selectDate': 'Select Date',
-    'datetime.selectTime': 'Select Time Slot',
-    'datetime.timeSlots.8-10': '8:00 AM - 10:00 AM',
-    'datetime.timeSlots.10-12': '10:00 AM - 12:00 PM',
-    'datetime.timeSlots.12-14': '12:00 PM - 2:00 PM',
-    'datetime.timeSlots.14-16': '2:00 PM - 4:00 PM',
-    'datetime.timeSlots.16-18': '4:00 PM - 6:00 PM',
-    'datetime.timeSlots.18-20': '6:00 PM - 8:00 PM',
-    
-    // Service Tier Screen
-    'service.title': 'Choose your service level',
-    'service.subtitle': 'Select the service that best fits your needs',
-    'service.basic.name': 'Basic Move',
-    'service.basic.description': 'Standard moving service with professional movers',
-    'service.premium.name': 'Premium Move',
-    'service.premium.description': 'Full-service moving with packing and unpacking',
-    'service.luxury.name': 'Luxury Move',
-    'service.luxury.description': 'White-glove service with premium care',
     
     // Items Screen
     'items.title': 'What are you moving?',
@@ -180,18 +211,6 @@ const translations = {
     'quote.included6': 'No hidden fees',
     'quote.bookThisMove': 'Book This Move',
     
-    // Payment Screen
-    'payment.title': 'Complete Your Booking',
-    'payment.subtitle': 'Enter your details to confirm your move',
-    'payment.contactInfo': 'Contact Information',
-    'payment.fullName': 'Full Name',
-    'payment.email': 'Email Address',
-    'payment.phone': 'Phone Number',
-    'payment.billingInfo': 'Billing Information',
-    'payment.billingAddress': 'Billing Address',
-    'payment.city': 'City',
-    'payment.postal': 'Postal Code',
-    'payment.payNow': 'Pay Now',
     
     // Confirmation Screen
     'confirmation.title': 'Booking Confirmed!',
@@ -401,6 +420,58 @@ const translations = {
     'steps.payment': 'Paiement',
     'steps.confirmation': 'Confirmation',
     
+    // Date Time Screen
+    'datetime.title': 'Quand souhaitez-vous déménager?',
+    'datetime.subtitle': 'Sélectionnez votre date et créneau horaire préférés',
+    'datetime.selectDate': 'Sélectionner une Date',
+    'datetime.selectTime': 'Sélectionner l\'Heure',
+    'datetime.selectedDate': 'Date Sélectionnée',
+    'datetime.selectedTime': 'Heure Sélectionnée',
+    'datetime.morning': 'Matin',
+    'datetime.morningTime': '8h00 - 12h00',
+    'datetime.afternoon': 'Après-midi',
+    'datetime.afternoonTime': '12h00 - 17h00', 
+    'datetime.evening': 'Soir',
+    'datetime.eveningTime': '17h00 - 20h00',
+    
+    // Service Tier Screen
+    'servicetier.title': 'Choisissez Votre Niveau de Service',
+    'servicetier.basic': 'De Base',
+    'servicetier.premium': 'Premium',
+    'servicetier.whiteglove': 'Service Complet',
+    'servicetier.popular': 'Populaire',
+    'servicetier.selectedService': 'Service Sélectionné',
+    'servicetier.basic.description': 'Déménagement standard. Meubles protégés avec des couvertures de déménagement. Boîtes d\'emballage non incluses.',
+    'servicetier.premium.description': 'Inclut le démontage/remontage de meubles, plus la protection standard des meubles.',
+    'servicetier.whiteglove.description': 'Déménagement complet incluant le démontage/remontage de meubles et services d\'emballage avec bacs réutilisables écologiques pour vos petits objets.',
+    'servicetier.features.professional': 'Équipe de déménagement professionnelle',
+    'servicetier.features.protection': 'Protection des meubles avec couvertures',
+    'servicetier.features.liability': 'Couverture de responsabilité standard',
+    'servicetier.features.loading': 'Chargement et déchargement',
+    'servicetier.features.everything': 'Tout ce qui est dans De Base',
+    'servicetier.features.enhanced': 'Couverture de responsabilité améliorée',
+    'servicetier.features.disassembly': 'Démontage/remontage de meubles',
+    'servicetier.features.everythingPremium': 'Tout ce qui est dans Premium',
+    'servicetier.features.packing': 'Emballage et déballage complets',
+    'servicetier.features.setup': 'Service d\'installation et d\'aménagement',
+    'servicetier.features.bins': '20 bacs de déménagement fournis qui sont récupérés à la fin du déménagement',
+    
+    // Payment Screen
+    'payment.title': 'Détails de Paiement',
+    'payment.subtitle': 'Complétez votre réservation avec un paiement sécurisé',
+    'payment.personalInfo': 'Informations Personnelles',
+    'payment.fullName': 'Nom Complet',
+    'payment.email': 'Adresse E-mail',
+    'payment.phone': 'Numéro de Téléphone',
+    'payment.billingInfo': 'Informations de Facturation',
+    'payment.sameAsPickup': 'Identique à l\'adresse de collecte',
+    'payment.address': 'Adresse',
+    'payment.city': 'Ville',
+    'payment.postalCode': 'Code Postal',
+    'payment.orderSummary': 'Résumé de Commande',
+    'payment.processing': 'Traitement en cours...',
+    'payment.completeBooking': 'Finaliser la Réservation',
+    
     // Common translations
     'back': 'Retour',
     'continue': 'Continuer',
@@ -416,27 +487,6 @@ const translations = {
     'address.addDropoff': 'Ajouter un Lieu de Livraison',
     'address.placeholder': 'Entrez l\'adresse...',
     
-    // Date & Time Screen
-    'datetime.title': 'Quand voulez-vous déménager?',
-    'datetime.subtitle': 'Sélectionnez votre date et heure préférées',
-    'datetime.selectDate': 'Sélectionner la Date',
-    'datetime.selectTime': 'Sélectionner le Créneau Horaire',
-    'datetime.timeSlots.8-10': '8h00 - 10h00',
-    'datetime.timeSlots.10-12': '10h00 - 12h00',
-    'datetime.timeSlots.12-14': '12h00 - 14h00',
-    'datetime.timeSlots.14-16': '14h00 - 16h00',
-    'datetime.timeSlots.16-18': '16h00 - 18h00',
-    'datetime.timeSlots.18-20': '18h00 - 20h00',
-    
-    // Service Tier Screen
-    'service.title': 'Choisissez votre niveau de service',
-    'service.subtitle': 'Sélectionnez le service qui correspond le mieux à vos besoins',
-    'service.basic.name': 'Déménagement Standard',
-    'service.basic.description': 'Service de déménagement standard avec déménageurs professionnels',
-    'service.premium.name': 'Déménagement Premium',
-    'service.premium.description': 'Service complet avec emballage et déballage',
-    'service.luxury.name': 'Déménagement de Luxe',
-    'service.luxury.description': 'Service haut de gamme avec soins premium',
     
     // Items Screen
     'items.title': 'Que déménagez-vous?',
@@ -488,18 +538,6 @@ const translations = {
     'quote.included6': 'Aucuns frais cachés',
     'quote.bookThisMove': 'Réserver ce Déménagement',
     
-    // Payment Screen
-    'payment.title': 'Complétez Votre Réservation',
-    'payment.subtitle': 'Entrez vos détails pour confirmer votre déménagement',
-    'payment.contactInfo': 'Informations de Contact',
-    'payment.fullName': 'Nom Complet',
-    'payment.email': 'Adresse E-mail',
-    'payment.phone': 'Numéro de Téléphone',
-    'payment.billingInfo': 'Informations de Facturation',
-    'payment.billingAddress': 'Adresse de Facturation',
-    'payment.city': 'Ville',
-    'payment.postal': 'Code Postal',
-    'payment.payNow': 'Payer Maintenant',
     
     // Confirmation Screen
     'confirmation.title': 'Réservation Confirmée!',

@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -8,6 +9,21 @@ interface StepIndicatorProps {
 }
 
 export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndicatorProps) {
+  const { t } = useLanguage();
+  
+  // Map step titles to translation keys
+  const getTranslatedTitle = (title: string) => {
+    const keyMap: { [key: string]: string } = {
+      'Address': 'steps.address',
+      'Service': 'steps.service', 
+      'Items': 'steps.items',
+      'Quote': 'steps.quote',
+      'Payment': 'steps.payment',
+      'Confirmation': 'steps.confirmation'
+    };
+    return t(keyMap[title] || title);
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between">
@@ -38,7 +54,7 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
                 index <= currentStep ? "text-foreground" : "text-muted-foreground"
               )}
             >
-              {title}
+              {getTranslatedTitle(title)}
             </span>
             
             {/* Connecting Line */}
