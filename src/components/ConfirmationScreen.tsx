@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, Calendar, Clock, MapPin, Package, Phone, Mail, CreditCard } from "lucide-react";
+import { CheckCircle, Calendar, Clock, MapPin, Package, Phone, Mail, CreditCard, Download } from "lucide-react";
+import { generateBookingPDF, downloadPDF } from "@/lib/pdfGenerator";
+import { useState } from "react";
 
 interface BookingData {
   date: Date;
   time: string;
-  addresses: Array<{ address: string; type: 'pickup' | 'dropoff' }>;
-  serviceTier: { name: string; price: number };
-  items: Array<{ name: string; quantity: number; weight: number; volume: number }>;
-  quote: { total: number };
-  paymentData: { fullName: string; email: string; phone: string };
+  addresses: Array<{ id: string; address: string; type: 'pickup' | 'dropoff' }>;
+  serviceTier: { id: string; name: string; price: number; priceUnit: string };
+  items: Array<{ id: string; name: string; category: string; quantity: number; weight: number; volume: number }>;
+  quote: { baseServiceFee: number; itemCost: number; distanceFee: number; subtotal: number; gst: number; qst: number; total: number };
+  paymentData: { fullName: string; email: string; phone: string; billingAddress: string; billingCity: string; billingPostal: string };
 }
 
 interface ConfirmationScreenProps {
@@ -18,19 +20,36 @@ interface ConfirmationScreenProps {
   onStartNew: () => void;
 }
 
-const timeSlotLabels = {
-  'morning': 'Morning (8:00 AM - 12:00 PM)',
-  'afternoon': 'Afternoon (12:00 PM - 5:00 PM)',
-  'evening': 'Evening (5:00 PM - 8:00 PM)',
-  'flexible': 'Flexible (Anytime)'
+const timeSlotLabels: Record<string, string> = {
+  '8-10': '8:00 AM - 10:00 AM',
+  '10-12': '10:00 AM - 12:00 PM',
+  '12-14': '12:00 PM - 2:00 PM',
+  '14-16': '2:00 PM - 4:00 PM',
+  '16-18': '4:00 PM - 6:00 PM',
+  '18-20': '6:00 PM - 8:00 PM'
 };
 
 export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScreenProps) {
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  
   const totalWeight = bookingData.items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
   const totalVolume = bookingData.items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
   const totalItems = bookingData.items.reduce((sum, item) => sum + item.quantity, 0);
   
   const bookingId = `NM-${Date.now().toString().slice(-6)}`;
+
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      const pdfBlob = await generateBookingPDF(bookingData, bookingId);
+      const filename = `NextMovement-Booking-${bookingId}.pdf`;
+      downloadPDF(pdfBlob, filename);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -165,13 +184,26 @@ export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScre
           Need to make changes? Contact us at <span className="font-medium">(438) 543-0904</span> or <span className="font-medium">mouvementsuivant@outlook.com</span>
         </p>
         
-        <Button 
-          onClick={onStartNew}
-          variant="outline"
-          size="lg"
-        >
-          Book Another Move
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button 
+            onClick={handleDownloadPDF}
+            variant="default"
+            size="lg"
+            disabled={isGeneratingPDF}
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            {isGeneratingPDF ? 'Generating PDF...' : 'Download Move Details & Checklist'}
+          </Button>
+          
+          <Button 
+            onClick={onStartNew}
+            variant="outline"
+            size="lg"
+          >
+            Book Another Move
+          </Button>
+        </div>
       </div>
       
       {/* Copyright Footer */}

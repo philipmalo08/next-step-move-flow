@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Search, Filter, Calendar, MapPin, User, DollarSign } from 'lucide-react';
+import { ArrowLeft, Search, Filter, Calendar, MapPin, User, DollarSign, Download } from 'lucide-react';
+import { generateBookingPDF, downloadPDF } from '@/lib/pdfGenerator';
 import { format } from 'date-fns';
 
 interface Booking {
@@ -42,6 +43,7 @@ const AdminBookings = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [downloadingPDF, setDownloadingPDF] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -107,6 +109,81 @@ const AdminBookings = () => {
       console.error('Error loading bookings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async (bookingId: string) => {
+    setDownloadingPDF(bookingId);
+    try {
+      // Fetch full booking details
+      const { data: fullBooking, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('id', bookingId)
+        .single();
+
+      if (error || !fullBooking) {
+        throw new Error('Failed to fetch booking details');
+      }
+
+      // Convert the admin booking format to the format expected by PDF generator
+      const pdfBookingData = {
+        date: new Date(fullBooking.booking_date),
+        time: fullBooking.booking_time,
+        addresses: [
+          ...fullBooking.pickup_addresses.map((addr: string, index: number) => ({
+            id: `pickup-${index}`,
+            address: addr,
+            type: 'pickup' as const
+          })),
+          ...fullBooking.dropoff_addresses.map((addr: string, index: number) => ({
+            id: `dropoff-${index}`,
+            address: addr,
+            type: 'dropoff' as const
+          }))
+        ],
+        serviceTier: {
+          id: 'service-1',
+          name: fullBooking.service_tier,
+          price: fullBooking.service_price,
+          priceUnit: 'base'
+        },
+        items: Object.entries(fullBooking.selected_items || {}).map(([name, quantity]) => ({
+          id: name.toLowerCase().replace(/\s+/g, '-'),
+          name,
+          category: 'Furniture', // Default category
+          quantity: quantity as number,
+          weight: 50, // Default weight
+          volume: 2   // Default volume
+        })),
+        quote: {
+          baseServiceFee: fullBooking.service_price,
+          itemCost: 0,
+          distanceFee: 0,
+          subtotal: fullBooking.subtotal,
+          gst: fullBooking.gst,
+          qst: fullBooking.qst,
+          total: fullBooking.total
+        },
+        paymentData: {
+          fullName: fullBooking.customer_name,
+          email: fullBooking.customer_email,
+          phone: fullBooking.customer_phone,
+          billingAddress: typeof fullBooking.payment_details_summary === 'object' && fullBooking.payment_details_summary && 'billingAddress' in fullBooking.payment_details_summary 
+            ? (fullBooking.payment_details_summary as any).billingAddress || '' 
+            : '',
+          billingCity: '',
+          billingPostal: ''
+        }
+      };
+
+      const pdfBlob = await generateBookingPDF(pdfBookingData, fullBooking.booking_id);
+      const filename = `NextMovement-Booking-${fullBooking.booking_id}.pdf`;
+      downloadPDF(pdfBlob, filename);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setDownloadingPDF(null);
     }
   };
 
@@ -270,6 +347,16 @@ const AdminBookings = () => {
                   )}
 
                   <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDownloadPDF(booking.id)}
+                      disabled={downloadingPDF === booking.id}
+                      className="flex items-center gap-2"
+                    >
+                      <Download className="w-3 h-3" />
+                      {downloadingPDF === booking.id ? 'Generating...' : 'Download PDF'}
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
