@@ -231,6 +231,7 @@ const Index = () => {
       </div>
       
       <HelpSupportButton />
+      <Chatbot />
     </div>
   );
 };
