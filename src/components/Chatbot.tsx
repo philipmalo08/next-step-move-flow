@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Message {
   id: string;
@@ -16,10 +17,11 @@ interface Message {
 
 const Chatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t, language } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! I\'m here to help with any questions about our moving services. How can I assist you today?',
+      text: t('chatbotWelcome'),
       isBot: true,
       timestamp: new Date(),
     }
@@ -53,7 +55,7 @@ const Chatbot: React.FC = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('chatbot', {
-        body: { message: inputMessage }
+        body: { message: inputMessage, language }
       });
 
       if (error) throw error;
@@ -69,8 +71,8 @@ const Chatbot: React.FC = () => {
     } catch (error) {
       console.error('Chatbot error:', error);
       toast({
-        title: "Error",
-        description: "Sorry, I'm having trouble responding right now. Please try again or contact customer service.",
+        title: t('error'),
+        description: t('chatbotError'),
         variant: "destructive",
       });
     } finally {
@@ -105,7 +107,7 @@ const Chatbot: React.FC = () => {
         <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
           <div className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5" />
-            <span className="font-semibold">Next Movement Support</span>
+            <span className="font-semibold">{t('chatbotTitle')}</span>
           </div>
           <Button
             variant="ghost"
@@ -158,7 +160,7 @@ const Chatbot: React.FC = () => {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
+              placeholder={t('chatbotPlaceholder')}
               disabled={isLoading}
               className="flex-1"
             />

@@ -2,86 +2,89 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FAQ = () => {
+  const { t } = useLanguage();
+  
   const faqSections = [
     {
-      title: "Service Areas & Coverage",
+      title: t('faqServiceAreasTitle'),
       questions: [
         {
-          q: "What areas do you service?",
-          a: "We primarily serve the Greater Montreal Area and surrounding regions, including Laval, Longueuil, and the South Shore. For long-distance moves, please contact us directly."
+          q: t('faqServiceAreasQ1'),
+          a: t('faqServiceAreasA1')
         },
         {
-          q: "Do you offer long-distance moves?",
-          a: "Yes, we provide both local and long-distance moving services across Quebec and neighboring provinces. Quotes may vary based on mileage and complexity."
+          q: t('faqServiceAreasQ2'),
+          a: t('faqServiceAreasA2')
         }
       ]
     },
     {
-      title: "Services & Equipment",
+      title: t('faqServicesTitle'),
       questions: [
         {
-          q: "Can you move pianos or heavy furniture?",
-          a: "We move heavy furniture but unfortunately, we do not move pianos."
+          q: t('faqServicesQ1'),
+          a: t('faqServicesA1')
         },
         {
-          q: "Do you provide packing materials?",
-          a: "Yes, for White Glove service tier, we offer boxes, tape, bubble wrap, and other packing supplies."
+          q: t('faqServicesQ2'),
+          a: t('faqServicesA2')
         },
         {
-          q: "Can I hire movers without a truck?",
-          a: "Yes, we offer labor-only services for loading/unloading or in-home moves where transportation isn't required. For a move with a truck you supply, the base service fee and distance fee would be waived. For commercial labor such as offices and warehouses, contact the customer service number at (438) 543-0904."
+          q: t('faqServicesQ3'),
+          a: t('faqServicesA3')
         },
         {
-          q: "Do you disassemble and reassemble furniture?",
-          a: "Yes, our team can disassemble and reassemble beds, tables, and other furniture as part of the move with the Premium service tier."
+          q: t('faqServicesQ4'),
+          a: t('faqServicesA4')
         },
         {
-          q: "What's included in each service tier?",
-          a: "Our service tiers vary from basic loading/unloading to full-service moves with packing, materials, and furniture assembly. You'll see details during booking."
+          q: t('faqServicesQ5'),
+          a: t('faqServicesA5')
         }
       ]
     },
     {
-      title: "Pricing & Costs",
+      title: t('faqPricingTitle'),
       questions: [
         {
-          q: "How much does a 1-bedroom apartment move cost?",
-          a: "Prices typically start at $350–$600 for a 1-bedroom move, depending on the distance, items, and service tier. Use our online quote tool for an instant estimate."
+          q: t('faqPricingQ1'),
+          a: t('faqPricingA1')
         },
         {
-          q: "Is your quote final or will there be extra charges?",
-          a: "The quote you receive is a final flat rate based on the inventory and details you provide. Additional charges only apply for last-minute changes or significant item additions."
+          q: t('faqPricingQ2'),
+          a: t('faqPricingA2')
         },
         {
-          q: "Do you charge hourly or flat rate?",
-          a: "We use flat-rate pricing for transparency and simplicity. However, hourly rates may apply in custom or special cases (commercial jobs)."
+          q: t('faqPricingQ3'),
+          a: t('faqPricingA3')
         },
       ]
     },
     {
-      title: "Booking & Scheduling",
+      title: t('faqBookingTitle'),
       questions: [
         {
-          q: "How far in advance should I book?",
-          a: "We recommend booking 2–3 weeks in advance, especially during weekends or at the end of the month when demand is highest."
+          q: t('faqBookingQ1'),
+          a: t('faqBookingA1')
         },
         {
-          q: "Can I change my moving date after booking?",
-          a: "Yes, you can reschedule up to 48 hours before your move without penalty, contact support to make changes."
+          q: t('faqBookingQ2'),
+          a: t('faqBookingA2')
         },
         {
-          q: "Do you offer same-day or next-day service?",
-          a: "We do offer last-minute bookings when availability allows. Contact us or check online for real-time scheduling."
+          q: t('faqBookingQ3'),
+          a: t('faqBookingA3')
         },
         {
-          q: "What time will the movers arrive?",
-          a: "You'll be given a time window when booking, and our team will confirm 24 hours before your move. We also send live updates the day of."
+          q: t('faqBookingQ4'),
+          a: t('faqBookingA4')
         },
         {
-          q: "Can I schedule a move for the evening or weekend?",
-          a: "Yes, we operate 7 days a week and offer evening time slots to accommodate your schedule."
+          q: t('faqBookingQ5'),
+          a: t('faqBookingA5')
         }
       ]
     }
@@ -95,21 +98,21 @@ const FAQ = () => {
           <Link to="/">
             <Button variant="ghost" size="sm" className="mr-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              {t('backToHome')}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold">Frequently Asked Questions</h1>
+          <h1 className="text-3xl font-bold">{t('frequentlyAskedQuestions')}</h1>
         </div>
 
         {/* Contact Info */}
         <Card className="mb-8">
           <CardContent className="pt-6">
             <p className="text-center text-muted-foreground">
-              Need more help? Contact us directly at{" "}
+              {t('faqNeedMoreHelp')}{" "}
               <a href="tel:4385430904" className="text-primary hover:underline font-medium">
                 (438) 543-0904
               </a>{" "}
-              or{" "}
+              {t('or')}{" "}
               <a href="mailto:mouvementsuivant@outlook.com" className="text-primary hover:underline font-medium">
                 mouvementsuivant@outlook.com
               </a>
@@ -145,9 +148,9 @@ const FAQ = () => {
         {/* Get Quote CTA */}
         <Card className="mt-8">
           <CardContent className="pt-6 text-center">
-            <h3 className="text-xl font-semibold mb-4">Ready to get started?</h3>
+            <h3 className="text-xl font-semibold mb-4">{t('readyToGetStarted')}</h3>
             <Link to="/">
-              <Button size="lg">Get Your Free Quote</Button>
+              <Button size="lg">{t('getYourFreeQuote')}</Button>
             </Link>
           </CardContent>
         </Card>
