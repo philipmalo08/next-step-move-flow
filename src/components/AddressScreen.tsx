@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkRateLimit } from "@/lib/validation";
 import { useToast } from "@/hooks/use-toast";
 import { AddressMap } from "./AddressMap";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Address {
   id: string;
@@ -23,6 +24,7 @@ interface AddressScreenProps {
 
 export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [addresses, setAddresses] = useState<Address[]>([
     { id: '1', address: '', type: 'pickup' },
     { id: '2', address: '', type: 'dropoff' }
@@ -219,14 +221,14 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
       <div className="max-w-2xl mx-auto">
         <Card className="shadow-lg">
           <CardHeader className="text-center pb-3">
-            <CardTitle className="text-xl sm:text-2xl">Where are we moving?</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">{t('address.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Pickup Addresses */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-green-600" />
-                <Label className="text-sm font-semibold">Pickup Location{pickupAddresses.length > 1 ? 's' : ''}</Label>
+                <Label className="text-sm font-semibold">{t('address.pickup')}{pickupAddresses.length > 1 ? 's' : ''}</Label>
                 <Button
                   variant="outline"
                   size="sm"

@@ -94,7 +94,7 @@ export interface SupabaseBookingData {
   status: 'confirmed' | 'pending' | 'cancelled';
 }
 
-export const saveBooking = async (bookingData: BookingData, userId?: string, distance?: number): Promise<string> => {
+export const saveBooking = async (bookingData: BookingData, userId?: string, distance?: number, language: 'en' | 'fr' = 'en'): Promise<string> => {
   try {
     console.log("Starting saveBooking with userId:", userId);
     
@@ -196,9 +196,9 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
     
     console.log("Booking saved successfully with ID:", data.id);
     
-    // Send confirmation email
+    // Send confirmation email with language support
     try {
-      await sendBookingConfirmationEmail(bookingData, bookingId);
+      await sendBookingConfirmationEmail(bookingData, bookingId, language);
     } catch (emailError) {
       console.error("Failed to send confirmation email:", emailError);
       // Don't fail the booking if email fails
@@ -211,22 +211,23 @@ export const saveBooking = async (bookingData: BookingData, userId?: string, dis
   }
 };
 
-const sendBookingConfirmationEmail = async (bookingData: BookingData, bookingId: string) => {
+const sendBookingConfirmationEmail = async (bookingData: BookingData, bookingId: string, language: 'en' | 'fr' = 'en') => {
   try {
-    // Generate PDF
-    const pdfBlob = await generateBookingPDF(bookingData, bookingId);
+    // Generate PDF with language support
+    const pdfBlob = await generateBookingPDF(bookingData, bookingId, language);
     
     // Convert PDF blob to base64 for email attachment
     const arrayBuffer = await pdfBlob.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
     const base64String = btoa(String.fromCharCode(...uint8Array));
 
-    // Use the new PDF-enabled email function
+    // Use the new PDF-enabled email function with language support
     const { error } = await supabase.functions.invoke('send-booking-confirmation', {
       body: {
         bookingData,
         bookingId,
-        pdfBuffer: base64String
+        pdfBuffer: base64String,
+        language
       }
     });
 

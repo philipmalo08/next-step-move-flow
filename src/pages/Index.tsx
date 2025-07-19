@@ -12,6 +12,7 @@ import { HelpSupportButton } from "@/components/HelpSupportButton";
 import Chatbot from "@/components/Chatbot";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Address {
   id: string;
@@ -66,6 +67,7 @@ const STEPS = [
 ];
 
 const Index = () => {
+  const { language } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>();

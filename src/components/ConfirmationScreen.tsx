@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { CheckCircle, Calendar, Clock, MapPin, Package, Phone, Mail, CreditCard, Download } from "lucide-react";
 import { generateBookingPDF, downloadPDF } from "@/lib/pdfGenerator";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookingData {
   date: Date;
@@ -31,6 +32,7 @@ const timeSlotLabels: Record<string, string> = {
 
 export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScreenProps) {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const { t, language } = useLanguage();
   
   const totalWeight = bookingData.items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
   const totalVolume = bookingData.items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
@@ -41,7 +43,7 @@ export function ConfirmationScreen({ bookingData, onStartNew }: ConfirmationScre
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      const pdfBlob = await generateBookingPDF(bookingData, bookingId);
+      const pdfBlob = await generateBookingPDF(bookingData, bookingId, language);
       const filename = `NextMovement-Booking-${bookingId}.pdf`;
       downloadPDF(pdfBlob, filename);
     } catch (error) {

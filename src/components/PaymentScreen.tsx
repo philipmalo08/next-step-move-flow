@@ -13,6 +13,7 @@ import { saveBooking, BookingData } from "@/lib/bookingService";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const stripePromise = loadStripe('pk_test_51RkHNORATEydiMXF2HU30fVHXrYPMq4zvE9iXgIDJu2eqj5IbDK7eOhL1KM5dfGV9JqMBK9CH6HIWERUfi21JqUh008FtyrUB5'); // In production, this should be an environment variable
 
@@ -55,6 +56,7 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
   const [canMakePayment, setCanMakePayment] = useState(false);
   const { toast } = useToast();
   const { executeRecaptcha } = useRecaptcha();
+  const { language } = useLanguage();
 
   // Set up Payment Request for Google Pay and Apple Pay
   useEffect(() => {
@@ -200,7 +202,7 @@ const CheckoutForm = ({ quote, formData, bookingData, distance }: {
         paymentData: formData
       };
 
-      const bookingId = await saveBooking(completeBookingData, userId, distance);
+      const bookingId = await saveBooking(completeBookingData, userId, distance, language);
       
       // Store booking ID for later reference
       sessionStorage.setItem('pending_booking_id', bookingId);

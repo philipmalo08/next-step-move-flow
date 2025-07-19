@@ -10,7 +10,86 @@ interface BookingConfirmationRequest {
   bookingData: any;
   bookingId: string;
   pdfBuffer: string; // Base64 encoded PDF
+  language?: 'en' | 'fr';
 }
+
+// Email translations
+const emailTranslations = {
+  en: {
+    title: "🚛 Booking Confirmed!",
+    thankYou: "Thank you for choosing NextMovement",
+    hello: "Hello",
+    confirmed: "Your moving booking has been confirmed. Here are the details:",
+    documentsTitle: "📄 Important Documents",
+    documentsDesc: "Please find attached your detailed move confirmation and inventory checklist PDF. This document contains:",
+    documentsFeature1: "Complete booking details and contact information",
+    documentsFeature2: "Inventory checklist for pickup and delivery verification", 
+    documentsFeature3: "Pricing breakdown and payment summary",
+    documentsFeature4: "Signature sections for move completion",
+    printReminder: "Please print and have this document ready on your move day.",
+    bookingInfo: "📋 Booking Information",
+    bookingId: "Booking ID",
+    date: "Date",
+    time: "Time",
+    service: "Service",
+    addresses: "📍 Addresses",
+    pickup: "Pickup:",
+    dropoff: "Drop-off:",
+    itemsSummary: "📦 Items Summary",
+    totalItems: "Total Items:",
+    seeAttached: "See attached PDF for complete inventory checklist",
+    paymentSummary: "💰 Payment Summary",
+    subtotal: "Subtotal",
+    gst: "GST",
+    qst: "QST",
+    total: "Total",
+    nextSteps: "📞 Next Steps",
+    step1: "Print the attached PDF - You'll need this for your move day",
+    step2: "Review the inventory checklist - Ensure all items are listed correctly",
+    step3: "Prepare for your move - We'll contact you 24 hours before to confirm details",
+    step4: "Have the document ready - Our team will use it for pickup and delivery verification",
+    contactNotice: "We'll contact you 24 hours before your move to confirm details and provide our team's contact information.",
+    footer: "Thank you for choosing NextMovement!",
+    contactUs: "Need help? Contact us at (438) 543-0904 or mouvementsuivant@outlook.com"
+  },
+  fr: {
+    title: "🚛 Réservation Confirmée!",
+    thankYou: "Merci d'avoir choisi NextMovement",
+    hello: "Bonjour",
+    confirmed: "Votre réservation de déménagement a été confirmée. Voici les détails:",
+    documentsTitle: "📄 Documents Importants",
+    documentsDesc: "Veuillez trouver en pièce jointe votre confirmation de déménagement détaillée et la liste de vérification d'inventaire PDF. Ce document contient:",
+    documentsFeature1: "Détails complets de la réservation et informations de contact",
+    documentsFeature2: "Liste de vérification d'inventaire pour la vérification du ramassage et de la livraison",
+    documentsFeature3: "Détail des prix et résumé de paiement",
+    documentsFeature4: "Sections de signature pour l'achèvement du déménagement",
+    printReminder: "Veuillez imprimer et avoir ce document prêt le jour de votre déménagement.",
+    bookingInfo: "📋 Informations de Réservation",
+    bookingId: "ID de Réservation",
+    date: "Date",
+    time: "Heure",
+    service: "Service",
+    addresses: "📍 Adresses",
+    pickup: "Ramassage:",
+    dropoff: "Livraison:",
+    itemsSummary: "📦 Résumé des Articles",
+    totalItems: "Total des Articles:",
+    seeAttached: "Voir le PDF ci-joint pour la liste complète de vérification d'inventaire",
+    paymentSummary: "💰 Résumé de Paiement",
+    subtotal: "Sous-total",
+    gst: "TPS",
+    qst: "TVQ",
+    total: "Total",
+    nextSteps: "📞 Prochaines Étapes",
+    step1: "Imprimez le PDF ci-joint - Vous en aurez besoin le jour de votre déménagement",
+    step2: "Examinez la liste de vérification d'inventaire - Assurez-vous que tous les articles sont listés correctement",
+    step3: "Préparez-vous pour votre déménagement - Nous vous contacterons 24 heures avant pour confirmer les détails",
+    step4: "Ayez le document prêt - Notre équipe l'utilisera pour la vérification du ramassage et de la livraison",
+    contactNotice: "Nous vous contacterons 24 heures avant votre déménagement pour confirmer les détails et fournir les informations de contact de notre équipe.",
+    footer: "Merci d'avoir choisi NextMovement!",
+    contactUs: "Besoin d'aide? Contactez-nous au (438) 543-0904 ou mouvementsuivant@outlook.com"
+  }
+};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -19,15 +98,17 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { bookingData, bookingId, pdfBuffer }: BookingConfirmationRequest = await req.json();
+    const { bookingData, bookingId, pdfBuffer, language = 'en' }: BookingConfirmationRequest = await req.json();
+    
+    const t = emailTranslations[language];
 
-    // Create email HTML
+    // Create email HTML with translations
     const emailHtml = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Booking Confirmation</title>
+        <title>${t.title}</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -42,70 +123,70 @@ const handler = async (req: Request): Promise<Response> => {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🚛 Booking Confirmed!</h1>
-            <p>Thank you for choosing NextMovement</p>
+            <h1>${t.title}</h1>
+            <p>${t.thankYou}</p>
           </div>
           
           <div class="content">
-            <h2>Hello ${bookingData.paymentData.fullName}!</h2>
-            <p>Your moving booking has been confirmed. Here are the details:</p>
+            <h2>${t.hello} ${bookingData.paymentData.fullName}!</h2>
+            <p>${t.confirmed}</p>
             
             <div class="pdf-notice">
-              <h3>📄 Important Documents</h3>
-              <p>Please find attached your detailed move confirmation and inventory checklist PDF. This document contains:</p>
+              <h3>${t.documentsTitle}</h3>
+              <p>${t.documentsDesc}</p>
               <ul>
-                <li>Complete booking details and contact information</li>
-                <li>Inventory checklist for pickup and delivery verification</li>
-                <li>Pricing breakdown and payment summary</li>
-                <li>Signature sections for move completion</li>
+                <li>${t.documentsFeature1}</li>
+                <li>${t.documentsFeature2}</li>
+                <li>${t.documentsFeature3}</li>
+                <li>${t.documentsFeature4}</li>
               </ul>
-              <p><strong>Please print and have this document ready on your move day.</strong></p>
+              <p><strong>${t.printReminder}</strong></p>
             </div>
             
             <div class="booking-details">
-              <h3>📋 Booking Information</h3>
-              <p><strong>Booking ID:</strong> ${bookingId}</p>
-              <p><strong>Date:</strong> ${new Date(bookingData.date).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> ${bookingData.time}</p>
-              <p><strong>Service:</strong> ${bookingData.serviceTier.name}</p>
+              <h3>${t.bookingInfo}</h3>
+              <p><strong>${t.bookingId}:</strong> ${bookingId}</p>
+              <p><strong>${t.date}:</strong> ${new Date(bookingData.date).toLocaleDateString(language === 'fr' ? 'fr-CA' : 'en-CA')}</p>
+              <p><strong>${t.time}:</strong> ${bookingData.time}</p>
+              <p><strong>${t.service}:</strong> ${bookingData.serviceTier.name}</p>
             </div>
             
             <div class="booking-details">
-              <h3>📍 Addresses</h3>
-              <p><strong>Pickup:</strong></p>
+              <h3>${t.addresses}</h3>
+              <p><strong>${t.pickup}</strong></p>
               ${bookingData.addresses.filter((addr: any) => addr.type === 'pickup').map((addr: any) => `<p>• ${addr.address}</p>`).join('')}
-              <p><strong>Drop-off:</strong></p>
+              <p><strong>${t.dropoff}</strong></p>
               ${bookingData.addresses.filter((addr: any) => addr.type === 'dropoff').map((addr: any) => `<p>• ${addr.address}</p>`).join('')}
             </div>
             
             <div class="booking-details">
-              <h3>📦 Items Summary</h3>
-              <p><strong>Total Items:</strong> ${bookingData.items.reduce((sum: number, item: any) => sum + item.quantity, 0)}</p>
-              <p><em>See attached PDF for complete inventory checklist</em></p>
+              <h3>${t.itemsSummary}</h3>
+              <p><strong>${t.totalItems}</strong> ${bookingData.items.reduce((sum: number, item: any) => sum + item.quantity, 0)}</p>
+              <p><em>${t.seeAttached}</em></p>
             </div>
             
             <div class="booking-details">
-              <h3>💰 Payment Summary</h3>
-              <p>Subtotal: $${bookingData.quote.subtotal.toFixed(2)}</p>
-              <p>GST: $${bookingData.quote.gst.toFixed(2)}</p>
-              <p>QST: $${bookingData.quote.qst.toFixed(2)}</p>
-              <p class="total">Total: $${bookingData.quote.total.toFixed(2)}</p>
+              <h3>${t.paymentSummary}</h3>
+              <p>${t.subtotal}: $${bookingData.quote.subtotal.toFixed(2)}</p>
+              <p>${t.gst}: $${bookingData.quote.gst.toFixed(2)}</p>
+              <p>${t.qst}: $${bookingData.quote.qst.toFixed(2)}</p>
+              <p class="total">${t.total}: $${bookingData.quote.total.toFixed(2)}</p>
             </div>
             
             <div class="booking-details">
-              <h3>📞 Next Steps</h3>
-              <p>1. <strong>Print the attached PDF</strong> - You'll need this for your move day</p>
-              <p>2. <strong>Review the inventory checklist</strong> - Ensure all items are listed correctly</p>
-              <p>3. <strong>Prepare for your move</strong> - We'll contact you 24 hours before to confirm details</p>
-              <p>4. <strong>Have the document ready</strong> - Our team will use it for pickup and delivery verification</p>
+              <h3>${t.nextSteps}</h3>
+              <p>1. <strong>${t.step1}</strong></p>
+              <p>2. <strong>${t.step2}</strong></p>
+              <p>3. <strong>${t.step3}</strong></p>
+              <p>4. <strong>${t.step4}</strong></p>
             </div>
             
-            <p>We'll contact you 24 hours before your move to confirm details and provide our team's contact information.</p>
+            <p>${t.contactNotice}</p>
           </div>
           
            <div class="footer">
-             <p>Thank you for choosing NextMovement!</p>
-             <p>Need help? Contact us at (438) 543-0904 or mouvementsuivant@outlook.com</p>
+             <p>${t.footer}</p>
+             <p>${t.contactUs}</p>
            </div>
         </div>
       </body>
