@@ -68,10 +68,21 @@ const translations = {
     // Welcome Screen
     'welcome.title': 'Professional Moving Services in Montreal',
     'welcome.subtitle': 'Reliable, efficient, and affordable moving solutions for your home or business.',
+    'welcome.tagline': 'Your move, simplified. Get an instant quote and book your move in minutes.',
     'welcome.getQuote': 'Get Your Free Quote',
+    'welcome.startMove': 'Start Your Move',
     'welcome.features.experience': '5+ Years Experience',
     'welcome.features.insured': 'Fully Insured',
     'welcome.features.support': '24/7 Support',
+    'welcome.features.instantQuotes': 'Instant Quotes',
+    'welcome.features.instantQuotesDesc': 'Get accurate pricing based on your specific items and distance',
+    'welcome.features.professionalService': 'Professional Service',
+    'welcome.features.professionalServiceDesc': 'Expert movers with 7 years of experience in the industry',
+    'welcome.features.easyBooking': 'Easy Booking',
+    'welcome.features.easyBookingDesc': 'Simple step-by-step process to schedule your move',
+    'welcome.trust.rating': '4.9/5 Rating',
+    'welcome.trust.customers': '1000+ Happy Customers',
+    'welcome.trust.insured': 'Fully Insured',
     
     // Address Screen
     'address.title': 'Where are you moving?',
@@ -228,10 +239,21 @@ const translations = {
     // Welcome Screen
     'welcome.title': 'Services de Déménagement Professionnels à Montréal',
     'welcome.subtitle': 'Solutions de déménagement fiables, efficaces et abordables pour votre maison ou entreprise.',
+    'welcome.tagline': 'Votre déménagement, simplifié. Obtenez un devis instantané et réservez votre déménagement en quelques minutes.',
     'welcome.getQuote': 'Obtenez Votre Devis Gratuit',
+    'welcome.startMove': 'Commencez Votre Déménagement',
     'welcome.features.experience': '5+ Années d\'Expérience',
     'welcome.features.insured': 'Entièrement Assuré',
     'welcome.features.support': 'Support 24/7',
+    'welcome.features.instantQuotes': 'Devis Instantanés',
+    'welcome.features.instantQuotesDesc': 'Obtenez une tarification précise basée sur vos articles spécifiques et la distance',
+    'welcome.features.professionalService': 'Service Professionnel',
+    'welcome.features.professionalServiceDesc': 'Déménageurs experts avec 7 années d\'expérience dans l\'industrie',
+    'welcome.features.easyBooking': 'Réservation Facile',
+    'welcome.features.easyBookingDesc': 'Processus simple étape par étape pour programmer votre déménagement',
+    'welcome.trust.rating': 'Note 4.9/5',
+    'welcome.trust.customers': '1000+ Clients Satisfaits',
+    'welcome.trust.insured': 'Entièrement Assuré',
     
     // Address Screen
     'address.title': 'Où déménagez-vous?',
