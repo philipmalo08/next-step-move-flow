@@ -58,10 +58,6 @@ const FAQ = () => {
           q: "Do you charge hourly or flat rate?",
           a: "We use flat-rate pricing for transparency and simplicity. However, hourly rates may apply in custom or special cases (commercial jobs)."
         },
-        {
-          q: "Do you offer discounts for students/seniors?",
-          a: "Unfortunately, we do not."
-        }
       ]
     },
     {
