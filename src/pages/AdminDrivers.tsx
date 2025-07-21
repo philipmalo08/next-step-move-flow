@@ -126,32 +126,34 @@ const AdminDrivers = () => {
   const handleAddDriver = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First create the auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: newDriver.email,
-        password: 'TempPass123!', // Temporary password - driver should reset
-        email_confirm: true,
-        user_metadata: {
-          full_name: newDriver.fullName
+      // Create user via Edge Function (uses service role key)
+      const { data: createResponse, error: createError } = await supabase.functions.invoke('admin-create-user', {
+        body: {
+          email: newDriver.email,
+          password: 'TempPass123!', // Temporary password - driver should reset
+          fullName: newDriver.fullName,
+          role: 'driver'
         }
       });
 
-      if (authError) throw authError;
+      if (createError) {
+        throw new Error(createError.message || 'Failed to create user');
+      }
 
-      // Create profile
-      const { data: profileData, error: profileError } = await supabase
+      if (!createResponse?.user) {
+        throw new Error('No user data returned from creation');
+      }
+
+      // Get the profile ID for the driver record
+      const { data: profileData, error: profileFetchError } = await supabase
         .from('profiles')
-        .insert({
-          user_id: authData.user.id,
-          email: newDriver.email,
-          full_name: newDriver.fullName,
-          phone: newDriver.phone,
-          role: 'driver'
-        })
-        .select()
+        .select('id')
+        .eq('user_id', createResponse.user.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileFetchError || !profileData) {
+        throw new Error('Failed to fetch user profile after creation');
+      }
 
       // Create driver record
       const { error: driverError } = await supabase
