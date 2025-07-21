@@ -126,6 +126,8 @@ const AdminDrivers = () => {
   const handleAddDriver = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log('Attempting to create driver via Edge Function...');
+      
       // Create user via Edge Function (uses service role key)
       const { data: createResponse, error: createError } = await supabase.functions.invoke('admin-create-user', {
         body: {
@@ -137,11 +139,15 @@ const AdminDrivers = () => {
         }
       });
 
+      console.log('Edge Function response:', { createResponse, createError });
+
       if (createError) {
-        throw new Error(createError.message || 'Failed to create user');
+        console.error('Edge Function call error:', createError);
+        throw new Error(`Edge Function error: ${createError.message}`);
       }
 
       if (!createResponse?.user) {
+        console.error('No user data returned from Edge Function');
         throw new Error('No user data returned from creation');
       }
 
