@@ -132,6 +132,7 @@ const AdminDrivers = () => {
           email: newDriver.email,
           password: 'TempPass123!', // Temporary password - driver should reset
           fullName: newDriver.fullName,
+          phone: newDriver.phone,
           role: 'driver'
         }
       });
