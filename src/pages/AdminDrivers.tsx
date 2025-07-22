@@ -143,7 +143,17 @@ const AdminDrivers = () => {
 
       if (createError) {
         console.error('Edge Function call error:', createError);
-        throw new Error(`Edge Function error: ${createError.message}`);
+        // Try to get the actual error message from the response
+        let errorMessage = createError.message;
+        if (createResponse?.error) {
+          errorMessage = createResponse.error;
+        }
+        throw new Error(errorMessage);
+      }
+
+      if (createResponse?.error) {
+        console.error('Edge Function returned error:', createResponse.error);
+        throw new Error(createResponse.error);
       }
 
       if (!createResponse?.user) {
