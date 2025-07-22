@@ -129,22 +129,24 @@ serve(async (req) => {
 
     console.log('✅ User created successfully:', newUser.user.id)
 
-    // Create profile
-    console.log('👤 Creating profile...')
+    // Create or update profile using upsert to handle existing profiles
+    console.log('👤 Creating/updating profile...')
     const { error: profileInsertError } = await supabaseAdmin
       .from('profiles')
-      .insert({
+      .upsert({
         user_id: newUser.user.id,
         email: email,
         full_name: fullName,
         phone: phone || null,
         role: role
+      }, {
+        onConflict: 'user_id'
       })
 
     if (profileInsertError) {
-      console.error('❌ Profile creation failed:', profileInsertError)
+      console.error('❌ Profile creation/update failed:', profileInsertError)
       return new Response(
-        JSON.stringify({ error: `Failed to create profile: ${profileInsertError.message}` }),
+        JSON.stringify({ error: `Failed to create/update profile: ${profileInsertError.message}` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
