@@ -69,13 +69,13 @@ serve(async (req) => {
     }
 
     // Check user role
-    const { data: profile, error: profileError } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
-    console.log('👨‍💼 Profile check:', { role: profile?.role, error: profileError?.message })
+    console.log('👨‍💼 Profile check:', { role: profile?.role, error: profileError?.message, userId: user.id })
 
     if (profileError || !profile || !['admin', 'super_admin'].includes(profile.role)) {
       console.error('❌ Insufficient permissions:', { role: profile?.role })
