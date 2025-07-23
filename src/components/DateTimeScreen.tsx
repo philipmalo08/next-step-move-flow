@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { availabilityService } from "@/lib/availabilityService";
 
 interface DateTimeScreenProps {
   onNext: (date: Date, time: string) => void;
@@ -17,6 +18,51 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
   const { t, language } = useLanguage();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [blackoutDates, setBlackoutDates] = useState<Set<string>>(new Set());
+  const [unavailableDays, setUnavailableDays] = useState<Set<number>>(new Set());
+  const [timeSlotAvailability, setTimeSlotAvailability] = useState<{[key: string]: boolean}>({});
+
+  useEffect(() => {
+    loadAvailabilityData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedDate) {
+      checkTimeSlotAvailability();
+    }
+  }, [selectedDate]);
+
+  const loadAvailabilityData = async () => {
+    try {
+      // Load blackout dates
+      const blackouts = await availabilityService.getBlackoutDates();
+      const blackoutDateSet = new Set(blackouts.map(b => b.date));
+      setBlackoutDates(blackoutDateSet);
+
+      // Check which days of the week are unavailable
+      const unavailableDaysSet = new Set<number>();
+      for (let day = 0; day <= 6; day++) {
+        const isOperating = await availabilityService.isOperatingDay(day);
+        if (!isOperating) {
+          unavailableDaysSet.add(day);
+        }
+      }
+      setUnavailableDays(unavailableDaysSet);
+    } catch (error) {
+      console.error('Error loading availability data:', error);
+    }
+  };
+
+  const checkTimeSlotAvailability = async () => {
+    if (!selectedDate) return;
+
+    const availability: {[key: string]: boolean} = {};
+    for (const slot of timeSlots) {
+      const isAvailable = await availabilityService.isDateTimeAvailable(selectedDate, slot.id);
+      availability[slot.id] = isAvailable;
+    }
+    setTimeSlotAvailability(availability);
+  };
 
   const timeSlots = [
     { id: 'morning', label: t('datetime.morning'), time: t('datetime.morningTime'), icon: '🌅' },
@@ -55,7 +101,19 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
               disabled={(date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                return date < today;
+                
+                // Disable past dates
+                if (date < today) return true;
+                
+                // Disable blackout dates
+                const dateString = date.toISOString().split('T')[0];
+                if (blackoutDates.has(dateString)) return true;
+                
+                // Disable days when company is not operating
+                const dayOfWeek = date.getDay();
+                if (unavailableDays.has(dayOfWeek)) return true;
+                
+                return false;
               }}
               className="rounded-lg border p-3"
             />
@@ -70,34 +128,51 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
           </div>
           
           <div className="space-y-3">
-            {timeSlots.map((slot) => (
-              <button
-                key={slot.id}
-                onClick={() => setSelectedTime(slot.id)}
-                className={cn(
-                  "w-full p-4 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-soft",
-                  selectedTime === slot.id
-                    ? "border-primary bg-primary/5 shadow-soft"
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{slot.icon}</span>
-                      <span className="font-medium">{slot.label}</span>
+            {timeSlots.map((slot) => {
+              const isSlotAvailable = timeSlotAvailability[slot.id] !== false;
+              const isDisabled = selectedDate && !isSlotAvailable;
+              
+              return (
+                <button
+                  key={slot.id}
+                  onClick={() => !isDisabled && setSelectedTime(slot.id)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
+                    isDisabled
+                      ? "border-muted bg-muted/30 text-muted-foreground cursor-not-allowed opacity-50"
+                      : selectedTime === slot.id
+                      ? "border-primary bg-primary/5 shadow-soft hover:shadow-soft"
+                      : "border-border hover:border-primary/50 hover:shadow-soft"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-lg", isDisabled && "grayscale")}>{slot.icon}</span>
+                        <span className="font-medium">
+                          {slot.label}
+                          {isDisabled && (
+                            <span className="ml-2 text-xs bg-muted px-2 py-1 rounded">
+                              {t('datetime.unavailable') || 'Unavailable'}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">{slot.time}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">{slot.time}</p>
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border-2 transition-colors",
+                      isDisabled
+                        ? "border-muted bg-muted"
+                        : selectedTime === slot.id
+                        ? "border-primary bg-primary"
+                        : "border-muted-foreground"
+                    )} />
                   </div>
-                  <div className={cn(
-                    "w-4 h-4 rounded-full border-2 transition-colors",
-                    selectedTime === slot.id
-                      ? "border-primary bg-primary"
-                      : "border-muted-foreground"
-                  )} />
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </Card>
       </div>

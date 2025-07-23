@@ -13,7 +13,8 @@ import {
   LogOut,
   BarChart3,
   ClipboardList,
-  Settings
+  Settings,
+  Clock
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -242,6 +243,18 @@ const AdminDashboard = () => {
 
           {isAdmin && (
             <>
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/availability')}>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Clock className="mr-2 h-5 w-5" />
+                    Company Availability
+                  </CardTitle>
+                  <CardDescription>
+                    Manage operating hours and blackout dates
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
               <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/analytics')}>
                 <CardHeader>
                   <CardTitle className="flex items-center">

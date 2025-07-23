@@ -17,6 +17,7 @@ import AdminDrivers from "./pages/AdminDrivers";
 import AdminSupport from "./pages/AdminSupport";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminSettings from "./pages/AdminSettings";
+import AdminAvailability from "./pages/AdminAvailability";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/admin/drivers" element={<AdminDrivers />} />
           <Route path="/admin/support" element={<AdminSupport />} />
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/availability" element={<AdminAvailability />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
