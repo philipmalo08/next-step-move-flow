@@ -152,11 +152,6 @@ export function DateTimeScreen({ onNext, onBack }: DateTimeScreenProps) {
                         <span className={cn("text-lg", isDisabled && "grayscale")}>{slot.icon}</span>
                         <span className="font-medium">
                           {slot.label}
-                          {isDisabled && (
-                            <span className="ml-2 text-xs bg-muted px-2 py-1 rounded">
-                              {t('datetime.unavailable') || 'Unavailable'}
-                            </span>
-                          )}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">{slot.time}</p>

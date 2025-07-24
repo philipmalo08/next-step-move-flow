@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Plus, Trash2, Calendar as CalendarIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { EditableAvailabilitySlot } from '@/components/EditableAvailabilitySlot';
 
 interface AvailabilitySlot {
   id: string;
@@ -334,28 +335,13 @@ const AdminAvailability: React.FC = () => {
             {/* Existing slots */}
             <div className="space-y-2">
               {availability.map((slot) => (
-                <div key={slot.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <Badge variant="outline">{DAYS_OF_WEEK[slot.day_of_week]}</Badge>
-                    <span className="text-sm">{slot.start_time} - {slot.end_time}</span>
-                    <Badge variant={slot.is_available ? "default" : "secondary"}>
-                      {slot.is_available ? 'Available' : 'Unavailable'}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={slot.is_available}
-                      onCheckedChange={() => handleToggleAvailability(slot.id, slot.is_available)}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteAvailabilitySlot(slot.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                <EditableAvailabilitySlot 
+                  key={slot.id} 
+                  slot={slot} 
+                  onUpdate={loadAvailability}
+                  onToggle={handleToggleAvailability}
+                  onDelete={handleDeleteAvailabilitySlot}
+                />
               ))}
             </div>
           </CardContent>

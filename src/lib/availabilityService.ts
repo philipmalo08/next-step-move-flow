@@ -34,7 +34,7 @@ export const availabilityService = {
       // Check if the company has availability for this day of week and time
       const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
       
-      // Map time slots to hour ranges (this would need to match your actual time slot logic)
+      // Map time slots to hour ranges
       const timeRanges = {
         'morning': { start: '08:00:00', end: '12:00:00' },
         'afternoon': { start: '12:00:00', end: '17:00:00' },
@@ -44,15 +44,23 @@ export const availabilityService = {
       const timeRange = timeRanges[timeSlot as keyof typeof timeRanges];
       if (!timeRange) return false;
 
+      // Check for any availability slot that overlaps with the requested time range
       const { data: availability } = await supabase
         .from('company_availability')
-        .select('is_available')
+        .select('start_time, end_time, is_available')
         .eq('day_of_week', dayOfWeek)
-        .eq('is_available', true)
-        .lte('start_time', timeRange.start)
-        .gte('end_time', timeRange.end);
+        .eq('is_available', true);
 
-      return availability && availability.length > 0;
+      if (!availability || availability.length === 0) return false;
+
+      // Check if any availability slot covers the requested time range
+      return availability.some(slot => {
+        const slotStart = slot.start_time;
+        const slotEnd = slot.end_time;
+        
+        // Check if the availability slot overlaps with the requested time range
+        return slotStart <= timeRange.start && slotEnd >= timeRange.end;
+      });
     } catch (error) {
       console.error('Error checking availability:', error);
       return false; // Default to unavailable on error
