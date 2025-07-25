@@ -160,7 +160,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
     }
   };
 
-  const canProceed = addresses.filter(addr => addr.address.trim()).length >= 2;
+  const canProceed = addresses.filter(addr => addr.address.trim()).length >= 2 && distance > 0 && !isCalculatingDistance;
   const pickupAddresses = addresses.filter(addr => addr.type === 'pickup');
   const dropoffAddresses = addresses.filter(addr => addr.type === 'dropoff');
 
@@ -194,8 +194,12 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
         }
       } catch (error) {
         console.error('Error calculating distance:', error);
-        // Fallback: estimate distance based on coordinates if needed
-        setDistance(10); // Default estimate
+        setDistance(0); // Reset to 0 on error
+        toast({
+          title: "Error calculating distance",
+          description: "Please check your addresses and try again.",
+          variant: "destructive",
+        });
       } finally {
         setIsCalculatingDistance(false);
       }
@@ -387,7 +391,7 @@ export const AddressScreen = ({ onNext, onBack }: AddressScreenProps) => {
               </Button>
               <Button 
                 onClick={() => onNext(addresses, distance)}
-                disabled={!canProceed || isCalculatingDistance}
+                disabled={!canProceed}
                 className="flex-1 bg-primary hover:bg-primary/90"
               >
                 {isCalculatingDistance ? (

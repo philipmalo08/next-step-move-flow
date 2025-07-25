@@ -18,7 +18,7 @@ const validateInput = (input: string): boolean => {
   return true;
 };
 
-const checkRateLimit = (clientId: string, maxRequests: number = 10): boolean => {
+const checkRateLimit = (clientId: string, maxRequests: number = 50): boolean => {
   const now = Date.now();
   const windowMs = 60000; // 1 minute
   const userLimit = rateLimitStore.get(clientId);
