@@ -15,7 +15,7 @@ import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const stripePromise = loadStripe('pk_test_51RkHNORATEydiMXF2HU30fVHXrYPMq4zvE9iXgIDJu2eqj5IbDK7eOhL1KM5dfGV9JqMBK9CH6HIWERUfi21JqUh008FtyrUB5'); // In production, this should be an environment variable
+const stripePromise = loadStripe('pk_live_51RkHNBI2Ilcui0ISUlzzoQ97X3BkVJtgRhNiKLgkrurAVfwIYjHmAQ7HcuTh2xqXmZipEOTQaJ9O82AW9Xm1jQeY00PG9dYGds'); // Live Stripe publishable key
 
 interface PaymentScreenProps {
   quote: {
