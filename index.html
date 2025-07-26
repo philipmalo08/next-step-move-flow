@@ -12,27 +12,28 @@
     <meta property="og:title" content="Next Movement - Professional Moving Services" />
     <meta property="og:description" content="Book professional moving services with instant quotes. Get your move scheduled in minutes with our easy step-by-step booking process." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/og-image.png" id="og-image" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚛</text></svg>">
+
+    <script>
+      // Set domain-specific OG images immediately for social crawlers
+      (function() {
+        const hostname = window.location.hostname;
+        let ogImageUrl = '/og-image.png';
+        
+        if (hostname === 'nextmovement.ca') {
+          ogImageUrl = '/lovable-uploads/a634c9e4-30ef-4320-8a1d-ff5311912ef4.png';
+        } else if (hostname === 'mouvementsuivant.ca') {
+          ogImageUrl = '/lovable-uploads/f65962f0-67a1-4f9a-aa2e-a2a82a677a85.png';
+        }
+        
+        // Write meta tags directly to document
+        document.write('<meta property="og:image" content="' + ogImageUrl + '" />');
+        document.write('<meta name="twitter:image" content="' + ogImageUrl + '" />');
+      })();
+    </script>
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="/og-image.png" id="twitter-image" />
-    
-    <script>
-      // Set domain-specific OG images
-      const hostname = window.location.hostname;
-      const ogImage = document.getElementById('og-image');
-      const twitterImage = document.getElementById('twitter-image');
-      
-      if (hostname === 'nextmovement.ca') {
-        ogImage.setAttribute('content', '/lovable-uploads/a634c9e4-30ef-4320-8a1d-ff5311912ef4.png');
-        twitterImage.setAttribute('content', '/lovable-uploads/a634c9e4-30ef-4320-8a1d-ff5311912ef4.png');
-      } else if (hostname === 'mouvementsuivant.ca') {
-        ogImage.setAttribute('content', '/lovable-uploads/f65962f0-67a1-4f9a-aa2e-a2a82a677a85.png');
-        twitterImage.setAttribute('content', '/lovable-uploads/f65962f0-67a1-4f9a-aa2e-a2a82a677a85.png');
-      }
-    </script>
   </head>
 
   <body>
