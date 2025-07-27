@@ -12,16 +12,15 @@ import { ArrowLeft, Settings, Users, Shield, Plus, Trash2, DollarSign, Calculato
 import { useToast } from '@/hooks/use-toast';
 
 interface PricingSettings {
-  baseRate: number;
+  baseServiceFee: number;
   distanceRate: number;
-  serviceTierMultipliers: {
+  tierRates: {
     basic: number;
     premium: number;
     whiteGlove: number;
   };
   gstRate: number;
   qstRate: number;
-  minimumCharge: number;
 }
 
 interface UserProfile {
@@ -38,16 +37,15 @@ interface UserProfile {
 const AdminSettings = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [pricing, setPricing] = useState<PricingSettings>({
-    baseRate: 89.99,
-    distanceRate: 1.50,
-    serviceTierMultipliers: {
-      basic: 1.0,
-      premium: 1.3,
-      whiteGlove: 1.8
+    baseServiceFee: 50,
+    distanceRate: 2.64,
+    tierRates: {
+      basic: 0.35,
+      premium: 0.38,
+      whiteGlove: 0.41
     },
     gstRate: 5.0,
-    qstRate: 9.975,
-    minimumCharge: 89.99
+    qstRate: 9.975
   });
   const [loading, setLoading] = useState(true);
   const [newUserEmail, setNewUserEmail] = useState('');
@@ -217,16 +215,15 @@ const AdminSettings = () => {
 
   const resetPricingToDefaults = () => {
     setPricing({
-      baseRate: 89.99,
-      distanceRate: 1.50,
-      serviceTierMultipliers: {
-        basic: 1.0,
-        premium: 1.3,
-        whiteGlove: 1.8
+      baseServiceFee: 50,
+      distanceRate: 2.64,
+      tierRates: {
+        basic: 0.35,
+        premium: 0.38,
+        whiteGlove: 0.41
       },
       gstRate: 5.0,
-      qstRate: 9.975,
-      minimumCharge: 89.99
+      qstRate: 9.975
     });
     toast({
       title: "Settings Reset",
@@ -341,15 +338,15 @@ const AdminSettings = () => {
                 <Calculator className="h-4 w-4" />
                 Base Pricing
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="baseRate">Base Rate ($)</Label>
+                  <Label htmlFor="baseServiceFee">Base Service Fee ($)</Label>
                   <Input
-                    id="baseRate"
+                    id="baseServiceFee"
                     type="number"
                     step="0.01"
-                    value={pricing.baseRate}
-                    onChange={(e) => setPricing({...pricing, baseRate: parseFloat(e.target.value) || 0})}
+                    value={pricing.baseServiceFee}
+                    onChange={(e) => setPricing({...pricing, baseServiceFee: parseFloat(e.target.value) || 0})}
                   />
                 </div>
                 <div>
@@ -362,68 +359,58 @@ const AdminSettings = () => {
                     onChange={(e) => setPricing({...pricing, distanceRate: parseFloat(e.target.value) || 0})}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="minimumCharge">Minimum Charge ($)</Label>
-                  <Input
-                    id="minimumCharge"
-                    type="number"
-                    step="0.01"
-                    value={pricing.minimumCharge}
-                    onChange={(e) => setPricing({...pricing, minimumCharge: parseFloat(e.target.value) || 0})}
-                  />
-                </div>
               </div>
             </div>
 
             <Separator />
 
-            {/* Service Tier Multipliers */}
+            {/* Service Tier Weight Rates */}
             <div>
-              <h4 className="text-sm font-medium mb-4">Service Tier Multipliers</h4>
+              <h4 className="text-sm font-medium mb-4">Service Tier Weight Rates ($/lb)</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="basicMultiplier">Basic (x)</Label>
+                  <Label htmlFor="basicRate">Basic ($/lb)</Label>
                   <Input
-                    id="basicMultiplier"
+                    id="basicRate"
                     type="number"
-                    step="0.1"
-                    value={pricing.serviceTierMultipliers.basic}
+                    step="0.01"
+                    value={pricing.tierRates.basic}
                     onChange={(e) => setPricing({
                       ...pricing, 
-                      serviceTierMultipliers: {
-                        ...pricing.serviceTierMultipliers,
+                      tierRates: {
+                        ...pricing.tierRates,
                         basic: parseFloat(e.target.value) || 0
                       }
                     })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="premiumMultiplier">Premium (x)</Label>
+                  <Label htmlFor="premiumRate">Premium ($/lb)</Label>
                   <Input
-                    id="premiumMultiplier"
+                    id="premiumRate"
                     type="number"
-                    step="0.1"
-                    value={pricing.serviceTierMultipliers.premium}
+                    step="0.01"
+                    value={pricing.tierRates.premium}
                     onChange={(e) => setPricing({
                       ...pricing, 
-                      serviceTierMultipliers: {
-                        ...pricing.serviceTierMultipliers,
+                      tierRates: {
+                        ...pricing.tierRates,
                         premium: parseFloat(e.target.value) || 0
                       }
                     })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="whiteGloveMultiplier">White Glove (x)</Label>
+                  <Label htmlFor="whiteGloveRate">White Glove ($/lb)</Label>
                   <Input
-                    id="whiteGloveMultiplier"
+                    id="whiteGloveRate"
                     type="number"
-                    step="0.1"
-                    value={pricing.serviceTierMultipliers.whiteGlove}
+                    step="0.01"
+                    value={pricing.tierRates.whiteGlove}
                     onChange={(e) => setPricing({
                       ...pricing, 
-                      serviceTierMultipliers: {
-                        ...pricing.serviceTierMultipliers,
+                      tierRates: {
+                        ...pricing.tierRates,
                         whiteGlove: parseFloat(e.target.value) || 0
                       }
                     })}
@@ -473,19 +460,22 @@ const AdminSettings = () => {
 
             {/* Pricing Preview */}
             <div className="bg-muted p-4 rounded-lg">
-              <h5 className="font-medium mb-2">Pricing Preview (50km move)</h5>
+              <h5 className="font-medium mb-2">Pricing Preview (50km move, 1000 lbs)</h5>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
                   <p className="font-medium">Basic</p>
-                  <p>${((pricing.baseRate + 50 * pricing.distanceRate) * pricing.serviceTierMultipliers.basic).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Base: ${pricing.baseServiceFee} + Weight: ${(1000 * pricing.tierRates.basic).toFixed(2)} + Distance: ${(50 * pricing.distanceRate).toFixed(2)}</p>
+                  <p className="font-bold">${(pricing.baseServiceFee + 1000 * pricing.tierRates.basic + 50 * pricing.distanceRate).toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="font-medium">Premium</p>
-                  <p>${((pricing.baseRate + 50 * pricing.distanceRate) * pricing.serviceTierMultipliers.premium).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Base: ${pricing.baseServiceFee} + Weight: ${(1000 * pricing.tierRates.premium).toFixed(2)} + Distance: ${(50 * pricing.distanceRate).toFixed(2)}</p>
+                  <p className="font-bold">${(pricing.baseServiceFee + 1000 * pricing.tierRates.premium + 50 * pricing.distanceRate).toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="font-medium">White Glove</p>
-                  <p>${((pricing.baseRate + 50 * pricing.distanceRate) * pricing.serviceTierMultipliers.whiteGlove).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Base: ${pricing.baseServiceFee} + Weight: ${(1000 * pricing.tierRates.whiteGlove).toFixed(2)} + Distance: ${(50 * pricing.distanceRate).toFixed(2)}</p>
+                  <p className="font-bold">${(pricing.baseServiceFee + 1000 * pricing.tierRates.whiteGlove + 50 * pricing.distanceRate).toFixed(2)}</p>
                 </div>
               </div>
             </div>
