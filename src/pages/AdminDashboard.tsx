@@ -16,6 +16,7 @@ import {
   Settings,
   Clock
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DashboardStats {
   totalBookings: number;
@@ -41,6 +42,7 @@ const AdminDashboard = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     checkAuth();
@@ -132,9 +134,9 @@ const AdminDashboard = () => {
       <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">NextMovement Admin</h1>
+            <h1 className="text-2xl font-bold">{t('admin.adminPortal')}</h1>
             <p className="text-muted-foreground">
-              Welcome back, {userProfile?.full_name}
+              {t('admin.welcomeBack')}, {userProfile?.full_name}
               <Badge variant="secondary" className="ml-2">
                 {userProfile?.role}
               </Badge>
@@ -142,17 +144,17 @@ const AdminDashboard = () => {
           </div>
           <Button onClick={handleLogout} variant="outline">
             <LogOut className="mr-2 h-4 w-4" />
-            Logout
+            {t('admin.logout')}
           </Button>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        {/* Stats Cards - Hide revenue and tickets for drivers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('admin.totalBookings')}</CardTitle>
               <ClipboardList className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -162,7 +164,7 @@ const AdminDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Bookings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('admin.todaysBookings')}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -172,7 +174,7 @@ const AdminDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Drivers</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('admin.activeDrivers')}</CardTitle>
               <Truck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -180,25 +182,29 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
-            </CardContent>
-          </Card>
+          {isAdmin && (
+            <>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('admin.totalRevenue')}</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Tickets</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingTickets}</div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('admin.pendingTickets')}</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.pendingTickets}</div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Quick Actions */}
@@ -207,10 +213,10 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <ClipboardList className="mr-2 h-5 w-5" />
-                Manage Bookings
+                {t('admin.manageBookings')}
               </CardTitle>
               <CardDescription>
-                View, assign, and track all moving jobs
+                {t('admin.manageBookingsDesc')}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -220,26 +226,28 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Users className="mr-2 h-5 w-5" />
-                  Driver Management
+                  {t('admin.driverManagement')}
                 </CardTitle>
                 <CardDescription>
-                  Manage drivers, schedules, and assignments
+                  {t('admin.driverManagementDesc')}
                 </CardDescription>
               </CardHeader>
             </Card>
           )}
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/support')}>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <MessageSquare className="mr-2 h-5 w-5" />
-                Customer Support
-              </CardTitle>
-              <CardDescription>
-                Handle customer inquiries and issues
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          {isAdmin && (
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/support')}>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MessageSquare className="mr-2 h-5 w-5" />
+                  {t('admin.customerSupport')}
+                </CardTitle>
+                <CardDescription>
+                  {t('admin.customerSupportDesc')}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
 
           {isAdmin && (
             <>
@@ -247,10 +255,10 @@ const AdminDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Clock className="mr-2 h-5 w-5" />
-                    Company Availability
+                    {t('admin.companyAvailability')}
                   </CardTitle>
                   <CardDescription>
-                    Manage operating hours and blackout dates
+                    {t('admin.companyAvailabilityDesc')}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -259,10 +267,10 @@ const AdminDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <BarChart3 className="mr-2 h-5 w-5" />
-                    Analytics
+                    {t('admin.analytics')}
                   </CardTitle>
                   <CardDescription>
-                    View reports and business insights
+                    {t('admin.analyticsDesc')}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -271,10 +279,10 @@ const AdminDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Settings className="mr-2 h-5 w-5" />
-                    Settings
+                    {t('admin.settings')}
                   </CardTitle>
                   <CardDescription>
-                    Manage users, pricing, and system settings
+                    {t('admin.settingsDesc')}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -285,10 +293,10 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Truck className="mr-2 h-5 w-5" />
-                Customer Portal
+                {t('admin.customerPortal')}
               </CardTitle>
               <CardDescription>
-                Go to the customer booking interface
+                {t('admin.customerPortalDesc')}
               </CardDescription>
             </CardHeader>
           </Card>
