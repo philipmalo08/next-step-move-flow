@@ -274,16 +274,16 @@ const AdminSettings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
-              Create New User
+              {t('admin.createUser')}
             </CardTitle>
             <CardDescription>
-              Add new admin or driver users to the system
+              {t('admin.createUserDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('admin.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -293,7 +293,7 @@ const AdminSettings = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('admin.fullName')}</Label>
                 <Input
                   id="name"
                   value={newUserName}
@@ -302,20 +302,20 @@ const AdminSettings = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">{t('admin.role')}</Label>
                 <Select value={newUserRole} onValueChange={(value: 'admin' | 'driver') => setNewUserRole(value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="driver">Driver</SelectItem>
+                    <SelectItem value="admin">{t('admin.adminRole')}</SelectItem>
+                    <SelectItem value="driver">{t('admin.driverRole')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-end">
                 <Button onClick={createUser} className="w-full">
-                  Create User
+                  {t('admin.createUser')}
                 </Button>
               </div>
             </div>
@@ -327,10 +327,10 @@ const AdminSettings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
-              Pricing Settings
+              {t('admin.pricingSettings')}
             </CardTitle>
             <CardDescription>
-              Configure base rates, service tier multipliers, and tax rates
+              {t('admin.pricingSettingsDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -342,7 +342,7 @@ const AdminSettings = () => {
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="baseServiceFee">Base Service Fee ($)</Label>
+                  <Label htmlFor="baseServiceFee">{t('admin.baseServiceFee')}</Label>
                   <Input
                     id="baseServiceFee"
                     type="number"
@@ -352,7 +352,7 @@ const AdminSettings = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="distanceRate">Distance Rate ($/km)</Label>
+                  <Label htmlFor="distanceRate">{t('admin.distanceRate')}</Label>
                   <Input
                     id="distanceRate"
                     type="number"
@@ -453,10 +453,10 @@ const AdminSettings = () => {
             {/* Actions */}
             <div className="flex gap-4 pt-4">
               <Button onClick={savePricingSettings}>
-                Save Pricing Settings
+                {t('admin.savePricingSettings')}
               </Button>
               <Button variant="outline" onClick={resetPricingToDefaults}>
-                Reset to Defaults
+                {t('admin.resetToDefaults')}
               </Button>
             </div>
 
@@ -512,7 +512,7 @@ const AdminSettings = () => {
                         {user.role.replace('_', ' ')}
                       </Badge>
                       <Badge variant={user.is_active ? 'default' : 'secondary'}>
-                        {user.is_active ? 'Active' : 'Inactive'}
+                        {user.is_active ? t('admin.active') : t('admin.inactive')}
                       </Badge>
                     </div>
                   </div>
@@ -525,10 +525,10 @@ const AdminSettings = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="customer">Customer</SelectItem>
-                        <SelectItem value="driver">Driver</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="super_admin">Super Admin</SelectItem>
+                        <SelectItem value="customer">{t('admin.customerRole')}</SelectItem>
+                        <SelectItem value="driver">{t('admin.driverRole')}</SelectItem>
+                        <SelectItem value="admin">{t('admin.adminRole')}</SelectItem>
+                        <SelectItem value="super_admin">{t('admin.superAdminRole')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button
@@ -536,7 +536,7 @@ const AdminSettings = () => {
                       size="sm"
                       onClick={() => toggleUserStatus(user.user_id, user.is_active)}
                     >
-                      {user.is_active ? 'Deactivate' : 'Activate'}
+                      {user.is_active ? t('admin.deactivate') : t('admin.activate')}
                     </Button>
                   </div>
                 </div>
