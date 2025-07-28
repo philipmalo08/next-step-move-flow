@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Search, UserPlus, Truck, Phone, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Driver {
   id: string;
@@ -40,6 +41,7 @@ const AdminDrivers = () => {
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     checkAuth();
@@ -240,9 +242,9 @@ const AdminDrivers = () => {
                 className="flex items-center"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                {t('admin.backToDashboard')}
               </Button>
-              <h1 className="text-2xl font-bold">Driver Management</h1>
+              <h1 className="text-2xl font-bold">{t('admin.driverManagement')}</h1>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>

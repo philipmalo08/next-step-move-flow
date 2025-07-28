@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, MessageSquare, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SupportTicket {
   id: string;
@@ -24,6 +25,7 @@ const AdminSupport = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     checkAuth();
@@ -125,8 +127,8 @@ const AdminSupport = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Customer Support</h1>
-            <p className="text-muted-foreground">Manage customer support tickets</p>
+            <h1 className="text-2xl font-bold">{t('admin.customerSupport')}</h1>
+            <p className="text-muted-foreground">{t('admin.customerSupportDesc')}</p>
           </div>
         </div>
       </header>

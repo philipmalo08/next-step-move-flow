@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Search, Filter, Calendar, MapPin, User, DollarSign, Download } from 'lucide-react';
 import { generateBookingPDF, downloadPDF } from '@/lib/pdfGenerator';
 import { format } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Booking {
   id: string;
@@ -45,6 +46,7 @@ const AdminBookings = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [downloadingPDF, setDownloadingPDF] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     checkAuth();
@@ -233,9 +235,9 @@ const AdminBookings = () => {
                 className="flex items-center"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                {t('admin.backToDashboard')}
               </Button>
-              <h1 className="text-2xl font-bold">Booking Management</h1>
+              <h1 className="text-2xl font-bold">{t('admin.bookingManagement')}</h1>
             </div>
           </div>
         </div>

@@ -324,6 +324,8 @@ const translations = {
     'admin.adminPortal': 'NextMovement Admin',
     'admin.welcomeBack': 'Welcome back',
     'admin.logout': 'Logout',
+    'admin.backToDashboard': 'Back to Dashboard',
+    'admin.bookingManagement': 'Booking Management',
     
     // Support Tickets
     'support.createTicket': 'Submit Support Request',
@@ -728,6 +730,8 @@ const translations = {
     'admin.adminPortal': 'Administration NextMovement',
     'admin.welcomeBack': 'Bon retour',
     'admin.logout': 'Déconnexion',
+    'admin.backToDashboard': 'Retour au Tableau de Bord',
+    'admin.bookingManagement': 'Gestion des Réservations',
     
     // Support Tickets
     'support.createTicket': 'Soumettre une Demande de Support',

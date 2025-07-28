@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AnalyticsData {
   totalBookings: number;
@@ -25,6 +26,7 @@ const AdminAnalytics = () => {
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     checkAuth();
@@ -139,8 +141,8 @@ const AdminAnalytics = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Analytics</h1>
-            <p className="text-muted-foreground">Business insights and reports</p>
+            <h1 className="text-2xl font-bold">{t('admin.analytics')}</h1>
+            <p className="text-muted-foreground">{t('admin.analyticsDesc')}</p>
           </div>
         </div>
       </header>

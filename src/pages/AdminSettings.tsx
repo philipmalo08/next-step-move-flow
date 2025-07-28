@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Settings, Users, Shield, Plus, Trash2, DollarSign, Calculator } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PricingSettings {
   baseServiceFee: number;
@@ -53,6 +54,7 @@ const AdminSettings = () => {
   const [newUserRole, setNewUserRole] = useState<'admin' | 'driver'>('admin');
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     checkAuth();
@@ -260,8 +262,8 @@ const AdminSettings = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">Manage users and system settings</p>
+            <h1 className="text-2xl font-bold">{t('admin.settings')}</h1>
+            <p className="text-muted-foreground">{t('admin.settingsDesc')}</p>
           </div>
         </div>
       </header>
