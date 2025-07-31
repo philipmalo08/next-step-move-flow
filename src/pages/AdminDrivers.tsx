@@ -250,17 +250,17 @@ const AdminDrivers = () => {
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="mr-2 h-4 w-4" />
-                  {t('admin.addDriver')}
+                  Add Driver
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>{t('admin.addNewDriver')}</DialogTitle>
+                  <DialogTitle>Add New Driver</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleAddDriver} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="fullName">{t('payment.fullName')}</Label>
+                      <Label htmlFor="fullName">Full Name</Label>
                       <Input
                         id="fullName"
                         value={newDriver.fullName}
@@ -269,7 +269,7 @@ const AdminDrivers = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="email">{t('payment.email')}</Label>
+                      <Label htmlFor="email">Email</Label>
                       <Input
                         id="email"
                         type="email"
@@ -281,7 +281,7 @@ const AdminDrivers = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="phone">{t('admin.phone')}</Label>
+                      <Label htmlFor="phone">Phone</Label>
                       <Input
                         id="phone"
                         value={newDriver.phone}
@@ -289,7 +289,7 @@ const AdminDrivers = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="licenseNumber">{t('admin.licenseNumber')}</Label>
+                      <Label htmlFor="licenseNumber">License Number</Label>
                       <Input
                         id="licenseNumber"
                         value={newDriver.licenseNumber}
@@ -300,20 +300,20 @@ const AdminDrivers = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="vehicleType">{t('admin.vehicleType')}</Label>
+                      <Label htmlFor="vehicleType">Vehicle Type</Label>
                       <Select value={newDriver.vehicleType} onValueChange={(value) => setNewDriver({...newDriver, vehicleType: value})}>
                         <SelectTrigger>
-                          <SelectValue placeholder={t('admin.selectType')} />
+                          <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="truck">{t('admin.truck')}</SelectItem>
-                          <SelectItem value="van">{t('admin.van')}</SelectItem>
-                          <SelectItem value="trailer">{t('admin.trailer')}</SelectItem>
+                          <SelectItem value="truck">Truck</SelectItem>
+                          <SelectItem value="van">Van</SelectItem>
+                          <SelectItem value="trailer">Trailer</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="vehicleModel">{t('admin.vehicleModel')}</Label>
+                      <Label htmlFor="vehicleModel">Vehicle Model</Label>
                       <Input
                         id="vehicleModel"
                         value={newDriver.vehicleModel}
@@ -323,9 +323,9 @@ const AdminDrivers = () => {
                   </div>
                   <div className="flex justify-end space-x-2">
                     <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                      {t('common.cancel')}
+                      Cancel
                     </Button>
-                    <Button type="submit">{t('admin.addDriver')}</Button>
+                    <Button type="submit">Add Driver</Button>
                   </div>
                 </form>
               </DialogContent>
@@ -341,7 +341,7 @@ const AdminDrivers = () => {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={t('admin.searchDrivers')}
+                placeholder="Search drivers by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -362,10 +362,10 @@ const AdminDrivers = () => {
                   </div>
                   <div className="flex space-x-2">
                     <Badge variant={driver.is_available ? "default" : "secondary"}>
-                      {driver.is_available ? t('admin.available') : t('admin.unavailable')}
+                      {driver.is_available ? "Available" : "Unavailable"}
                     </Badge>
                     <Badge variant={driver.profiles.is_active ? "default" : "destructive"}>
-                      {driver.profiles.is_active ? t('admin.active') : t('admin.inactive')}
+                      {driver.profiles.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </div>
                 </div>
@@ -380,13 +380,13 @@ const AdminDrivers = () => {
                   <div className="flex items-center space-x-2">
                     <Truck className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">
-                      {t('admin.license')}: {driver.license_number}
+                      License: {driver.license_number}
                     </span>
                   </div>
 
                   {driver.vehicle_info && (
                     <div className="text-sm">
-                      <strong>{t('admin.vehicle')}:</strong> {driver.vehicle_info.type} - {driver.vehicle_info.model}
+                      <strong>Vehicle:</strong> {driver.vehicle_info.type} - {driver.vehicle_info.model}
                     </div>
                   )}
 
@@ -397,7 +397,7 @@ const AdminDrivers = () => {
                       onClick={() => toggleDriverAvailability(driver.id, driver.is_available)}
                       className="flex-1"
                     >
-                      {driver.is_available ? t('admin.setUnavailable') : t('admin.setAvailable')}
+                      {driver.is_available ? "Set Unavailable" : "Set Available"}
                     </Button>
                   </div>
                 </div>
@@ -409,7 +409,7 @@ const AdminDrivers = () => {
             <div className="col-span-full">
               <Card>
                 <CardContent className="p-12 text-center">
-                  <p className="text-muted-foreground">{t('admin.noDriversFound')}</p>
+                  <p className="text-muted-foreground">No drivers found matching your search.</p>
                 </CardContent>
               </Card>
             </div>
