@@ -27,14 +27,13 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6">
-      {/* Desktop/Tablet Step Indicator */}
-      <div className="hidden sm:flex items-center justify-between">
+      <div className="flex items-center justify-between">
         {stepTitles.map((title, index) => (
-          <div key={index} className="flex flex-col items-center relative flex-1">
+          <div key={index} className="flex flex-col items-center">
             {/* Step Circle */}
             <div
               className={cn(
-                "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 relative z-10",
+                "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
                 index < currentStep
                   ? "bg-primary border-primary text-primary-foreground"
                   : index === currentStep
@@ -52,7 +51,7 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
             {/* Step Title */}
             <span
               className={cn(
-                "mt-2 text-xs font-medium text-center transition-colors duration-300 max-w-20",
+                "mt-2 text-xs font-medium text-center transition-colors duration-300",
                 index <= currentStep ? "text-foreground" : "text-muted-foreground"
               )}
             >
@@ -61,13 +60,13 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
             
             {/* Connecting Line */}
             {index < totalSteps - 1 && (
-              <div className="absolute top-5 left-1/2 w-full h-0.5 -translate-y-1/2 z-0">
+              <div className="absolute top-5 left-1/2 w-full h-0.5 -translate-y-1/2 hidden md:block">
                 <div
                   className={cn(
-                    "h-full transition-all duration-500 ml-5",
+                    "h-full transition-all duration-500",
                     index < currentStep ? "bg-primary" : "bg-muted"
                   )}
-                  style={{ width: "calc(100% - 2.5rem)" }}
+                  style={{ width: "calc(100% - 5rem)" }}
                 />
               </div>
             )}
@@ -75,35 +74,8 @@ export function StepIndicator({ currentStep, totalSteps, stepTitles }: StepIndic
         ))}
       </div>
       
-      {/* Mobile Step Indicator */}
-      <div className="sm:hidden">
-        {/* Current Step Display */}
-        <div className="flex items-center justify-center mb-4">
-          <div
-            className={cn(
-              "w-12 h-12 rounded-full border-2 flex items-center justify-center",
-              "bg-primary border-primary text-primary-foreground"
-            )}
-          >
-            {currentStep >= stepTitles.length ? (
-              <Check className="w-6 h-6" />
-            ) : (
-              <span className="text-lg font-medium">{currentStep + 1}</span>
-            )}
-          </div>
-        </div>
-        
-        {/* Current Step Title */}
-        <div className="text-center mb-4">
-          <h3 className="text-base font-semibold text-foreground">
-            {currentStep < stepTitles.length ? getTranslatedTitle(stepTitles[currentStep]) : t('steps.confirmation')}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {`${currentStep + 1} ${t('steps.stepOf')} ${totalSteps}`}
-          </p>
-        </div>
-        
-        {/* Mobile Progress Bar */}
+      {/* Mobile Progress Bar */}
+      <div className="mt-4 md:hidden">
         <div className="w-full bg-muted rounded-full h-2">
           <div
             className="bg-primary h-2 rounded-full transition-all duration-500"
