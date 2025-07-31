@@ -342,7 +342,7 @@ const AdminSettings = () => {
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="baseServiceFee">Base Service Fee ($)</Label>
+                  <Label htmlFor="baseServiceFee">{t('admin.baseServiceFee')} ($)</Label>
                   <Input
                     id="baseServiceFee"
                     type="number"
@@ -352,7 +352,7 @@ const AdminSettings = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="distanceRate">Distance Rate ($/km)</Label>
+                  <Label htmlFor="distanceRate">{t('admin.distanceRate')} ($/km)</Label>
                   <Input
                     id="distanceRate"
                     type="number"
@@ -368,10 +368,10 @@ const AdminSettings = () => {
 
             {/* Service Tier Weight Rates */}
             <div>
-              <h4 className="text-sm font-medium mb-4">Service Tier Weight Rates ($/lb)</h4>
+              <h4 className="text-sm font-medium mb-4">{t('admin.serviceTierRates')} ($/lb)</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="basicRate">Basic ($/lb)</Label>
+                  <Label htmlFor="basicRate">{t('serviceTier.basic')} ($/lb)</Label>
                   <Input
                     id="basicRate"
                     type="number"
@@ -387,7 +387,7 @@ const AdminSettings = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="premiumRate">Premium ($/lb)</Label>
+                  <Label htmlFor="premiumRate">{t('serviceTier.premium')} ($/lb)</Label>
                   <Input
                     id="premiumRate"
                     type="number"
@@ -403,7 +403,7 @@ const AdminSettings = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="whiteGloveRate">White Glove ($/lb)</Label>
+                  <Label htmlFor="whiteGloveRate">{t('serviceTier.whiteGlove')} ($/lb)</Label>
                   <Input
                     id="whiteGloveRate"
                     type="number"
@@ -425,10 +425,10 @@ const AdminSettings = () => {
 
             {/* Tax Rates */}
             <div>
-              <h4 className="text-sm font-medium mb-4">Tax Rates</h4>
+              <h4 className="text-sm font-medium mb-4">{t('admin.taxRates')}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="gstRate">GST Rate (%)</Label>
+                  <Label htmlFor="gstRate">{t('admin.gstRate')} (%)</Label>
                   <Input
                     id="gstRate"
                     type="number"
@@ -438,7 +438,7 @@ const AdminSettings = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="qstRate">QST Rate (%)</Label>
+                  <Label htmlFor="qstRate">{t('admin.qstRate')} (%)</Label>
                   <Input
                     id="qstRate"
                     type="number"
@@ -453,29 +453,29 @@ const AdminSettings = () => {
             {/* Actions */}
             <div className="flex gap-4 pt-4">
               <Button onClick={savePricingSettings}>
-                Save Pricing Settings
+                {t('admin.savePricingSettings')}
               </Button>
               <Button variant="outline" onClick={resetPricingToDefaults}>
-                Reset to Defaults
+                {t('admin.resetToDefaults')}
               </Button>
             </div>
 
             {/* Pricing Preview */}
             <div className="bg-muted p-4 rounded-lg">
-              <h5 className="font-medium mb-2">Pricing Preview (50km move, 1000 lbs)</h5>
+              <h5 className="font-medium mb-2">{t('admin.pricingPreview')} (50km move, 1000 lbs)</h5>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="font-medium">Basic</p>
+                  <p className="font-medium">{t('serviceTier.basic')}</p>
                   <p className="text-xs text-muted-foreground">Base: ${pricing.baseServiceFee} + Weight: ${(1000 * pricing.tierRates.basic).toFixed(2)} + Distance: ${(50 * pricing.distanceRate).toFixed(2)}</p>
                   <p className="font-bold">${(pricing.baseServiceFee + 1000 * pricing.tierRates.basic + 50 * pricing.distanceRate).toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Premium</p>
+                  <p className="font-medium">{t('serviceTier.premium')}</p>
                   <p className="text-xs text-muted-foreground">Base: ${pricing.baseServiceFee} + Weight: ${(1000 * pricing.tierRates.premium).toFixed(2)} + Distance: ${(50 * pricing.distanceRate).toFixed(2)}</p>
                   <p className="font-bold">${(pricing.baseServiceFee + 1000 * pricing.tierRates.premium + 50 * pricing.distanceRate).toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="font-medium">White Glove</p>
+                  <p className="font-medium">{t('serviceTier.whiteGlove')}</p>
                   <p className="text-xs text-muted-foreground">Base: ${pricing.baseServiceFee} + Weight: ${(1000 * pricing.tierRates.whiteGlove).toFixed(2)} + Distance: ${(50 * pricing.distanceRate).toFixed(2)}</p>
                   <p className="font-bold">${(pricing.baseServiceFee + 1000 * pricing.tierRates.whiteGlove + 50 * pricing.distanceRate).toFixed(2)}</p>
                 </div>
@@ -504,7 +504,7 @@ const AdminSettings = () => {
                       <p className="font-medium">{user.full_name}</p>
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        Created: {new Date(user.created_at).toLocaleDateString()}
+                        {t('admin.created')}: {new Date(user.created_at).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -512,7 +512,7 @@ const AdminSettings = () => {
                         {user.role.replace('_', ' ')}
                       </Badge>
                       <Badge variant={user.is_active ? 'default' : 'secondary'}>
-                        {user.is_active ? 'Active' : 'Inactive'}
+                        {user.is_active ? t('admin.active') : t('admin.inactive')}
                       </Badge>
                     </div>
                   </div>
@@ -525,10 +525,10 @@ const AdminSettings = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="customer">Customer</SelectItem>
-                        <SelectItem value="driver">Driver</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="super_admin">Super Admin</SelectItem>
+                        <SelectItem value="customer">{t('admin.customer')}</SelectItem>
+                        <SelectItem value="driver">{t('admin.driver')}</SelectItem>
+                        <SelectItem value="admin">{t('admin.admin')}</SelectItem>
+                        <SelectItem value="super_admin">{t('admin.superAdmin')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button
@@ -536,7 +536,7 @@ const AdminSettings = () => {
                       size="sm"
                       onClick={() => toggleUserStatus(user.user_id, user.is_active)}
                     >
-                      {user.is_active ? 'Deactivate' : 'Activate'}
+                      {user.is_active ? t('admin.deactivate') : t('admin.activate')}
                     </Button>
                   </div>
                 </div>
@@ -545,7 +545,7 @@ const AdminSettings = () => {
               {users.length === 0 && (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No users found.</p>
+                  <p className="text-muted-foreground">{t('admin.noUsersFound')}</p>
                 </div>
               )}
             </div>
