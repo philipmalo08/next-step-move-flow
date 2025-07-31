@@ -326,6 +326,15 @@ const translations = {
     'admin.logout': 'Logout',
     'admin.backToDashboard': 'Back to Dashboard',
     'admin.bookingManagement': 'Booking Management',
+    'admin.createUser': 'Create New User',
+    'admin.createUserDesc': 'Add new admin or driver users to the system',
+    'admin.role': 'Role',
+    'admin.admin': 'Admin',
+    'admin.driver': 'Driver',
+    'admin.pricingSettings': 'Pricing Settings',
+    'admin.pricingSettingsDesc': 'Configure base rates, service tier multipliers, and tax rates',
+    'admin.userManagement': 'User Management',
+    'admin.userManagementDesc': 'Manage existing users, roles, and permissions',
     
     // Support Tickets
     'support.createTicket': 'Submit Support Request',
@@ -493,10 +502,10 @@ const translations = {
     
     // Step Indicator
     'steps.address': 'Adresse',
-    'steps.service': 'Niveau De Service',
+    'steps.service': 'Service',
     'steps.items': 'Articles', 
     'steps.quote': 'Devis',
-    'steps.datetime': 'Date & Heure',
+    'steps.datetime': 'Date',
     'steps.payment': 'Paiement',
     'steps.confirmation': 'Confirmation',
     
@@ -732,6 +741,15 @@ const translations = {
     'admin.logout': 'Déconnexion',
     'admin.backToDashboard': 'Retour au Tableau de Bord',
     'admin.bookingManagement': 'Gestion des Réservations',
+    'admin.createUser': 'Créer Nouvel Utilisateur',
+    'admin.createUserDesc': 'Ajouter de nouveaux administrateurs ou chauffeurs au système',
+    'admin.role': 'Rôle',
+    'admin.admin': 'Administrateur',
+    'admin.driver': 'Chauffeur',
+    'admin.pricingSettings': 'Paramètres de Tarification',
+    'admin.pricingSettingsDesc': 'Configurer les tarifs de base, multiplicateurs de niveaux de service et taux de taxes',
+    'admin.userManagement': 'Gestion des Utilisateurs',
+    'admin.userManagementDesc': 'Gérer les utilisateurs existants, rôles et permissions',
     
     // Support Tickets
     'support.createTicket': 'Soumettre une Demande de Support',

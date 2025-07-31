@@ -274,16 +274,16 @@ const AdminSettings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
-              Create New User
+              {t('admin.createUser')}
             </CardTitle>
             <CardDescription>
-              Add new admin or driver users to the system
+              {t('admin.createUserDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('payment.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -293,7 +293,7 @@ const AdminSettings = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('payment.fullName')}</Label>
                 <Input
                   id="name"
                   value={newUserName}
@@ -302,20 +302,20 @@ const AdminSettings = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">{t('admin.role')}</Label>
                 <Select value={newUserRole} onValueChange={(value: 'admin' | 'driver') => setNewUserRole(value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="driver">Driver</SelectItem>
+                    <SelectItem value="admin">{t('admin.admin')}</SelectItem>
+                    <SelectItem value="driver">{t('admin.driver')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-end">
                 <Button onClick={createUser} className="w-full">
-                  Create User
+                  {t('admin.createUser')}
                 </Button>
               </div>
             </div>
@@ -327,10 +327,10 @@ const AdminSettings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
-              Pricing Settings
+              {t('admin.pricingSettings')}
             </CardTitle>
             <CardDescription>
-              Configure base rates, service tier multipliers, and tax rates
+              {t('admin.pricingSettingsDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -489,10 +489,10 @@ const AdminSettings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              User Management
+              {t('admin.userManagement')}
             </CardTitle>
             <CardDescription>
-              Manage existing users, roles, and permissions
+              {t('admin.userManagementDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
