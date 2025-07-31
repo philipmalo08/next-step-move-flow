@@ -277,18 +277,18 @@ const AdminAvailability: React.FC = () => {
         {/* Weekly Availability */}
         <Card>
           <CardHeader>
-            <CardTitle>Weekly Availability</CardTitle>
+            <CardTitle>{t('admin.weeklyAvailability')}</CardTitle>
             <CardDescription>
-              Set your company's regular operating hours for each day of the week
+              {t('admin.weeklyAvailabilityDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Add new slot form */}
             <div className="border rounded-lg p-4 space-y-4">
-              <h3 className="font-semibold">Add New Time Slot</h3>
+              <h3 className="font-semibold">{t('admin.addNewTimeSlot')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="day">Day of Week</Label>
+                  <Label htmlFor="day">{t('admin.dayOfWeek')}</Label>
                   <select
                     id="day"
                     value={newSlot.day_of_week}
@@ -305,12 +305,12 @@ const AdminAvailability: React.FC = () => {
                     checked={newSlot.is_available}
                     onCheckedChange={(checked) => setNewSlot({ ...newSlot, is_available: checked })}
                   />
-                  <Label>{newSlot.is_available ? 'Available' : 'Unavailable'}</Label>
+                  <Label>{newSlot.is_available ? t('admin.available') : t('admin.unavailable')}</Label>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="start_time">Start Time</Label>
+                  <Label htmlFor="start_time">{t('admin.startTime')}</Label>
                   <Input
                     id="start_time"
                     type="time"
@@ -319,7 +319,7 @@ const AdminAvailability: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="end_time">End Time</Label>
+                  <Label htmlFor="end_time">{t('admin.endTime')}</Label>
                   <Input
                     id="end_time"
                     type="time"
@@ -330,7 +330,7 @@ const AdminAvailability: React.FC = () => {
               </div>
               <Button onClick={handleAddAvailabilitySlot} className="w-full">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Time Slot
+                {t('admin.addTimeSlot')}
               </Button>
             </div>
 
@@ -352,9 +352,9 @@ const AdminAvailability: React.FC = () => {
         {/* Blackout Dates */}
         <Card>
           <CardHeader>
-            <CardTitle>Blackout Dates</CardTitle>
+            <CardTitle>{t('admin.blackoutDates')}</CardTitle>
             <CardDescription>
-              Set specific dates when the company is unavailable (holidays, maintenance, etc.)
+              {t('admin.blackoutDatesDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -362,14 +362,14 @@ const AdminAvailability: React.FC = () => {
               <DialogTrigger asChild>
                 <Button className="w-full">
                   <CalendarIcon className="h-4 w-4 mr-2" />
-                  Add Blackout Date
+                  {t('admin.addBlackoutDate')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Add Blackout Date</DialogTitle>
+                  <DialogTitle>{t('admin.addBlackoutDate')}</DialogTitle>
                   <DialogDescription>
-                    Select a date when the company will be unavailable
+                    {t('admin.addBlackoutDateDesc')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -381,16 +381,16 @@ const AdminAvailability: React.FC = () => {
                     disabled={(date) => date < new Date()}
                   />
                   <div>
-                    <Label htmlFor="reason">Reason (optional)</Label>
+                    <Label htmlFor="reason">{t('admin.reasonOptional')}</Label>
                     <Input
                       id="reason"
-                      placeholder="e.g., Holiday, Maintenance"
+                      placeholder={t('admin.reasonPlaceholder')}
                       value={blackoutReason}
                       onChange={(e) => setBlackoutReason(e.target.value)}
                     />
                   </div>
                   <Button onClick={handleAddBlackoutDate} disabled={!selectedDate} className="w-full">
-                    Add Blackout Date
+                    {t('admin.addBlackoutDate')}
                   </Button>
                 </div>
               </DialogContent>
@@ -417,7 +417,7 @@ const AdminAvailability: React.FC = () => {
               ))}
               {blackoutDates.length === 0 && (
                 <div className="text-center text-muted-foreground py-6">
-                  No blackout dates set
+                  {t('admin.noBlackoutDates')}
                 </div>
               )}
             </div>

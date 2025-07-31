@@ -249,7 +249,7 @@ const AdminBookings = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Filter className="mr-2 h-5 w-5" />
-              Filters
+              {t('admin.filters')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -258,7 +258,7 @@ const AdminBookings = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by customer name, email, or booking ID..."
+                    placeholder={t('admin.searchBookings')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-9"
@@ -267,15 +267,15 @@ const AdminBookings = () => {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder={t('admin.filterByStatus')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="assigned">Assigned</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="all">{t('admin.allStatus')}</SelectItem>
+                  <SelectItem value="confirmed">{t('admin.confirmed')}</SelectItem>
+                  <SelectItem value="assigned">{t('admin.assigned')}</SelectItem>
+                  <SelectItem value="in_progress">{t('admin.inProgress')}</SelectItem>
+                  <SelectItem value="completed">{t('admin.completed')}</SelectItem>
+                  <SelectItem value="cancelled">{t('admin.cancelled')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -331,21 +331,21 @@ const AdminBookings = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Pickup:</p>
-                      <p className="text-sm">{booking.pickup_addresses?.[0] || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Dropoff:</p>
-                      <p className="text-sm">{booking.dropoff_addresses?.[0] || 'N/A'}</p>
-                    </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('admin.pickup')}:</p>
+                    <p className="text-sm">{booking.pickup_addresses?.[0] || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('admin.dropoff')}:</p>
+                    <p className="text-sm">{booking.dropoff_addresses?.[0] || 'N/A'}</p>
+                  </div>
                   </div>
 
                   {assignment && assignment.driver && (
-                    <div className="mb-4">
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Assigned Driver:</p>
-                      <p className="text-sm">{assignment.driver.profiles?.full_name || 'Unknown'}</p>
-                    </div>
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t('admin.assignedDriver')}:</p>
+                    <p className="text-sm">{assignment.driver.profiles?.full_name || 'Unknown'}</p>
+                  </div>
                   )}
 
                   <div className="flex justify-end space-x-2">
@@ -357,14 +357,14 @@ const AdminBookings = () => {
                       className="flex items-center gap-2"
                     >
                       <Download className="w-3 h-3" />
-                      {downloadingPDF === booking.id ? 'Generating...' : 'Download PDF'}
+                      {downloadingPDF === booking.id ? t('admin.generating') : t('admin.downloadPdf')}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(`/admin/bookings/${booking.id}`)}
                     >
-                      View Details
+                      {t('admin.viewDetails')}
                     </Button>
                   </div>
                 </CardContent>
@@ -375,7 +375,7 @@ const AdminBookings = () => {
           {filteredBookings.length === 0 && (
             <Card>
               <CardContent className="p-12 text-center">
-                <p className="text-muted-foreground">No bookings found matching your criteria.</p>
+                <p className="text-muted-foreground">{t('admin.noBookingsFound')}</p>
               </CardContent>
             </Card>
           )}
