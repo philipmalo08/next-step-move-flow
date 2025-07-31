@@ -138,19 +138,19 @@ const AdminSupport = () => {
           <div className="flex items-center gap-4">
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder={t('admin.filterByStatus')} />
+                <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('admin.allTickets')}</SelectItem>
-                <SelectItem value="open">{t('admin.open')}</SelectItem>
-                <SelectItem value="in_progress">{t('admin.inProgress')}</SelectItem>
-                <SelectItem value="resolved">{t('admin.resolved')}</SelectItem>
-                <SelectItem value="closed">{t('admin.closed')}</SelectItem>
+                <SelectItem value="all">All Tickets</SelectItem>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="text-sm text-muted-foreground">
-            {filteredTickets.length} {t('admin.tickets')}
+            {filteredTickets.length} tickets
           </div>
         </div>
 
@@ -175,10 +175,10 @@ const AdminSupport = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="open">{t('admin.open')}</SelectItem>
-                        <SelectItem value="in_progress">{t('admin.inProgress')}</SelectItem>
-                        <SelectItem value="resolved">{t('admin.resolved')}</SelectItem>
-                        <SelectItem value="closed">{t('admin.closed')}</SelectItem>
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -200,7 +200,7 @@ const AdminSupport = () => {
               <CardContent className="text-center py-8">
                 <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  {selectedStatus === 'all' ? t('admin.noSupportTickets') : `${t('admin.no')} ${selectedStatus} ${t('admin.ticketsFound')}`}
+                  {selectedStatus === 'all' ? 'No support tickets found.' : `No ${selectedStatus} tickets found.`}
                 </p>
               </CardContent>
             </Card>
