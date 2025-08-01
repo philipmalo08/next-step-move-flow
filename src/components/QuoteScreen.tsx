@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, MapPin, Package, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calculator, MapPin, Package, ArrowRight, ArrowLeft, CheckCircle, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Item {
   id: string;
@@ -42,7 +47,10 @@ interface QuoteData {
 export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: QuoteScreenProps) {
   const [quote, setQuote] = useState<QuoteData | null>(null);
   const [isCalculating, setIsCalculating] = useState(true);
-  const { t } = useLanguage();
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     // Simulate quote calculation
@@ -83,6 +91,41 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
   const totalWeight = items.reduce((sum, item) => sum + (item.weight * item.quantity), 0);
   const totalVolume = items.reduce((sum, item) => sum + (item.volume * item.quantity), 0);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleEmailQuote = async () => {
+    if (!email.trim()) {
+      toast.error(t('quote.enterEmail'));
+      return;
+    }
+
+    setIsSendingEmail(true);
+    
+    try {
+      const { error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
+          to: email.trim(),
+          quote,
+          items,
+          serviceTier,
+          distance,
+          language
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success(t('quote.emailSent'));
+      setEmailDialogOpen(false);
+      setEmail("");
+    } catch (error) {
+      console.error('Error sending quote email:', error);
+      toast.error(t('quote.emailError'));
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   if (isCalculating) {
     return (
@@ -241,6 +284,58 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
           </div>
         </div>
       </Card>
+
+        {/* Email Quote Dialog */}
+        <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="w-full mb-4">
+              <Mail className="h-4 w-4 mr-2" />
+              {t('quote.emailQuote')}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t('quote.emailQuote')}</DialogTitle>
+              <DialogDescription>
+                {t('quote.emailQuoteDesc')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('quote.enterEmail')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={t('quote.emailPlaceholder')}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleEmailQuote();
+                    }
+                  }}
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setEmailDialogOpen(false)}
+                  className="flex-1"
+                >
+                  {t('quote.cancel')}
+                </Button>
+                <Button 
+                  onClick={handleEmailQuote} 
+                  disabled={isSendingEmail}
+                  className="flex-1"
+                >
+                  {isSendingEmail ? '...' : t('quote.send')}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Navigation */}
         <div className="flex gap-3 pt-4">

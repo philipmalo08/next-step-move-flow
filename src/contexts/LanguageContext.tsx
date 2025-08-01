@@ -255,6 +255,14 @@ const translations = {
     'quote.included5': 'Basic insurance coverage',
     'quote.included6': 'No hidden fees',
     'quote.bookThisMove': 'Book This Move',
+    'quote.emailQuote': 'Email me my quote',
+    'quote.emailQuoteDesc': 'Get your quote sent to your email',
+    'quote.emailSent': 'Quote sent to your email!',
+    'quote.emailError': 'Failed to send email. Please try again.',
+    'quote.enterEmail': 'Enter your email address',
+    'quote.emailPlaceholder': 'your@email.com',
+    'quote.send': 'Send Quote',
+    'quote.cancel': 'Cancel',
     
     
     // Confirmation Screen
@@ -670,6 +678,14 @@ const translations = {
     'quote.included5': 'Couverture d\'assurance de base',
     'quote.included6': 'Aucuns frais cachés',
     'quote.bookThisMove': 'Réserver ce Déménagement',
+    'quote.emailQuote': 'Envoyez-moi mon devis',
+    'quote.emailQuoteDesc': 'Recevez votre devis par email',
+    'quote.emailSent': 'Devis envoyé à votre email!',
+    'quote.emailError': 'Échec de l\'envoi de l\'email. Veuillez réessayer.',
+    'quote.enterEmail': 'Entrez votre adresse email',
+    'quote.emailPlaceholder': 'votre@email.com',
+    'quote.send': 'Envoyer le devis',
+    'quote.cancel': 'Annuler',
     
     
     // Confirmation Screen
