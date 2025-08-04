@@ -29,6 +29,21 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   });
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem('language') as Language;
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'fr')) {
+      setLanguage(savedLanguage);
+    } else {
+      // Domain-based language detection
+      const hostname = window.location.hostname;
+      if (hostname === 'mouvementsuivant.ca') {
+        setLanguage('fr');
+      } else if (hostname === 'nextmovement.ca') {
+        setLanguage('en');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
 
@@ -149,6 +164,17 @@ const translations = {
     'payment.termsLink': 'Terms and Conditions',
     'payment.paymentInfo': 'Payment Information',
     
+    // Chatbot translations
+    chatbotWelcome: "Hi! I'm here to help you with your moving questions. How can I assist you today?",
+    chatbotTitle: "Moving Assistant",
+    chatbotPlaceholder: "Type your message...",
+    chatbotError: "Sorry, I'm having trouble responding right now. Please try again later.",
+    chatbotLimit: "You've reached your 3 question limit. Please provide your email to continue getting help:",
+    chatbotEmail: "Email Address",
+    chatbotSubmit: "Submit",
+    chatbotThankYou: "Thank you! Please visit our Help & Support section for more assistance.",
+    chatbotEmailError: "Please enter a valid email address.",
+
     // Common translations
     'back': 'Back',
     'continue': 'Continue',
@@ -460,11 +486,6 @@ const translations = {
     additionalCharge1: 'Packing services requested on moving day',
     additionalCharge2: 'Waiting time due to customer delays',
     
-    // Chatbot
-    chatbotWelcome: 'Hello! I\'m here to help with any questions about our moving services. How can I assist you today?',
-    chatbotTitle: 'Next Movement Support',
-    chatbotPlaceholder: 'Type your message...',
-    chatbotError: 'Sorry, I\'m having trouble responding right now. Please try again or contact customer service.',
     error: 'Error',
   },
   fr: {
@@ -572,6 +593,17 @@ const translations = {
     'payment.termsLink': 'Conditions Générales',
     'payment.paymentInfo': 'Information de Paiement',
     
+    // Chatbot translations
+    chatbotWelcome: "Bonjour! Je suis là pour vous aider avec vos questions de déménagement. Comment puis-je vous aider aujourd'hui?",
+    chatbotTitle: "Assistant Déménagement",
+    chatbotPlaceholder: "Tapez votre message...",
+    chatbotError: "Désolé, j'ai des difficultés à répondre en ce moment. Veuillez réessayer plus tard.",
+    chatbotLimit: "Vous avez atteint votre limite de 3 questions. Veuillez fournir votre email pour continuer à obtenir de l'aide:",
+    chatbotEmail: "Adresse Email",
+    chatbotSubmit: "Soumettre",
+    chatbotThankYou: "Merci! Veuillez visiter notre section Aide & Support pour plus d'assistance.",
+    chatbotEmailError: "Veuillez entrer une adresse email valide.",
+
     // Common translations
     'back': 'Retour',
     'continue': 'Continuer',
@@ -883,11 +915,6 @@ const translations = {
     additionalCharge1: 'Services d\'emballage demandés le jour du déménagement',
     additionalCharge2: 'Temps d\'attente dû aux retards du client',
     
-    // Chatbot
-    chatbotWelcome: 'Bonjour ! Je suis là pour vous aider avec toutes questions concernant nos services de déménagement. Comment puis-je vous aider aujourd\'hui ?',
-    chatbotTitle: 'Support Mouvement Suivant',
-    chatbotPlaceholder: 'Tapez votre message...',
-    chatbotError: 'Désolé, j\'ai des difficultés à répondre en ce moment. Veuillez réessayer ou contacter le service clientèle.',
     error: 'Erreur',
   }
 };

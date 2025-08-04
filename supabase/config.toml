@@ -12,6 +12,12 @@ verify_jwt = false
 [functions.send-quote-email]
 verify_jwt = false
 
+[functions.send-marketing-emails]
+verify_jwt = false
+
+[functions.schedule-marketing-emails]
+verify_jwt = false
+
 [functions.verify-recaptcha]
 verify_jwt = false
 

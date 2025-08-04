@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '@/components/ui/label';
 import { MessageCircle, Send, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getUserIdentifier } from '@/lib/sessionManager';
 
 interface Message {
   id: string;
@@ -28,6 +30,9 @@ const Chatbot: React.FC = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -52,6 +57,23 @@ const Chatbot: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
+    
+    const newQuestionCount = questionCount + 1;
+    setQuestionCount(newQuestionCount);
+
+    // Check if user has reached the limit
+    if (newQuestionCount >= 3) {
+      const limitMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        text: t('chatbotLimit'),
+        isBot: true,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, limitMessage]);
+      setShowEmailForm(true);
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.functions.invoke('chatbot', {
@@ -77,6 +99,54 @@ const Chatbot: React.FC = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const submitEmail = async () => {
+    if (!email.trim() || !email.includes('@')) {
+      toast({
+        title: t('error'),
+        description: t('chatbotEmailError'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const userIdentifier = await getUserIdentifier();
+      
+      const { error } = await supabase
+        .from('chatbot_emails')
+        .insert({
+          email: email.trim(),
+          user_session_id: userIdentifier,
+          questions_asked: questionCount
+        });
+
+      if (error) throw error;
+
+      const thankYouMessage: Message = {
+        id: (Date.now() + 3).toString(),
+        text: t('chatbotThankYou'),
+        isBot: true,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, thankYouMessage]);
+      setShowEmailForm(false);
+      setEmail('');
+      
+      toast({
+        title: "Success",
+        description: "Thank you for your email. Please visit our Help & Support section.",
+      });
+    } catch (error) {
+      console.error('Error saving email:', error);
+      toast({
+        title: t('error'),
+        description: "Failed to save email. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -155,23 +225,49 @@ const Chatbot: React.FC = () => {
         </CardContent>
 
         <div className="p-4 border-t">
-          <div className="flex gap-2">
-            <Input
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={t('chatbotPlaceholder')}
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button
-              onClick={sendMessage}
-              disabled={isLoading || !inputMessage.trim()}
-              size="sm"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
+          {showEmailForm ? (
+            <div className="space-y-3">
+              <Label htmlFor="chatbot-email">{t('chatbotEmail')}</Label>
+              <Input
+                id="chatbot-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitEmail();
+                  }
+                }}
+              />
+              <Button
+                onClick={submitEmail}
+                className="w-full"
+                size="sm"
+              >
+                {t('chatbotSubmit')}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={t('chatbotPlaceholder')}
+                disabled={isLoading || questionCount >= 3}
+                className="flex-1"
+              />
+              <Button
+                onClick={sendMessage}
+                disabled={isLoading || !inputMessage.trim() || questionCount >= 3}
+                size="sm"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
     </div>

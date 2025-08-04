@@ -9,6 +9,7 @@ import { Calculator, MapPin, Package, ArrowRight, ArrowLeft, CheckCircle, Mail }
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getUserIdentifier } from "@/lib/sessionManager";
 
 interface Item {
   id: string;
@@ -101,6 +102,8 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
     setIsSendingEmail(true);
     
     try {
+      const userIdentifier = await getUserIdentifier();
+      
       const { error } = await supabase.functions.invoke('send-quote-email', {
         body: {
           to: email.trim(),
@@ -115,6 +118,21 @@ export function QuoteScreen({ items, serviceTier, distance, onNext, onBack }: Qu
       if (error) {
         throw error;
       }
+
+      // Save email to database for marketing follow-up
+      await supabase
+        .from('quote_emails')
+        .insert({
+          email: email.trim(),
+          user_session_id: userIdentifier,
+          quote_amount: quote.total,
+          quote_data: JSON.parse(JSON.stringify({
+            quote,
+            items,
+            serviceTier,
+            distance
+          }))
+        });
 
       toast.success(t('quote.emailSent'));
       setEmailDialogOpen(false);
