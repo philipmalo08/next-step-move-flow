@@ -101,6 +101,36 @@ export type Database = {
         }
         Relationships: []
       }
+      chatbot_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          marketing_email_sent: boolean | null
+          marketing_email_sent_at: string | null
+          questions_asked: number | null
+          user_session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          marketing_email_sent?: boolean | null
+          marketing_email_sent_at?: string | null
+          questions_asked?: number | null
+          user_session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          marketing_email_sent?: boolean | null
+          marketing_email_sent_at?: string | null
+          questions_asked?: number | null
+          user_session_id?: string | null
+        }
+        Relationships: []
+      }
       company_availability: {
         Row: {
           created_at: string
@@ -293,6 +323,39 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      quote_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          marketing_email_sent: boolean | null
+          marketing_email_sent_at: string | null
+          quote_amount: number | null
+          quote_data: Json | null
+          user_session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          marketing_email_sent?: boolean | null
+          marketing_email_sent_at?: string | null
+          quote_amount?: number | null
+          quote_data?: Json | null
+          user_session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          marketing_email_sent?: boolean | null
+          marketing_email_sent_at?: string | null
+          quote_amount?: number | null
+          quote_data?: Json | null
+          user_session_id?: string | null
         }
         Relationships: []
       }
