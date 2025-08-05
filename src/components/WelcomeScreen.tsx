@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Truck, ArrowRight, Star } from "lucide-react";
+import { Truck, ArrowRight, Star, FileText } from "lucide-react";
 import logoImageEn from "@/assets/nextmovement-final.PNG?url";
-import logoImageFr from "@/assets/mouvementsuivant-final.PNG?url";
+import logoImageFr from "@/assets/mouvementsuivant-final1.PNG?url";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { getUserIdentifier } from "@/lib/sessionManager";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -11,6 +18,48 @@ interface WelcomeScreenProps {
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const { t, language } = useLanguage();
   const logoImage = language === 'fr' ? logoImageFr : logoImageEn;
+  const [email, setEmail] = useState('');
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
+  const [isSendingChecklist, setIsSendingChecklist] = useState(false);
+
+  const handleChecklistRequest = async () => {
+    if (!email) {
+      toast.error(language === 'fr' ? 'Veuillez entrer votre adresse e-mail' : 'Please enter your email address');
+      return;
+    }
+
+    setIsSendingChecklist(true);
+    try {
+      const userIdentifier = await getUserIdentifier();
+      
+      // Save email to chatbot_emails table (same as chatbot)
+      await supabase.from('chatbot_emails').insert({
+        email,
+        user_session_id: userIdentifier,
+        questions_asked: 0, // Different from chatbot to distinguish
+        marketing_email_sent: false
+      });
+
+      // Send checklist email
+      const { error } = await supabase.functions.invoke('send-checklist-email', {
+        body: {
+          email,
+          language: language || 'en'
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success(language === 'fr' ? 'Liste de vérification envoyée par e-mail!' : 'Checklist sent to your email!');
+      setIsChecklistModalOpen(false);
+      setEmail('');
+    } catch (error) {
+      console.error('Error sending checklist:', error);
+      toast.error(language === 'fr' ? 'Erreur lors de l\'envoi de la liste' : 'Error sending checklist');
+    } finally {
+      setIsSendingChecklist(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-background flex flex-col">
       <div className="flex-1 flex items-center justify-center px-4 py-6">
@@ -57,15 +106,65 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             </div>
           </div>
 
-          {/* CTA Button */}
-          <Button 
-            size="lg" 
-            onClick={onStart}
-            className="group animate-fade-in-up"
-          >
-            {t('welcome.startMove')}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-          </Button>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              size="lg" 
+              onClick={onStart}
+              className="group animate-fade-in-up"
+            >
+              {t('welcome.startMove')}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+            </Button>
+
+            <Dialog open={isChecklistModalOpen} onOpenChange={setIsChecklistModalOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="group animate-fade-in-up"
+                >
+                  <FileText className="w-5 h-5 mr-2" />
+                  {language === 'fr' ? 'Liste de vérification' : 'Moving Checklist'}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>
+                    {language === 'fr' ? 'Recevez votre liste de vérification' : 'Get Your Moving Checklist'}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'fr' 
+                      ? 'Entrez votre adresse e-mail pour recevoir notre liste complète de vérification de déménagement.'
+                      : 'Enter your email to receive our comprehensive moving checklist.'}
+                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="checklist-email">
+                      {language === 'fr' ? 'Adresse e-mail' : 'Email Address'}
+                    </Label>
+                    <Input
+                      id="checklist-email"
+                      type="email"
+                      placeholder={language === 'fr' ? 'votre@email.com' : 'your@email.com'}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleChecklistRequest} 
+                    disabled={isSendingChecklist}
+                    className="w-full"
+                  >
+                    {isSendingChecklist 
+                      ? (language === 'fr' ? 'Envoi...' : 'Sending...') 
+                      : (language === 'fr' ? 'Envoyer la liste' : 'Send Checklist')}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           
           {/* Trust Indicators */}
           <div className="mt-8 flex items-center justify-center space-x-6 text-muted-foreground">
