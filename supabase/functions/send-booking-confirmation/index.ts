@@ -102,6 +102,14 @@ const handler = async (req: Request): Promise<Response> => {
     
     const t = emailTranslations[language];
 
+    const logoImage = language === 'fr' 
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.PNG'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.PNG';
+    
+    const thankYouImage = language === 'fr'
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Mouvement Suivant Merci Courriel.png'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Next Movement Thank You Email.png';
+
     // Create email HTML with translations
     const emailHtml = `
       <!DOCTYPE html>
@@ -110,11 +118,11 @@ const handler = async (req: Request): Promise<Response> => {
         <meta charset="utf-8">
         <title>${t.title}</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
           .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9f9f9; }
-          .booking-details { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+          .content { padding: 20px; background: #ffffff; }
+          .booking-details { background: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px; }
           .total { font-size: 1.2em; font-weight: bold; color: #2563eb; }
           .footer { text-align: center; padding: 20px; color: #666; }
           .pdf-notice { background: #e7f3ff; padding: 15px; border-left: 4px solid #2563eb; margin: 15px 0; }
@@ -122,6 +130,11 @@ const handler = async (req: Request): Promise<Response> => {
       </head>
       <body>
         <div class="container">
+          <!-- Logo -->
+          <div style="text-align: center; padding: 20px 0; background-color: #ffffff;">
+            <img src="${logoImage}" alt="Logo" style="max-height: 80px; width: auto;">
+          </div>
+
           <div class="header">
             <h1>${t.title}</h1>
             <p>${t.thankYou}</p>
@@ -183,11 +196,16 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p>${t.contactNotice}</p>
           </div>
+
+          <!-- Thank You Image -->
+          <div style="text-align: center; padding: 20px;">
+            <img src="${thankYouImage}" alt="Thank You" style="max-width: 100%; height: auto;">
+          </div>
           
-           <div class="footer">
-             <p>${t.footer}</p>
-             <p>${t.contactUs}</p>
-           </div>
+          <div class="footer">
+            <p>${t.footer}</p>
+            <p>${t.contactUs}</p>
+          </div>
         </div>
       </body>
       </html>
