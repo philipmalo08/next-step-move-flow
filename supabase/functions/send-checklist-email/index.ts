@@ -57,19 +57,19 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     const logoImage = language === 'fr' 
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.PNG'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.PNG';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.png'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.png';
     
     const bottomImage = language === 'fr'
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Mouvement Suivant Liste Courriel.png'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Next Movement Checklist Email.png';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvement-suivant-liste-courriel.png'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/next-movement-checklist-email.png';
 
     const websiteUrl = language === 'fr' ? 'https://mouvementsuivant.ca' : 'https://nextmovement.ca';
 
-    // PDF download links pointing to the website
+    // PDF download links pointing to storage
     const pdfDownloadUrl = language === 'fr'
-      ? 'https://mouvementsuivant.ca/checklist'
-      : 'https://nextmovement.ca/checklist';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvement-suivant-checklist.pdf'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/next-movement-checklist.pdf';
 
     const htmlContent = `
       <!DOCTYPE html>

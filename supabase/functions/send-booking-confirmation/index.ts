@@ -103,12 +103,12 @@ const handler = async (req: Request): Promise<Response> => {
     const t = emailTranslations[language];
 
     const logoImage = language === 'fr' 
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.PNG'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.PNG';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.png'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.png';
     
     const thankYouImage = language === 'fr'
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Mouvement Suivant Merci Courriel.png'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Next Movement Thank You Email.png';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvement-suivant-merci-courriel.png'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/next-movement-thank-you-email.png';
 
     // Create email HTML with translations
     const emailHtml = `
