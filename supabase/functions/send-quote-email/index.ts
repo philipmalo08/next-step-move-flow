@@ -123,15 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>${t.subject}</title>
-        </head>
-        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-            <!-- Logo -->
-            <div style="text-align: center; padding: 20px 0; background-color: #ffffff;">
-              <img src="${logoImage}" alt="Logo" style="max-height: 80px; width: auto;">
-            </div>
-            
-            <div class="header" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white; padding: 30px; text-align: center; margin-bottom: 20px;">`
+          <style>
             .content { background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 20px; }
             .quote-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3B82F6; }
             .quote-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
@@ -146,11 +138,17 @@ const handler = async (req: Request): Promise<Response> => {
             .contact { background: #3B82F6; color: white; padding: 15px; text-align: center; border-radius: 8px; margin-top: 20px; }
           </style>
         </head>
-        <body>
-          <div class="header">
-            <h1>${t.title}</h1>
-            <p>${t.subtitle}</p>
-          </div>
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            <!-- Logo -->
+            <div style="text-align: center; padding: 20px 0; background-color: #ffffff;">
+              <img src="${logoImage}" alt="Logo" style="max-height: 80px; width: auto;">
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white; padding: 30px; text-align: center; margin-bottom: 20px;">
+              <h1>${t.title}</h1>
+              <p>${t.subtitle}</p>
+            </div>
 
           <div class="quote-section">
             <h3>${t.breakdown}</h3>
