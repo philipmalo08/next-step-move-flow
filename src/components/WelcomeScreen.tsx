@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Truck, ArrowRight, Star, FileText } from "lucide-react";
-import logoImageEn from "/public/assets/nextmovement-final.PNG?url";
-import logoImageFr from "/public/assets/mouvementsuivant-final1.PNG?url";
+const logoImageEn = "/assets/nextmovement-final.PNG";
+const logoImageFr = "/assets/mouvementsuivant-final1.PNG";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getUserIdentifier } from "@/lib/sessionManager";

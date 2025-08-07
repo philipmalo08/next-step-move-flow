@@ -56,20 +56,23 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
+    // Use your uploaded public assets directly from the project domain
+    const baseUrl = 'https://de7d845b-548f-4237-9e48-209cd748b08a.lovableproject.com';
+    
     const logoImage = language === 'fr' 
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/mouvementsuivant-final1.PNG'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/nextmovement-final.PNG';
+      ? `${baseUrl}/assets/mouvementsuivant-final1.PNG`
+      : `${baseUrl}/assets/nextmovement-final.PNG`;
     
     const bottomImage = language === 'fr'
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Mouvement Suivant Liste Courriel.png'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Next Movement Checklist Email.png';
+      ? `${baseUrl}/assets/Mouvement Suivant Liste Courriel.png`
+      : `${baseUrl}/assets/Next Movement Checklist Email.png`;
 
     const websiteUrl = language === 'fr' ? 'https://mouvementsuivant.ca' : 'https://nextmovement.ca';
 
-    // Get PDF file from storage and attach it
+    // Get PDF file from your public assets
     const pdfUrl = language === 'fr'
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Mouvement Suivant Liste de demenagement.pdf'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Next Movement Moving-Checklist.pdf';
+      ? `${baseUrl}/assets/Mouvement Suivant Liste de demenagement.pdf`
+      : `${baseUrl}/assets/Next Movement Moving-Checklist.pdf`;
     
     // Fetch PDF content
     const pdfResponse = await fetch(pdfUrl);
