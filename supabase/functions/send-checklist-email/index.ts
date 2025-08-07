@@ -57,19 +57,27 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     const logoImage = language === 'fr' 
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.PNG'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.PNG';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/mouvementsuivant-final1.PNG'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/nextmovement-final.PNG';
     
     const bottomImage = language === 'fr'
-      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Mouvement Suivant Liste Courriel.png'
-      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Next Movement Checklist Email.png';
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Mouvement Suivant Liste Courriel.png'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Next Movement Checklist Email.png';
 
     const websiteUrl = language === 'fr' ? 'https://mouvementsuivant.ca' : 'https://nextmovement.ca';
 
-    // PDF download links pointing to the website
-    const pdfDownloadUrl = language === 'fr'
-      ? 'https://mouvementsuivant.ca/checklist'
-      : 'https://nextmovement.ca/checklist';
+    // Get PDF file from storage and attach it
+    const pdfUrl = language === 'fr'
+      ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Mouvement Suivant Liste de demenagement.pdf'
+      : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Next Movement Moving-Checklist.pdf';
+    
+    // Fetch PDF content
+    const pdfResponse = await fetch(pdfUrl);
+    if (!pdfResponse.ok) {
+      throw new Error('Failed to fetch PDF file');
+    }
+    const pdfBuffer = await pdfResponse.arrayBuffer();
+    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -104,11 +112,12 @@ const handler = async (req: Request): Promise<Response> => {
               <p>${t.intro}</p>
               
               <div class="download-section">
-                <h3>📋 ${language === 'fr' ? 'Télécharger votre liste' : 'Download Your Checklist'}</h3>
-                <p>${t.downloadInfo}</p>
-                <a href="${pdfDownloadUrl}" class="download-button" target="_blank">
-                  📄 ${t.downloadButton}
-                </a>
+                <h3>📋 ${language === 'fr' ? 'Votre liste de déménagement' : 'Your Moving Checklist'}</h3>
+                <p>${language === 'fr' ? 'Votre liste de déménagement détaillée est incluse en pièce jointe à ce courriel.' : 'Your detailed moving checklist is included as an attachment to this email.'}</p>
+                <p style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                  <strong>📎 ${language === 'fr' ? 'Pièce jointe incluse' : 'Attachment Included'}</strong><br>
+                  ${language === 'fr' ? 'Veuillez vérifier vos pièces jointes pour télécharger votre liste de déménagement PDF.' : 'Please check your attachments to download your moving checklist PDF.'}
+                </p>
               </div>
 
               <p>${t.contact}</p>
@@ -148,6 +157,12 @@ const handler = async (req: Request): Promise<Response> => {
       content: [{
         type: 'text/html',
         value: htmlContent
+      }],
+      attachments: [{
+        content: pdfBase64,
+        filename: language === 'fr' ? 'Mouvement-Suivant-Liste-Demenagement.pdf' : 'Next-Movement-Moving-Checklist.pdf',
+        type: 'application/pdf',
+        disposition: 'attachment'
       }]
     };
 

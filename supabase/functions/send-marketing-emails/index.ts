@@ -122,12 +122,12 @@ async function sendChatbotMarketingEmail(email: string, language: 'en' | 'fr' = 
     : 'Prêt à déménager? Mouvement Suivant est là pour vous aider!';
 
   const logoImage = isEnglish 
-    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.PNG'
-    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.PNG';
+    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/nextmovement-final.PNG'
+    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/mouvementsuivant-final1.PNG';
   
   const bottomImage = isEnglish
-    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Next Movement MT Email.png'
-    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Mouvement Suivant Courriel MT.png';
+    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Next Movement MT Email.png'
+    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Mouvement Suivant Courriel MT.png';
 
   const websiteUrl = isEnglish ? 'https://nextmovement.ca' : 'https://mouvementsuivant.ca';
 
@@ -241,12 +241,12 @@ async function sendQuoteReminderEmail(email: string, quoteAmount: number, quoteD
     : `N'oubliez pas votre devis de ${quoteAmount.toFixed(2)}$ pour votre déménagement!`;
 
   const logoImage = isEnglish 
-    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/nextmovement-final.PNG'
-    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/mouvementsuivant-final1.PNG';
+    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/nextmovement-final.PNG'
+    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/mouvementsuivant-final1.PNG';
   
   const bottomImage = isEnglish
-    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Next Movement Book Email.png'
-    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/assets/Mouvement Suivant Reservez Courriel.png';
+    ? 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Next Movement Book Email.png'
+    : 'https://eqqggvtodrgbboebvglh.supabase.co/storage/v1/object/public/public/assets/Mouvement Suivant Reservez Courriel.png';
 
   const websiteUrl = isEnglish ? 'https://nextmovement.ca' : 'https://mouvementsuivant.ca';
 
