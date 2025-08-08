@@ -65,16 +65,16 @@ const handler = async (req: Request): Promise<Response> => {
       : `${baseUrl}/assets/nextmovement-final.PNG`;
     
     const bottomImage = language === 'fr'
-      ? `${baseUrl}/assets/Mouvement Suivant Liste Courriel.png`
-      : `${baseUrl}/assets/Next Movement Checklist Email.png`;
+      ? `${baseUrl}/assets/mouvement-suivant-liste-courriel.png`
+      : `${baseUrl}/assets/next-movement-checklist-email.png`;
 
     const websiteUrl = language === 'fr'
       ? 'https://mouvementsuivant.ca'
       : 'https://nextmovement.ca';
 
     const pdfUrl = language === 'fr'
-      ? `${baseUrl}/assets/Mouvement Suivant Liste de demenagement.pdf`
-      : `${baseUrl}/assets/Next Movement Moving-Checklist.pdf`;
+      ? `${baseUrl}/assets/mouvement-suivant-liste-demenagement.pdf`
+      : `${baseUrl}/assets/next-movement-moving-checklist.pdf`;
     
     // Fetch PDF content
     const pdfResponse = await fetch(pdfUrl);
@@ -165,7 +165,7 @@ const handler = async (req: Request): Promise<Response> => {
       }],
       attachments: [{
         content: pdfBase64,
-        filename: language === 'fr' ? 'Mouvement-Suivant-Liste-Demenagement.pdf' : 'Next-Movement-Moving-Checklist.pdf',
+        filename: language === 'fr' ? 'mouvement-suivant-liste-demenagement.pdf' : 'next-movement-moving-checklist.pdf',
         type: 'application/pdf',
         disposition: 'attachment'
       }]
