@@ -56,10 +56,11 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Use your uploaded public assets directly from the project domain
+    // Use your uploaded public assets from your Lovable project domain
     const baseUrl = 'https://de7d845b-548f-4237-9e48-209cd748b08a.lovableproject.com';
     
-    const logoImage = language === 'fr' 
+    // Determine asset URLs based on language
+    const logoImage = language === 'fr'
       ? `${baseUrl}/assets/mouvementsuivant-final1.PNG`
       : `${baseUrl}/assets/nextmovement-final.PNG`;
     
@@ -67,9 +68,10 @@ const handler = async (req: Request): Promise<Response> => {
       ? `${baseUrl}/assets/Mouvement Suivant Liste Courriel.png`
       : `${baseUrl}/assets/Next Movement Checklist Email.png`;
 
-    const websiteUrl = language === 'fr' ? 'https://mouvementsuivant.ca' : 'https://nextmovement.ca';
+    const websiteUrl = language === 'fr'
+      ? 'https://mouvementsuivant.ca'
+      : 'https://nextmovement.ca';
 
-    // Get PDF file from your public assets
     const pdfUrl = language === 'fr'
       ? `${baseUrl}/assets/Mouvement Suivant Liste de demenagement.pdf`
       : `${baseUrl}/assets/Next Movement Moving-Checklist.pdf`;
