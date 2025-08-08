@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
+import { encode as base64encode } from "https://deno.land/std@0.190.0/encoding/base64.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -99,19 +100,22 @@ const handler = async (req: Request): Promise<Response> => {
     // ---- Fetch & base64 the PDF
     const pdfResponse = await fetch(pdfUrl);
     if (!pdfResponse.ok) throw new Error('Failed to fetch PDF file');
-    const pdfBuffer = new Uint8Array(await pdfResponse.arrayBuffer());
-    const pdfBase64 = btoa(String.fromCharCode(...pdfBuffer));
+    const pdfU8 = new Uint8Array(await pdfResponse.arrayBuffer());
+    const pdfBase64 = base64encode(pdfU8);
 
     // ---- Fetch & base64 the images (so we can embed as CID)
     const [logoRes, bottomRes] = await Promise.all([fetch(logoUrl), fetch(bottomUrl)]);
     if (!logoRes.ok) throw new Error('Failed to fetch logo image');
     if (!bottomRes.ok) throw new Error('Failed to fetch bottom image');
 
-    const logoType = logoRes.headers.get('content-type') || 'image/png';
-    const bottomType = bottomRes.headers.get('content-type') || 'image/png';
+    const logoType = "image/png";
+    const bottomType = "image/png";
 
-    const logoBase64 = btoa(String.fromCharCode(...new Uint8Array(await logoRes.arrayBuffer())));
-    const bottomBase64 = btoa(String.fromCharCode(...new Uint8Array(await bottomRes.arrayBuffer())));
+    const logoU8 = new Uint8Array(await logoRes.arrayBuffer());
+    const bottomU8 = new Uint8Array(await bottomRes.arrayBuffer());
+
+    const logoBase64 = base64encode(logoU8);
+    const bottomBase64 = base64encode(bottomU8);
 
     // ---- Build HTML that uses CID images
     const htmlContent = `
