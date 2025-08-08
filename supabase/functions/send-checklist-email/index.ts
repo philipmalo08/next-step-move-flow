@@ -47,7 +47,26 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('SendGrid API key not configured');
     }
 
-    const { email, language }: ChecklistEmailRequest = await req.json();
+    // Safely parse JSON request body
+    let requestBody;
+    try {
+      const text = await req.text();
+      if (!text.trim()) {
+        throw new Error('Empty request body');
+      }
+      requestBody = JSON.parse(text);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        }
+      );
+    }
+
+    const { email, language }: ChecklistEmailRequest = requestBody;
     const lang = language || 'en';
     const t = emailTranslations[lang];
     
