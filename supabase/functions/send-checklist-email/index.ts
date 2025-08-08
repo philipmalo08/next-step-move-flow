@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 interface ChecklistEmailRequest {
@@ -78,12 +79,12 @@ const handler = async (req: Request): Promise<Response> => {
     // Use your uploaded public assets from your Lovable project domain
     const baseUrl = 'https://de7d845b-548f-4237-9e48-209cd748b08a.lovableproject.com';
     
-    // Determine asset URLs based on language
-    const logoImage = language === 'fr'
+    // Determine asset URLs based on language (keep absolute URLs for fallback or testing)
+    const logoUrl = language === 'fr'
       ? `${baseUrl}/assets/mouvementsuivant-final1.PNG`
       : `${baseUrl}/assets/nextmovement-final.PNG`;
-    
-    const bottomImage = language === 'fr'
+
+    const bottomUrl = language === 'fr'
       ? `${baseUrl}/assets/mouvement-suivant-liste-courriel.png`
       : `${baseUrl}/assets/next-movement-checklist-email.png`;
 
@@ -94,15 +95,25 @@ const handler = async (req: Request): Promise<Response> => {
     const pdfUrl = language === 'fr'
       ? `${baseUrl}/assets/mouvement-suivant-liste-demenagement.pdf`
       : `${baseUrl}/assets/next-movement-moving-checklist.pdf`;
-    
-    // Fetch PDF content
-    const pdfResponse = await fetch(pdfUrl);
-    if (!pdfResponse.ok) {
-      throw new Error('Failed to fetch PDF file');
-    }
-    const pdfBuffer = await pdfResponse.arrayBuffer();
-    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
 
+    // ---- Fetch & base64 the PDF
+    const pdfResponse = await fetch(pdfUrl);
+    if (!pdfResponse.ok) throw new Error('Failed to fetch PDF file');
+    const pdfBuffer = new Uint8Array(await pdfResponse.arrayBuffer());
+    const pdfBase64 = btoa(String.fromCharCode(...pdfBuffer));
+
+    // ---- Fetch & base64 the images (so we can embed as CID)
+    const [logoRes, bottomRes] = await Promise.all([fetch(logoUrl), fetch(bottomUrl)]);
+    if (!logoRes.ok) throw new Error('Failed to fetch logo image');
+    if (!bottomRes.ok) throw new Error('Failed to fetch bottom image');
+
+    const logoType = logoRes.headers.get('content-type') || 'image/png';
+    const bottomType = bottomRes.headers.get('content-type') || 'image/png';
+
+    const logoBase64 = btoa(String.fromCharCode(...new Uint8Array(await logoRes.arrayBuffer())));
+    const bottomBase64 = btoa(String.fromCharCode(...new Uint8Array(await bottomRes.arrayBuffer())));
+
+    // ---- Build HTML that uses CID images
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -120,13 +131,13 @@ const handler = async (req: Request): Promise<Response> => {
             .book-button { display: inline-block; background-color: #3B82F6; color: white; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px; }
           </style>
         </head>
-        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-            <!-- Logo -->
-            <div style="text-align: center; padding: 20px 0; background-color: #ffffff;">
-              <img src="${logoImage}" alt="Logo" style="max-height: 80px; width: auto;">
+        <body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#f4f4f4;">
+          <div style="max-width:600px;margin:0 auto;background-color:#ffffff;">
+            <!-- Logo (CID) -->
+            <div style="text-align:center;padding:20px 0;background-color:#ffffff;">
+              <img src="cid:logo" alt="Logo" width="200" style="display:block;border:0;outline:none;text-decoration:none;height:auto;">
             </div>
-            
+
             <div class="header">
               <h1>${t.title}</h1>
               <p>${t.subtitle}</p>
@@ -134,11 +145,11 @@ const handler = async (req: Request): Promise<Response> => {
 
             <div class="content">
               <p>${t.intro}</p>
-              
+
               <div class="download-section">
                 <h3>📋 ${language === 'fr' ? 'Votre liste de déménagement' : 'Your Moving Checklist'}</h3>
                 <p>${language === 'fr' ? 'Votre liste de déménagement détaillée est incluse en pièce jointe à ce courriel.' : 'Your detailed moving checklist is included as an attachment to this email.'}</p>
-                <p style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                <p style="background:#e3f2fd;padding:15px;border-radius:8px;border-left:4px solid #2196f3;">
                   <strong>📎 ${language === 'fr' ? 'Pièce jointe incluse' : 'Attachment Included'}</strong><br>
                   ${language === 'fr' ? 'Veuillez vérifier vos pièces jointes pour télécharger votre liste de déménagement PDF.' : 'Please check your attachments to download your moving checklist PDF.'}
                 </p>
@@ -148,10 +159,8 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
 
             <!-- Book Now Button -->
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${websiteUrl}" class="book-button">
-                ${t.bookButton}
-              </a>
+            <div style="text-align:center;margin:30px 0;">
+              <a href="${websiteUrl}" class="book-button">${t.bookButton}</a>
             </div>
 
             <div class="contact">
@@ -159,9 +168,9 @@ const handler = async (req: Request): Promise<Response> => {
               <p>Contact: mouvementsuivant@outlook.com</p>
             </div>
 
-            <!-- Bottom Image -->
-            <div style="text-align: center; padding: 20px;">
-              <img src="${bottomImage}" alt="Checklist" style="max-width: 100%; height: auto;">
+            <!-- Bottom Image (CID) -->
+            <div style="text-align:center;padding:20px;">
+              <img src="cid:bottom" alt="Checklist" width="560" style="display:block;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">
             </div>
 
             <div class="footer">
@@ -172,22 +181,33 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
+    // ---- Build SendGrid payload with inline images
     const emailData = {
-      personalizations: [{
-        to: [{ email }],
-        subject: t.subject
-      }],
+      personalizations: [{ to: [{ email }], subject: t.subject }],
       from: { email: "mouvementsuivant@outlook.com", name: language === 'fr' ? "Mouvement Suivant" : "Next Movement" },
-      content: [{
-        type: 'text/html',
-        value: htmlContent
-      }],
-      attachments: [{
-        content: pdfBase64,
-        filename: language === 'fr' ? 'mouvement-suivant-liste-demenagement.pdf' : 'next-movement-moving-checklist.pdf',
-        type: 'application/pdf',
-        disposition: 'attachment'
-      }]
+      content: [{ type: 'text/html', value: htmlContent }],
+      attachments: [
+        {
+          content: pdfBase64,
+          filename: language === 'fr' ? 'mouvement-suivant-liste-demenagement.pdf' : 'next-movement-moving-checklist.pdf',
+          type: 'application/pdf',
+          disposition: 'attachment'
+        },
+        {
+          content: logoBase64,
+          filename: 'logo.png',
+          type: logoType,
+          disposition: 'inline',
+          content_id: 'logo'
+        },
+        {
+          content: bottomBase64,
+          filename: 'checklist.png',
+          type: bottomType,
+          disposition: 'inline',
+          content_id: 'bottom'
+        }
+      ]
     };
 
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
