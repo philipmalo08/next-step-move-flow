@@ -8,6 +8,39 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+const baseUrl = 'https://de7d845b-548f-4237-9e48-209cd748b08a.lovableproject.com';
+
+// Module-scope cache for heavy assets (persist across warm invocations)
+let cached = {
+  logoEnB64: null as string | null,
+  logoFrB64: null as string | null,
+  pdfEnB64: null as string | null,
+  pdfFrB64: null as string | null,
+};
+
+async function ensureAssets() {
+  if (!cached.logoEnB64) {
+    const logoRes = await fetch(`${baseUrl}/assets/nextmovement-final.PNG`);
+    if (!logoRes.ok) throw new Error('Failed to fetch EN logo');
+    cached.logoEnB64 = base64encode(new Uint8Array(await logoRes.arrayBuffer()));
+  }
+  if (!cached.logoFrB64) {
+    const logoRes = await fetch(`${baseUrl}/assets/mouvementsuivant-final1.PNG`);
+    if (!logoRes.ok) throw new Error('Failed to fetch FR logo');
+    cached.logoFrB64 = base64encode(new Uint8Array(await logoRes.arrayBuffer()));
+  }
+  if (!cached.pdfEnB64) {
+    const pdfRes = await fetch(`${baseUrl}/assets/next-movement-moving-checklist.pdf`);
+    if (!pdfRes.ok) throw new Error('Failed to fetch EN PDF');
+    cached.pdfEnB64 = base64encode(new Uint8Array(await pdfRes.arrayBuffer()));
+  }
+  if (!cached.pdfFrB64) {
+    const pdfRes = await fetch(`${baseUrl}/assets/mouvement-suivant-liste-demenagement.pdf`);
+    if (!pdfRes.ok) throw new Error('Failed to fetch FR PDF');
+    cached.pdfFrB64 = base64encode(new Uint8Array(await pdfRes.arrayBuffer()));
+  }
+}
+
 interface ChecklistEmailRequest {
   email: string;
   language: 'en' | 'fr';
@@ -72,50 +105,39 @@ const handler = async (req: Request): Promise<Response> => {
     const lang = language || 'en';
     const t = emailTranslations[lang];
     
+    if (!email) {
+      return new Response(
+        JSON.stringify({ error: 'Missing email address' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        }
+      );
+    }
+
+    // Lazy load heavy assets (once per warm worker)
+    await ensureAssets();
+    
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
-    // Use your uploaded public assets from your Lovable project domain
-    const baseUrl = 'https://de7d845b-548f-4237-9e48-209cd748b08a.lovableproject.com';
-    
-    // Determine asset URLs based on language (keep absolute URLs for fallback or testing)
-    const logoUrl = language === 'fr'
-      ? `${baseUrl}/assets/mouvementsuivant-final1.PNG`
-      : `${baseUrl}/assets/nextmovement-final.PNG`;
-
-    const bottomUrl = language === 'fr'
-      ? `${baseUrl}/assets/mouvement-suivant-liste-courriel.png`
-      : `${baseUrl}/assets/next-movement-checklist-email.png`;
 
     const websiteUrl = language === 'fr'
       ? 'https://mouvementsuivant.ca'
       : 'https://nextmovement.ca';
 
-    const pdfUrl = language === 'fr'
-      ? `${baseUrl}/assets/mouvement-suivant-liste-demenagement.pdf`
-      : `${baseUrl}/assets/next-movement-moving-checklist.pdf`;
+    // Use remote URL for bottom image to reduce payload (not critical for branding)
+    const bottomImageUrl = language === 'fr'
+      ? `${baseUrl}/assets/mouvement-suivant-liste-courriel.png`
+      : `${baseUrl}/assets/next-movement-checklist-email.png`;
 
-    // ---- Fetch & base64 the PDF
-    const pdfResponse = await fetch(pdfUrl);
-    if (!pdfResponse.ok) throw new Error('Failed to fetch PDF file');
-    const pdfU8 = new Uint8Array(await pdfResponse.arrayBuffer());
-    const pdfBase64 = base64encode(pdfU8);
-
-    // ---- Fetch & base64 the images (so we can embed as CID)
-    const [logoRes, bottomRes] = await Promise.all([fetch(logoUrl), fetch(bottomUrl)]);
-    if (!logoRes.ok) throw new Error('Failed to fetch logo image');
-    if (!bottomRes.ok) throw new Error('Failed to fetch bottom image');
-
-    const logoType = "image/png";
-    const bottomType = "image/png";
-
-    const logoU8 = new Uint8Array(await logoRes.arrayBuffer());
-    const bottomU8 = new Uint8Array(await bottomRes.arrayBuffer());
-
-    const logoBase64 = base64encode(logoU8);
-    const bottomBase64 = base64encode(bottomU8);
+    // Get cached assets
+    const logoBase64 = language === 'fr' ? cached.logoFrB64! : cached.logoEnB64!;
+    const pdfBase64 = language === 'fr' ? cached.pdfFrB64! : cached.pdfEnB64!;
+    const pdfFilename = language === 'fr'
+      ? 'mouvement-suivant-liste-demenagement.pdf'
+      : 'next-movement-moving-checklist.pdf';
 
     // ---- Build HTML that uses CID images
     const htmlContent = `
@@ -172,9 +194,9 @@ const handler = async (req: Request): Promise<Response> => {
               <p>Contact: mouvementsuivant@outlook.com</p>
             </div>
 
-            <!-- Bottom Image (CID) -->
+            <!-- Bottom Image (Remote URL - reduces payload) -->
             <div style="text-align:center;padding:20px;">
-              <img src="cid:bottom" alt="Checklist" width="560" style="display:block;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">
+              <img src="${bottomImageUrl}" alt="Checklist" width="560" style="display:block;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">
             </div>
 
             <div class="footer">
@@ -193,23 +215,16 @@ const handler = async (req: Request): Promise<Response> => {
       attachments: [
         {
           content: pdfBase64,
-          filename: language === 'fr' ? 'mouvement-suivant-liste-demenagement.pdf' : 'next-movement-moving-checklist.pdf',
+          filename: pdfFilename,
           type: 'application/pdf',
           disposition: 'attachment'
         },
         {
           content: logoBase64,
           filename: 'logo.png',
-          type: logoType,
+          type: 'image/png',
           disposition: 'inline',
           content_id: 'logo'
-        },
-        {
-          content: bottomBase64,
-          filename: 'checklist.png',
-          type: bottomType,
-          disposition: 'inline',
-          content_id: 'bottom'
         }
       ]
     };
